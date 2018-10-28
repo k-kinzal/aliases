@@ -1,0 +1,18 @@
+/usr/local/bin/kubectl:
+  image: chatwork/kubectl
+  tag: 1.11.2
+  volume:
+  - $HOME/.kube:/root/.kube
+  network: host
+
+/usr/local/bin/helmfile:
+  image: chatwork/helmfile
+  tag: 0.36.1-2.10.0
+  volume:
+  - $HOME/.kube:/root/.kube
+  - $HOME/.helm:/root/.helm
+  - $PWD:/helmfile
+  workdir: /helmfile
+  network: host
+  dependencies:
+  - /usr/local/bin/kubectl
