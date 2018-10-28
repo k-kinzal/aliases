@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/k-kinzal/aliases/cmd"
+	"github.com/k-kinzal/aliases/pkg/version"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 	"log"
@@ -23,7 +24,7 @@ func main() {
 	app.Name = "aliases"
 	app.Usage = "Generate alias for command on container"
 
-	app.Version = "0.0.0"
+	app.Version = version.GetVersion()
 
 	app.Flags = []cli.Flag {
 		cli.StringFlag{
