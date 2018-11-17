@@ -136,13 +136,8 @@ func LoadConfFile(path string) (*AliasesConf, error) {
 
 	conf := new(AliasesConf)
 	conf.PathMap = make(map[string]*AliasConf)
-	for path, _ := range defs {
-		c := AliasConf{}
-		c.DockerConf.DockerOpts.Interactive = true
-		c.DockerConf.DockerOpts.Rm = true
-		c.DockerConf.DockerOpts.Network = ptrStr("host")
-
-		conf.PathMap[path] = &c
+	for path := range defs {
+		conf.PathMap[path] = &AliasConf{}
 	}
 
 	for path, def := range defs {

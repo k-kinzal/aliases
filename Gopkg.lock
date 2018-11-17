@@ -2,6 +2,14 @@
 
 
 [[projects]]
+  digest = "1:7f769a7ea697a8e50c8a79a829f53a469e3ca7b8e314434ea9d9a25ca8401cb7"
+  name = "github.com/creasty/defaults"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "a7e48e2230891fc7456c8ab918c424c5b06c3192"
+  version = "v1.2.1"
+
+[[projects]]
   digest = "1:e1ff887e232b2d8f4f7c7db15a5fac7be418025afc4dda53c59c765dbb5aa6b4"
   name = "github.com/go-playground/locales"
   packages = [
@@ -83,6 +91,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/creasty/defaults",
     "github.com/sirupsen/logrus",
     "github.com/urfave/cli",
     "gopkg.in/go-playground/validator.v9",
