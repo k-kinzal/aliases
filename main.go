@@ -32,6 +32,7 @@ func main() {
 	}
 	app.Commands = []cli.Command{
 		cmd.GenCommand(),
+		cmd.HomeCommand(),
 	}
 
 	err := app.Run(os.Args)
