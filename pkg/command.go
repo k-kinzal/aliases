@@ -359,6 +359,8 @@ func GenerateCommands(conf AliasesConf, ctx Context) []AliasCommand {
 			}
 		}
 
+		c.DockerConf.DockerOpts.Env["ALIASES_PWD"] = "${ALIASES_PWD:-$PWD}"
+
 		cmds = append(cmds, *NewAliasCommand(c, ctx))
 	}
 
