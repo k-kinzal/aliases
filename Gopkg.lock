@@ -29,6 +29,14 @@
   version = "v0.16.0"
 
 [[projects]]
+  digest = "1:3a26588bc48b96825977c1b3df964f8fd842cd6860cc26370588d3563433cf11"
+  name = "github.com/google/uuid"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "d460ce9f8df2e77fb1ba55ca87fafed96c607494"
+  version = "v1.0.0"
+
+[[projects]]
   digest = "1:0a69a1c0db3591fcefb47f115b224592c8dfa4368b7ba9fae509d5e16cdc95c8"
   name = "github.com/konsorten/go-windows-terminal-sequences"
   packages = ["."]
@@ -92,6 +100,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/creasty/defaults",
+    "github.com/google/uuid",
     "github.com/sirupsen/logrus",
     "github.com/urfave/cli",
     "gopkg.in/go-playground/validator.v9",

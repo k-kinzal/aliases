@@ -1,16 +1,21 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/k-kinzal/aliases/pkg"
+	"github.com/k-kinzal/aliases/pkg/export"
 	"github.com/urfave/cli"
 )
 
 func GenCommand() cli.Command {
 	return cli.Command {
-		Name:    "generate",
-		Aliases: []string{"gen"},
+		Name:    "gen",
 		Usage:   "Generate aliases",
+		Flags: []cli.Flag {
+			cli.BoolFlag{
+				Name: "binary",
+				Usage: "",
+			},
+		},
 		Action:  func(c *cli.Context) error {
 			return GenAction(c)
 		},
@@ -19,21 +24,20 @@ func GenCommand() cli.Command {
 
 func GenAction(c *cli.Context) error {
 	// context
-	context, err := aliases.NewContext(c.GlobalString("config"))
-	if err != nil {
-		return err
-	}
+	ctx := aliases.NewContext(c.GlobalString("home"), c.GlobalString("config"))
 	// configuration
-	conf, err := aliases.LoadConfFile(context.ConfPath)
+	conf, err := aliases.LoadConfFile(*ctx)
 	if err != nil {
 		return err
 	}
 	// generate commands
-	cmds := aliases.GenerateCommands(conf, context)
+	cmds := aliases.GenerateCommands(*conf, *ctx)
 
 	// output aliases
-	for _, cmd := range cmds {
-		fmt.Printf(cmd.ToString())
+	if c.Bool("binary") {
+		export.Script(cmds, *conf, *ctx)
+	} else {
+		export.Aliases(cmds)
 	}
 
 	return nil

@@ -5,10 +5,6 @@ import (
 	"strings"
 )
 
-func ptrStr(s string) *string {
-	return &s
-}
-
 func expandColonDelimitedStringWithEnv(s string) string {
 	arr := strings.Split(s, ":")
 	if len(arr) > 0 {

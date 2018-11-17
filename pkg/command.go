@@ -15,14 +15,14 @@ var (
 )
 
 type AliasCommand struct {
-	path string
-	filename string
-	cmd exec.Cmd
+	Path string
+	Filename string
+	Cmd exec.Cmd
 }
 
-func (c *AliasCommand) ToDockerRunString() string {
+func (c *AliasCommand)ToString() string {
 	args := make([]string, 0)
-	for i, arg := range c.cmd.Args {
+	for i, arg := range c.Cmd.Args {
 		if i == 0 {
 			continue
 		}
@@ -36,23 +36,10 @@ func (c *AliasCommand) ToDockerRunString() string {
 		}
 	}
 
-	return fmt.Sprintf("%s %s", c.cmd.Path, strings.Join(args, " "))
+	return fmt.Sprintf("%s %s", c.Cmd.Path, strings.Replace(strings.Join(args, " "), "'", "\\'", -1))
 }
 
-func (c *AliasCommand) ToString() string {
-	return fmt.Sprintf("alias %s='%s'\n", c.filename, strings.Replace(c.ToDockerRunString(), "'", "\\'", -1))
-}
-
-func GenerateCommands(conf *AliasesConf, ctx *Context) []*AliasCommand {
-	cmds := make([]*AliasCommand, 0)
-	for _, c := range conf.Aliases {
-		cmds = append(cmds, GenerateCommand(&c, ctx))
-	}
-
-	return cmds
-}
-
-func GenerateCommand(conf *AliasConf, ctx *Context) *AliasCommand {
+func NewAliasCommand(conf AliasConf, ctx Context) *AliasCommand {
 	cmd := exec.Command("docker", "run")
 
 	for _, v := range conf.DockerConf.DockerOpts.AddHost {
@@ -343,8 +330,17 @@ func GenerateCommand(conf *AliasConf, ctx *Context) *AliasCommand {
 	cmd.Stderr = os.Stderr
 
 	return &AliasCommand {
-		path: conf.Path,
-		filename: path.Base(conf.Path),
-		cmd: *cmd,
+		Path: conf.Path,
+		Filename: path.Base(conf.Path),
+		Cmd: *cmd,
 	}
+}
+
+func GenerateCommands(conf AliasesConf, ctx Context) []AliasCommand {
+	cmds := make([]AliasCommand, 0)
+	for _, c := range conf.Aliases {
+		cmds = append(cmds, *NewAliasCommand(c, ctx))
+	}
+
+	return cmds
 }

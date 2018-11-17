@@ -16,7 +16,7 @@ type YamlDefinition struct {
 	Args    []string `yaml:"args"`
 	// docker run options
 	AddHost             []string          `yaml:"add-host"`
-	Attach              []string          `yaml:"attach" oneof:"STDIN STDOUT STDERR"`
+	Attach              []string          `yaml:"attach" validate:"dive,oneof=STDIN STDOUT STDERR"`
 	BlkioWeight         *uint16           `yaml:"blkio-weight"`
 	BlkioWeightDevice   []string          `yaml:"blkio-weight-device"`
 	CapAdd              []string          `yaml:"cap-add"`
@@ -117,7 +117,7 @@ func UnmarshalConfFile(buf []byte) (map[string]YamlDefinition, error) {
 		if err := defaults.Set(&def); err != nil {
 			return nil, err
 		}
-		if err := validator.New().Struct(&def); err != nil {
+		if err := validator.New().Struct(def); err != nil {
 			return nil, err
 		}
 		defs[idx] = def

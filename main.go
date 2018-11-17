@@ -9,14 +9,8 @@ import (
 	"os"
 )
 
-var (
-	cmds []cli.Command
-)
-
 func init() {
 	logrus.SetOutput(os.Stdout)
-
-	cmds = append(cmds, cmd.GenCommand())
 }
 
 func main() {
@@ -31,8 +25,14 @@ func main() {
 			Name: "config, c",
 			Usage: "Load configuration from `FILE`",
 		},
+		cli.StringFlag{
+			Name: "home",
+			Usage: "Home directory for aliases",
+		},
 	}
-	app.Commands = cmds
+	app.Commands = []cli.Command{
+		cmd.GenCommand(),
+	}
 
 	err := app.Run(os.Args)
 	if err != nil {
