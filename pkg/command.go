@@ -15,14 +15,14 @@ var (
 )
 
 type AliasCommand struct {
-	path string
-	filename string
-	cmd exec.Cmd
+	Path string
+	Filename string
+	Cmd exec.Cmd
 }
 
-func (c *AliasCommand) ToDockerRunString() string {
+func (c *AliasCommand)ToString() string {
 	args := make([]string, 0)
-	for i, arg := range c.cmd.Args {
+	for i, arg := range c.Cmd.Args {
 		if i == 0 {
 			continue
 		}
@@ -36,23 +36,10 @@ func (c *AliasCommand) ToDockerRunString() string {
 		}
 	}
 
-	return fmt.Sprintf("%s %s", c.cmd.Path, strings.Join(args, " "))
+	return fmt.Sprintf("%s %s", c.Cmd.Path, strings.Replace(strings.Join(args, " "), "'", "\\'", -1))
 }
 
-func (c *AliasCommand) ToString() string {
-	return fmt.Sprintf("alias %s='%s'\n", c.filename, strings.Replace(c.ToDockerRunString(), "'", "\\'", -1))
-}
-
-func GenerateCommands(conf *AliasesConf, ctx *Context) []*AliasCommand {
-	cmds := make([]*AliasCommand, 0)
-	for _, c := range conf.Aliases {
-		cmds = append(cmds, GenerateCommand(&c, ctx))
-	}
-
-	return cmds
-}
-
-func GenerateCommand(conf *AliasConf, ctx *Context) *AliasCommand {
+func NewAliasCommand(conf AliasConf, ctx Context) *AliasCommand {
 	cmd := exec.Command("docker", "run")
 
 	for _, v := range conf.DockerConf.DockerOpts.AddHost {
@@ -343,8 +330,39 @@ func GenerateCommand(conf *AliasConf, ctx *Context) *AliasCommand {
 	cmd.Stderr = os.Stderr
 
 	return &AliasCommand {
-		path: conf.Path,
-		filename: path.Base(conf.Path),
-		cmd: *cmd,
+		Path: conf.Path,
+		Filename: path.Base(conf.Path),
+		Cmd: *cmd,
 	}
+}
+
+func GenerateCommands(conf AliasesConf, ctx Context) []AliasCommand {
+	cmds := make([]AliasCommand, 0)
+	for _, c := range conf.Aliases {
+		if len(c.Dependencies) > 0 {
+			c.DockerConf.DockerOpts.Privileged = true
+			c.DockerConf.DockerOpts.Volume = append(c.DockerConf.DockerOpts.Volume, fmt.Sprintf("%s:/usr/local/bin/docker", exec.Command("docker").Path))
+			host := os.Getenv("DOCKER_HOST")
+			if host != "" {
+				host = "unix:///var/run/docker.sock"
+			}
+			if strings.HasPrefix(host, "unix://") {
+				sock := strings.TrimPrefix(host, "unix://")
+				c.DockerConf.DockerOpts.Volume = append(c.DockerConf.DockerOpts.Volume, fmt.Sprintf("%s:/var/run/docker.sock", sock))
+			} else {
+				c.DockerConf.DockerOpts.Env["DOCKER_HOST"] = host
+			}
+			for _, dep := range c.Dependencies {
+				p := fmt.Sprintf("%s/%s", ctx.GetBinaryPath(conf.Hash), path.Base(dep.Path))
+				v := fmt.Sprintf("%s:/usr/local/bin/%s", p, path.Base(dep.Path))
+				c.DockerConf.DockerOpts.Volume = append(c.DockerConf.DockerOpts.Volume, v)
+			}
+		}
+
+		c.DockerConf.DockerOpts.Env["ALIASES_PWD"] = "${ALIASES_PWD:-$PWD}"
+
+		cmds = append(cmds, *NewAliasCommand(c, ctx))
+	}
+
+	return cmds
 }

@@ -4,6 +4,7 @@ A is a tool for resolving command dependencies with containers.
 
 * YAML-based command definition
 * Version of command with environment variable
+* Call another dependent command from the command
 
 ## Install
 
@@ -19,15 +20,35 @@ $ go get github.com/k-kinzal/aliases
 /usr/local/bin/kubectl:
   image: chatwork/kubectl
   tag: 1.11.2
-  interactive: true
-  network: host
   volume:
   - $HOME/.kube:/root/.kube
+  network: host
+
+/usr/local/bin/helmfile:
+  image: chatwork/helmfile
+  tag: 0.36.1-2.10.0
+  volume:
+  - $HOME/.kube:/root/.kube
+  - $HOME/.helm:/root/.helm
+  - $PWD:/helmfile
+  workdir: /helmfile
+  network: host
+  dependencies:
+  - /usr/local/bin/kubectl
 ```
 
 ```
 $ eval $(aliases gen)
 ```
+
+or 
+
+```
+$ eval $(aliases gen --binary)
+```
+
+
+Using the option of `--binary` can be used as a command instead of an alias.
 
 ## CLI
 
@@ -40,14 +61,16 @@ USAGE:
    aliases [global options] command [command options] [arguments...]
 
 VERSION:
-   0.0.0
+   dev
 
 COMMANDS:
-     generate, gen  Generate aliases
-     help, h        Shows a list of commands or help for one command
+     gen      Generate aliases
+     home     Get aliases home path
+     help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
    --config FILE, -c FILE  Load configuration from FILE
+   --home value            Home directory for aliases
    --help, -h              show help
    --version, -v           print the version
 ```

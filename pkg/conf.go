@@ -3,6 +3,7 @@ package aliases
 import (
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"io/ioutil"
 	"os"
 )
@@ -116,15 +117,16 @@ type AliasConf struct {
 
 type AliasesConf struct {
 	PathMap map[string]*AliasConf
+	Hash string
 	Aliases []AliasConf
 }
 
-func LoadConfFile(path string) (*AliasesConf, error) {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return nil, fmt.Errorf("configuration file is not exists `%s`", path)
+func LoadConfFile(ctx Context) (*AliasesConf, error) {
+	if _, err := os.Stat(ctx.GetConfPath()); os.IsNotExist(err) {
+		return nil, fmt.Errorf("configuration file is not exists `%s`", ctx.GetConfPath())
 	}
 
-	buf, err := ioutil.ReadFile(path)
+	buf, err := ioutil.ReadFile(ctx.GetConfPath())
 	if err != nil {
 		return nil, fmt.Errorf("configuration file cannot read `%q`", err)
 	}
@@ -135,14 +137,10 @@ func LoadConfFile(path string) (*AliasesConf, error) {
 	}
 
 	conf := new(AliasesConf)
+	conf.Hash = uuid.NewMD5(uuid.UUID{}, buf).String()
 	conf.PathMap = make(map[string]*AliasConf)
-	for path, _ := range defs {
-		c := AliasConf{}
-		c.DockerConf.DockerOpts.Interactive = true
-		c.DockerConf.DockerOpts.Rm = true
-		c.DockerConf.DockerOpts.Network = ptrStr("host")
-
-		conf.PathMap[path] = &c
+	for path := range defs {
+		conf.PathMap[path] = &AliasConf{}
 	}
 
 	for path, def := range defs {

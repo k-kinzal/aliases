@@ -1,6 +1,7 @@
 package aliases
 
 import (
+	"github.com/creasty/defaults"
 	"gopkg.in/go-playground/validator.v9"
 	"gopkg.in/yaml.v2"
 )
@@ -15,7 +16,7 @@ type YamlDefinition struct {
 	Args    []string `yaml:"args"`
 	// docker run options
 	AddHost             []string          `yaml:"add-host"`
-	Attach              []string          `yaml:"attach"`
+	Attach              []string          `yaml:"attach" validate:"dive,oneof=STDIN STDOUT STDERR"`
 	BlkioWeight         *uint16           `yaml:"blkio-weight"`
 	BlkioWeightDevice   []string          `yaml:"blkio-weight-device"`
 	CapAdd              []string          `yaml:"cap-add"`
@@ -54,7 +55,7 @@ type YamlDefinition struct {
 	HealthTimeout       *int              `yaml:"health-timeout"`
 	Hostname            *string           `yaml:"hostname"`
 	Init                bool              `yaml:"init"`
-	Interactive         bool              `yaml:"interactive"`
+	Interactive         bool              `yaml:"interactive" default:"true"`
 	Ip                  *string           `yaml:"ip"`
 	Ip6                 *string           `yaml:"ip6"`
 	Ipc                 *string           `yaml:"ipc"`
@@ -73,7 +74,7 @@ type YamlDefinition struct {
 	MemorySwappiness    *int              `yaml:"memory-swappiness"`
 	Mount               map[string]string `yaml:"mount"`
 	Name                *string           `yaml:"name"`
-	Network             *string           `yaml:"network"`
+	Network             *string           `yaml:"network" default:"host"`
 	NetworkAlias        []string          `yaml:"network-alias"`
 	NoHealthcheck       bool              `yaml:"no-healthcheck"`
 	OomKillDisable      bool              `yaml:"oom-kill-disable"`
@@ -86,7 +87,7 @@ type YamlDefinition struct {
 	PublishAll          bool              `yaml:"publish-all"`
 	ReadOnly            bool              `yaml:"read-only"`
 	Restart             *string           `yaml:"restart"`
-	Rm                  bool              `yaml:"rm"`
+	Rm                  bool              `yaml:"rm" default:"true"`
 	Runtime             *string           `yaml:"runtime"`
 	SecurityOpt         map[string]string `yaml:"security-opt"`
 	ShmSize             *int              `yaml:"shm-size"`
@@ -112,10 +113,14 @@ func UnmarshalConfFile(buf []byte) (map[string]YamlDefinition, error) {
 	if err := yaml.Unmarshal(buf, &defs); err != nil {
 		return nil, err
 	}
-	for _, def := range defs {
+	for idx, def := range defs {
+		if err := defaults.Set(&def); err != nil {
+			return nil, err
+		}
 		if err := validator.New().Struct(def); err != nil {
 			return nil, err
 		}
+		defs[idx] = def
 	}
 
 	return defs, nil
