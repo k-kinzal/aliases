@@ -1,6 +1,6 @@
 # aliases
 
-A is a tool for resolving command dependencies with containers.
+ is a tool for resolving command dependencies with containers.
 
 * YAML-based command definition
 * Version of command with environment variable
