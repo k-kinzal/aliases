@@ -339,6 +339,26 @@ func NewAliasCommand(conf AliasConf, ctx Context) *AliasCommand {
 func GenerateCommands(conf AliasesConf, ctx Context) []AliasCommand {
 	cmds := make([]AliasCommand, 0)
 	for _, c := range conf.Aliases {
+		if len(c.Dependencies) > 0 {
+			c.DockerConf.DockerOpts.Privileged = true
+			c.DockerConf.DockerOpts.Volume = append(c.DockerConf.DockerOpts.Volume, fmt.Sprintf("%s:/usr/local/bin/docker", exec.Command("docker").Path))
+			host := os.Getenv("DOCKER_HOST")
+			if host != "" {
+				host = "unix:///var/run/docker.sock"
+			}
+			if strings.HasPrefix(host, "unix://") {
+				sock := strings.TrimPrefix(host, "unix://")
+				c.DockerConf.DockerOpts.Volume = append(c.DockerConf.DockerOpts.Volume, fmt.Sprintf("%s:/var/run/docker.sock", sock))
+			} else {
+				c.DockerConf.DockerOpts.Env["DOCKER_HOST"] = host
+			}
+			for _, dep := range c.Dependencies {
+				p := fmt.Sprintf("%s/%s", ctx.GetBinaryPath(conf.Hash), path.Base(dep.Path))
+				v := fmt.Sprintf("%s:/usr/local/bin/%s", p, path.Base(dep.Path))
+				c.DockerConf.DockerOpts.Volume = append(c.DockerConf.DockerOpts.Volume, v)
+			}
+		}
+
 		cmds = append(cmds, *NewAliasCommand(c, ctx))
 	}
 

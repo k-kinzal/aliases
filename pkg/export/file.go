@@ -11,16 +11,16 @@ var (
 	tmpl = `#!/bin/sh
 
 if [ -p /dev/stdin ]; then
-    cat - | %s $@
-	exit $?
+  cat - | %s $@
+  exit $?
 else
-    %s $@
-	exit $?
+  %s $@
+  exit $?
 fi
 `
 )
 
-func Script(cmds []aliases.AliasCommand, conf aliases.AliasesConf, ctx aliases.Context) {
+func WriteFiles(cmds []aliases.AliasCommand, conf aliases.AliasesConf, ctx aliases.Context) {
 	os.Remove(ctx.GetBinaryPath(conf.Hash))
 	os.Mkdir(ctx.GetBinaryPath(conf.Hash), 0755)
 
@@ -31,7 +31,4 @@ func Script(cmds []aliases.AliasCommand, conf aliases.AliasesConf, ctx aliases.C
 
 		ioutil.WriteFile(path, []byte(content), 0755)
 	}
-
-	fmt.Printf("export PATH=\"%s:$PATH\"", ctx.GetBinaryPath(conf.Hash))
-
 }

@@ -137,7 +137,7 @@ func LoadConfFile(ctx Context) (*AliasesConf, error) {
 	}
 
 	conf := new(AliasesConf)
-	conf.Hash = uuid.NewMD5(uuid.New(), buf).String()
+	conf.Hash = uuid.NewMD5(uuid.UUID{}, buf).String()
 	conf.PathMap = make(map[string]*AliasConf)
 	for path := range defs {
 		conf.PathMap[path] = &AliasConf{}
