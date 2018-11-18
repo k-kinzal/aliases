@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/k-kinzal/aliases/pkg/util"
 	"io/ioutil"
 	"os"
 )
@@ -160,10 +161,10 @@ func LoadConfFile(ctx Context) (*AliasesConf, error) {
 		c.DockerConf.Command = def.Command
 		c.DockerConf.Args = def.Args
 
-		c.DockerConf.DockerOpts.AddHost = expandColonDelimitedStringListWithEnv(def.AddHost)
-		c.DockerConf.DockerOpts.Attach = expandColonDelimitedStringListWithEnv(def.Attach)
+		c.DockerConf.DockerOpts.AddHost = util.ExpandColonDelimitedStringListWithEnv(def.AddHost)
+		c.DockerConf.DockerOpts.Attach = util.ExpandColonDelimitedStringListWithEnv(def.Attach)
 		c.DockerConf.DockerOpts.BlkioWeight = def.BlkioWeight
-		c.DockerConf.DockerOpts.BlkioWeightDevice = expandColonDelimitedStringListWithEnv(def.BlkioWeightDevice)
+		c.DockerConf.DockerOpts.BlkioWeightDevice = util.ExpandColonDelimitedStringListWithEnv(def.BlkioWeightDevice)
 		c.DockerConf.DockerOpts.CapAdd = def.CapAdd
 		c.DockerConf.DockerOpts.CapDrop = def.CapDrop
 		c.DockerConf.DockerOpts.CgroupParent = def.CgroupParent
@@ -178,18 +179,18 @@ func LoadConfFile(ctx Context) (*AliasesConf, error) {
 		c.DockerConf.DockerOpts.CpusetMems = def.CpusetMems
 		c.DockerConf.DockerOpts.Detach = def.Detach
 		c.DockerConf.DockerOpts.DetachKeys = def.DetachKeys
-		c.DockerConf.DockerOpts.Device = expandColonDelimitedStringListWithEnv(def.Device)
+		c.DockerConf.DockerOpts.Device = util.ExpandColonDelimitedStringListWithEnv(def.Device)
 		c.DockerConf.DockerOpts.DeviceCgroupRule = def.DeviceCgroupRule
-		c.DockerConf.DockerOpts.DeviceReadBps = expandColonDelimitedStringListWithEnv(def.DeviceReadBps)
-		c.DockerConf.DockerOpts.DeviceReadIops = expandColonDelimitedStringListWithEnv(def.DeviceReadIops)
-		c.DockerConf.DockerOpts.DeviceWriteBps = expandColonDelimitedStringListWithEnv(def.DeviceWriteBps)
-		c.DockerConf.DockerOpts.DeviceWriteIops = expandColonDelimitedStringListWithEnv(def.DeviceWriteIops)
+		c.DockerConf.DockerOpts.DeviceReadBps = util.ExpandColonDelimitedStringListWithEnv(def.DeviceReadBps)
+		c.DockerConf.DockerOpts.DeviceReadIops = util.ExpandColonDelimitedStringListWithEnv(def.DeviceReadIops)
+		c.DockerConf.DockerOpts.DeviceWriteBps = util.ExpandColonDelimitedStringListWithEnv(def.DeviceWriteBps)
+		c.DockerConf.DockerOpts.DeviceWriteIops = util.ExpandColonDelimitedStringListWithEnv(def.DeviceWriteIops)
 		c.DockerConf.DockerOpts.DisableContentTrust = def.DisableContentTrust
 		c.DockerConf.DockerOpts.Dns = def.Dns
 		c.DockerConf.DockerOpts.DnsOption = def.DnsOption
 		c.DockerConf.DockerOpts.DnsSearch = def.DnsSearch
 		c.DockerConf.DockerOpts.Entrypoint = def.Entrypoint
-		c.DockerConf.DockerOpts.Env = expandStringKeyMapWithEnv(def.Env)
+		c.DockerConf.DockerOpts.Env = util.ExpandStringKeyMapWithEnv(def.Env)
 		c.DockerConf.DockerOpts.EnvFile = def.EnvFile
 		c.DockerConf.DockerOpts.Expose = def.Expose
 		c.DockerConf.DockerOpts.GroupAdd = def.GroupAdd
@@ -206,18 +207,18 @@ func LoadConfFile(ctx Context) (*AliasesConf, error) {
 		c.DockerConf.DockerOpts.Ipc = def.Ipc
 		c.DockerConf.DockerOpts.Isolation = def.Isolation
 		c.DockerConf.DockerOpts.KernelMemory = def.KernelMemory
-		c.DockerConf.DockerOpts.Label = expandStringKeyMapWithEnv(def.Label)
+		c.DockerConf.DockerOpts.Label = util.ExpandStringKeyMapWithEnv(def.Label)
 		c.DockerConf.DockerOpts.LabelFile = def.LabelFile
-		c.DockerConf.DockerOpts.Link = expandColonDelimitedStringListWithEnv(def.Link)
+		c.DockerConf.DockerOpts.Link = util.ExpandColonDelimitedStringListWithEnv(def.Link)
 		c.DockerConf.DockerOpts.LinkLocalIp = def.LinkLocalIp
 		c.DockerConf.DockerOpts.LogDriver = def.LogDriver
-		c.DockerConf.DockerOpts.LogOpt = expandStringKeyMapWithEnv(def.LogOpt)
+		c.DockerConf.DockerOpts.LogOpt = util.ExpandStringKeyMapWithEnv(def.LogOpt)
 		c.DockerConf.DockerOpts.MacAddress = def.MacAddress
 		c.DockerConf.DockerOpts.Memory = def.Memory
 		c.DockerConf.DockerOpts.MemoryReservation = def.MemoryReservation
 		c.DockerConf.DockerOpts.MemorySwap = def.MemorySwap
 		c.DockerConf.DockerOpts.MemorySwappiness = def.MemorySwappiness
-		c.DockerConf.DockerOpts.Mount = expandStringKeyMapWithEnv(def.Mount)
+		c.DockerConf.DockerOpts.Mount = util.ExpandStringKeyMapWithEnv(def.Mount)
 		c.DockerConf.DockerOpts.Name = def.Name
 		c.DockerConf.DockerOpts.Network = def.Network
 		c.DockerConf.DockerOpts.NetworkAlias = def.NetworkAlias
@@ -234,20 +235,20 @@ func LoadConfFile(ctx Context) (*AliasesConf, error) {
 		c.DockerConf.DockerOpts.Restart = def.Restart
 		c.DockerConf.DockerOpts.Rm = def.Rm
 		c.DockerConf.DockerOpts.Runtime = def.Runtime
-		c.DockerConf.DockerOpts.SecurityOpt = expandStringKeyMapWithEnv(def.SecurityOpt)
+		c.DockerConf.DockerOpts.SecurityOpt = util.ExpandStringKeyMapWithEnv(def.SecurityOpt)
 		c.DockerConf.DockerOpts.ShmSize = def.ShmSize
 		c.DockerConf.DockerOpts.SigProxy = def.SigProxy
 		c.DockerConf.DockerOpts.StopSignal = def.StopSignal
 		c.DockerConf.DockerOpts.StopTimeout = def.StopTimeout
-		c.DockerConf.DockerOpts.StorageOpt = expandStringKeyMapWithEnv(def.StorageOpt)
-		c.DockerConf.DockerOpts.Sysctl = expandStringKeyMapWithEnv(def.Sysctl)
+		c.DockerConf.DockerOpts.StorageOpt = util.ExpandStringKeyMapWithEnv(def.StorageOpt)
+		c.DockerConf.DockerOpts.Sysctl = util.ExpandStringKeyMapWithEnv(def.Sysctl)
 		c.DockerConf.DockerOpts.Tmpfs = def.Tmpfs
 		c.DockerConf.DockerOpts.Tty = def.Tty
-		c.DockerConf.DockerOpts.Ulimit = expandStringKeyMapWithEnv(def.Ulimit)
+		c.DockerConf.DockerOpts.Ulimit = util.ExpandStringKeyMapWithEnv(def.Ulimit)
 		c.DockerConf.DockerOpts.User = def.User
 		c.DockerConf.DockerOpts.Userns = def.Userns
 		c.DockerConf.DockerOpts.Uts = def.Uts
-		c.DockerConf.DockerOpts.Volume = expandColonDelimitedStringListWithEnv(def.Volume)
+		c.DockerConf.DockerOpts.Volume = util.ExpandColonDelimitedStringListWithEnv(def.Volume)
 		c.DockerConf.DockerOpts.VolumeDriver = def.VolumeDriver
 		c.DockerConf.DockerOpts.VolumesFrom = def.VolumesFrom
 		c.DockerConf.DockerOpts.Workdir = def.Workdir
