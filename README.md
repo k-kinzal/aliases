@@ -38,13 +38,13 @@ $ go get github.com/k-kinzal/aliases
 ```
 
 ```
-$ eval $(aliases gen)
+$ eval "$(aliases gen)"
 ```
 
 or 
 
 ```
-$ eval $(aliases gen --binary)
+$ eval "$(aliases gen --binary)"
 ```
 
 
