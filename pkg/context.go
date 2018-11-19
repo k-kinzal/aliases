@@ -35,6 +35,10 @@ func (ctx *Context)GetConfPath() string {
 	if ctx.confPath == "" {
 		cwd, _ := os.Getwd()
 		ctx.confPath = fmt.Sprintf("%s/aliases.yaml", cwd)
+
+		if _, err := os.Stat(ctx.confPath); os.IsNotExist(err) {
+			ctx.confPath = fmt.Sprintf("%s/aliases.yaml", ctx.GetHomePath())
+		}
 	}
 
 	return ctx.confPath
