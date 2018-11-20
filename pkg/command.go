@@ -343,7 +343,7 @@ func GenerateCommands(conf AliasesConf, ctx Context) []AliasCommand {
 			c.DockerConf.DockerOpts.Privileged = true
 			c.DockerConf.DockerOpts.Volume = append(c.DockerConf.DockerOpts.Volume, fmt.Sprintf("%s:/usr/local/bin/docker", exec.Command("docker").Path))
 			host := os.Getenv("DOCKER_HOST")
-			if host != "" {
+			if host == "" {
 				host = "unix:///var/run/docker.sock"
 			}
 			if strings.HasPrefix(host, "unix://") {
