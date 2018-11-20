@@ -11,7 +11,7 @@ import (
 
 type AliasConf struct {
 	Path         string
-	Dependencies []AliasConf
+	Dependencies []*AliasConf
 
 	DockerConf struct {
 		Image         string
@@ -149,7 +149,7 @@ func LoadConfFile(ctx Context) (*AliasesConf, error) {
 		c.Path = path
 		for _, dep := range def.Dependencies {
 			if co, ok := conf.PathMap[dep]; ok {
-				c.Dependencies = append(c.Dependencies, *co)
+				c.Dependencies = append(c.Dependencies, co)
 			} else {
 				return nil, errors.New(fmt.Sprintf("undefined dependency: `%s` in `%s.Dependencies[]`", dep, path))
 			}
