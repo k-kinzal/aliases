@@ -11,10 +11,10 @@ var (
 	tmpl = `#!/bin/sh
 
 if [ -p /dev/stdin ]; then
-  cat - | %s $@
+  cat - | %s "$@"
   exit $?
 else
-  %s $@
+  %s "$@"
   exit $?
 fi
 `
