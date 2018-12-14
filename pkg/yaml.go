@@ -110,7 +110,7 @@ type YamlDefinition struct {
 
 func UnmarshalConfFile(buf []byte) (map[string]YamlDefinition, error) {
 	defs := make(map[string]YamlDefinition)
-	if err := yaml.Unmarshal(buf, &defs); err != nil {
+	if err := yaml.UnmarshalStrict(buf, &defs); err != nil {
 		return nil, err
 	}
 	for idx, def := range defs {
