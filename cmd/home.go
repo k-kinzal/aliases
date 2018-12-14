@@ -18,7 +18,7 @@ func HomeCommand() cli.Command {
 
 func HomeAction(c *cli.Context) error {
 	// context
-	ctx := aliases.NewContext("", "")
+	ctx := aliases.NewContext("", "", "")
 
 	// output
 	fmt.Print(ctx.GetHomePath())

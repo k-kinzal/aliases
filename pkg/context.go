@@ -9,6 +9,7 @@ import (
 type Context struct {
 	homePath string
 	confPath string
+	binaryPath string
 }
 
 func (ctx *Context)GetHomePath() string {
@@ -28,6 +29,9 @@ func (ctx *Context)GetHomePath() string {
 }
 
 func (ctx *Context)GetBinaryPath(hash string) string {
+	if ctx.binaryPath != "" {
+		return ctx.binaryPath
+	}
 	return fmt.Sprintf("%s/%s", ctx.GetHomePath(), hash)
 }
 
@@ -44,6 +48,6 @@ func (ctx *Context)GetConfPath() string {
 	return ctx.confPath
 }
 
-func NewContext(homePath string, confPath string) *Context {
-	return &Context{homePath, confPath}
+func NewContext(homePath string, confPath string, binaryPath string) *Context {
+	return &Context{homePath, confPath, binaryPath}
 }
