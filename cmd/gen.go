@@ -35,15 +35,12 @@ func GenAction(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	// generate commands
-	cmds := aliases.GenerateCommands(*conf, *ctx)
 
 	// output aliases
-	export.WriteFiles(cmds, *conf, *ctx)
 	if c.Bool("binary") {
-		export.Path(*conf, *ctx)
+		export.Path(conf, ctx)
 	} else {
-		export.Aliases(cmds)
+		export.Aliases(conf, ctx)
 	}
 
 	return nil

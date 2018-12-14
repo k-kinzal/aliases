@@ -4,122 +4,24 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/k-kinzal/aliases/pkg/docker"
 	"github.com/k-kinzal/aliases/pkg/util"
 	"io/ioutil"
 	"os"
+	"os/exec"
+	"path"
+	"strings"
 )
 
-
-type AliasConf struct {
-	Path         string
-	Dependencies []*AliasConf
-
-	DockerConf struct {
-		Image         string
-		Tag           string
-		Command       *string
-		Args          []string
-		DockerOpts struct {
-			AddHost             []string
-			Attach              []string
-			BlkioWeight         *uint16
-			BlkioWeightDevice   []string
-			CapAdd              []string
-			CapDrop             []string
-			CgroupParent        *string
-			Cidfile             *string
-			CpuPeriod           *int
-			CpuQuota            *int
-			CpuRtPeriod         *int
-			CpuRtRuntime        *int
-			CpuShares           *int
-			Cpus                *float64
-			CpusetCpus          *string
-			CpusetMems          *string
-			Detach              bool
-			DetachKeys          *string
-			Device              []string
-			DeviceCgroupRule    []string
-			DeviceReadBps       []string
-			DeviceReadIops      []string
-			DeviceWriteBps      []string
-			DeviceWriteIops     []string
-			DisableContentTrust bool
-			Dns                 []string
-			DnsOption           []string
-			DnsSearch           []string
-			Entrypoint          *string
-			Env                 map[string]string
-			EnvFile             []string
-			Expose              []string
-			GroupAdd            []string
-			HealthCmd           *string
-			HealthInterval      *int
-			HealthRetries       *int
-			HealthStartPeriod   *int
-			HealthTimeout       *int
-			Hostname            *string
-			Init                bool
-			Interactive         bool
-			Ip                  *string
-			Ip6                 *string
-			Ipc                 *string
-			Isolation           *string
-			KernelMemory        *int
-			Label               map[string]string
-			LabelFile           []string
-			Link                []string
-			LinkLocalIp         []string
-			LogDriver           *string
-			LogOpt              map[string]string
-			MacAddress          *string
-			Memory              *int
-			MemoryReservation   *int
-			MemorySwap          *int
-			MemorySwappiness    *int
-			Mount               map[string]string
-			Name                *string
-			Network             *string
-			NetworkAlias        []string
-			NoHealthcheck       bool
-			OomKillDisable      bool
-			OomScoreAdj         *int
-			Pid                 *string
-			PidsLimit           *int
-			Platform            *string
-			Privileged          bool
-			Publish             []string
-			PublishAll          bool
-			ReadOnly            bool
-			Restart             *string
-			Rm                  bool
-			Runtime             *string
-			SecurityOpt         map[string]string
-			ShmSize             *int
-			SigProxy            bool
-			StopSignal          *string
-			StopTimeout         *int
-			StorageOpt          map[string]string
-			Sysctl              map[string]string
-			Tmpfs               []string
-			Tty                 bool
-			Ulimit              map[string]string
-			User                *string
-			Userns              *string
-			Uts                 *string
-			Volume              []string
-			VolumeDriver        *string
-			VolumesFrom         []string
-			Workdir             *string
-		}
-	}
-
+type CommandConf struct {
+	Path          string
+	Dependencies  []*CommandConf
+	DockerRunOpts docker.RunOpts
 }
 
 type AliasesConf struct {
-	PathMap map[string]*AliasConf
 	Hash string
-	Aliases []AliasConf
+	Commands []CommandConf
 }
 
 func LoadConfFile(ctx Context) (*AliasesConf, error) {
@@ -139,121 +41,171 @@ func LoadConfFile(ctx Context) (*AliasesConf, error) {
 
 	conf := new(AliasesConf)
 	conf.Hash = uuid.NewMD5(uuid.UUID{}, buf).String()
-	conf.PathMap = make(map[string]*AliasConf)
-	for path := range defs {
-		conf.PathMap[path] = &AliasConf{}
+
+	pathMap := make(map[string]*CommandConf)
+	for key := range defs {
+		pathMap[key] = &CommandConf{Path: key}
 	}
 
-	for path, def := range defs {
-		c := conf.PathMap[path]
+	for key, def := range defs {
+		c := pathMap[key]
 
-		c.Path = path
-		for _, dep := range def.Dependencies {
-			if co, ok := conf.PathMap[dep]; ok {
-				c.Dependencies = append(c.Dependencies, co)
+		c.Path = key
+		c.DockerRunOpts.Image = fmt.Sprintf("%s:${%s_VERSION:-%s}", def.Image, strings.ToUpper(path.Base(key)), key)
+		if def.Command != nil {
+			c.DockerRunOpts.Args = []string{*def.Command}
+		}
+		c.DockerRunOpts.Args = append(c.DockerRunOpts.Args, def.Args...)
+		c.DockerRunOpts.AddHost = util.ExpandColonDelimitedStringListWithEnv(def.AddHost)
+		c.DockerRunOpts.Attach = def.Attach
+		c.DockerRunOpts.BlkioWeight = def.BlkioWeight
+		c.DockerRunOpts.BlkioWeightDevice = util.ExpandColonDelimitedStringListWithEnv(def.BlkioWeightDevice)
+		c.DockerRunOpts.CapAdd = def.CapAdd
+		c.DockerRunOpts.CapDrop = def.CapDrop
+		c.DockerRunOpts.CgroupParent = def.CgroupParent
+		c.DockerRunOpts.Cidfile = def.Cidfile
+		c.DockerRunOpts.CpuPeriod = def.CpuPeriod
+		c.DockerRunOpts.CpuQuota = def.CpuQuota
+		c.DockerRunOpts.CpuRtPeriod = def.CpuRtPeriod
+		c.DockerRunOpts.CpuRtRuntime = def.CpuRtRuntime
+		c.DockerRunOpts.CpuShares = def.CpuShares
+		c.DockerRunOpts.Cpus = def.Cpus
+		c.DockerRunOpts.CpusetCpus = def.CpusetCpus
+		c.DockerRunOpts.CpusetMems = def.CpusetMems
+		c.DockerRunOpts.Detach = def.Detach
+		c.DockerRunOpts.DetachKeys = def.DetachKeys
+		c.DockerRunOpts.Device = util.ExpandColonDelimitedStringListWithEnv(def.Device)
+		c.DockerRunOpts.DeviceCgroupRule = def.DeviceCgroupRule
+		c.DockerRunOpts.DeviceReadBps = util.ExpandColonDelimitedStringListWithEnv(def.DeviceReadBps)
+		c.DockerRunOpts.DeviceReadIops = util.ExpandColonDelimitedStringListWithEnv(def.DeviceReadIops)
+		c.DockerRunOpts.DeviceWriteBps = util.ExpandColonDelimitedStringListWithEnv(def.DeviceWriteBps)
+		c.DockerRunOpts.DeviceWriteIops = util.ExpandColonDelimitedStringListWithEnv(def.DeviceWriteIops)
+		c.DockerRunOpts.DisableContentTrust = def.DisableContentTrust
+		c.DockerRunOpts.Dns = def.Dns
+		c.DockerRunOpts.DnsOption = def.DnsOption
+		c.DockerRunOpts.DnsSearch = def.DnsSearch
+		c.DockerRunOpts.Entrypoint = def.Entrypoint
+		c.DockerRunOpts.Env = util.ExpandStringKeyMapWithEnv(def.Env)
+		c.DockerRunOpts.EnvFile = def.EnvFile
+		c.DockerRunOpts.Expose = def.Expose
+		c.DockerRunOpts.GroupAdd = def.GroupAdd
+		c.DockerRunOpts.HealthCmd = def.HealthCmd
+		c.DockerRunOpts.HealthInterval = def.HealthInterval
+		c.DockerRunOpts.HealthRetries = def.HealthRetries
+		c.DockerRunOpts.HealthStartPeriod = def.HealthStartPeriod
+		c.DockerRunOpts.HealthTimeout = def.HealthTimeout
+		c.DockerRunOpts.Hostname = def.Hostname
+		c.DockerRunOpts.Init = def.Init
+		if def.Interactive == nil {
+			c.DockerRunOpts.Interactive = util.Pbool(true)
+		} else {
+			c.DockerRunOpts.Interactive = def.Interactive
+		}
+		c.DockerRunOpts.Ip = def.Ip
+		c.DockerRunOpts.Ip6 = def.Ip6
+		c.DockerRunOpts.Ipc = def.Ipc
+		c.DockerRunOpts.Isolation = def.Isolation
+		c.DockerRunOpts.KernelMemory = def.KernelMemory
+		c.DockerRunOpts.Label = util.ExpandStringKeyMapWithEnv(def.Label)
+		c.DockerRunOpts.LabelFile = def.LabelFile
+		c.DockerRunOpts.Link = util.ExpandColonDelimitedStringListWithEnv(def.Link)
+		c.DockerRunOpts.LinkLocalIp = def.LinkLocalIp
+		c.DockerRunOpts.LogDriver = def.LogDriver
+		c.DockerRunOpts.LogOpt = util.ExpandStringKeyMapWithEnv(def.LogOpt)
+		c.DockerRunOpts.MacAddress = def.MacAddress
+		c.DockerRunOpts.Memory = def.Memory
+		c.DockerRunOpts.MemoryReservation = def.MemoryReservation
+		c.DockerRunOpts.MemorySwap = def.MemorySwap
+		c.DockerRunOpts.MemorySwappiness = def.MemorySwappiness
+		c.DockerRunOpts.Mount = util.ExpandStringKeyMapWithEnv(def.Mount)
+		c.DockerRunOpts.Name = def.Name
+		if def.Network == nil {
+			c.DockerRunOpts.Network = util.Pstr("host")
+		} else {
+			c.DockerRunOpts.Network = def.Network
+		}
+		c.DockerRunOpts.NetworkAlias = def.NetworkAlias
+		c.DockerRunOpts.NoHealthcheck = def.NoHealthcheck
+		c.DockerRunOpts.OomKillDisable = def.OomKillDisable
+		c.DockerRunOpts.OomScoreAdj = def.OomScoreAdj
+		c.DockerRunOpts.Pid = def.Pid
+		c.DockerRunOpts.PidsLimit = def.PidsLimit
+		c.DockerRunOpts.Platform = def.Platform
+		c.DockerRunOpts.Privileged = def.Privileged
+		c.DockerRunOpts.Publish = def.Publish
+		c.DockerRunOpts.PublishAll = def.PublishAll
+		c.DockerRunOpts.ReadOnly = def.ReadOnly
+		c.DockerRunOpts.Restart = def.Restart
+		if def.Rm == nil {
+			c.DockerRunOpts.Rm = util.Pbool(false)
+		} else {
+			c.DockerRunOpts.Rm = def.Rm
+		}
+		c.DockerRunOpts.Runtime = def.Runtime
+		c.DockerRunOpts.SecurityOpt = util.ExpandStringKeyMapWithEnv(def.SecurityOpt)
+		c.DockerRunOpts.ShmSize = def.ShmSize
+		c.DockerRunOpts.SigProxy = def.SigProxy
+		c.DockerRunOpts.StopSignal = def.StopSignal
+		c.DockerRunOpts.StopTimeout = def.StopTimeout
+		c.DockerRunOpts.StorageOpt = util.ExpandStringKeyMapWithEnv(def.StorageOpt)
+		c.DockerRunOpts.Sysctl = util.ExpandStringKeyMapWithEnv(def.Sysctl)
+		c.DockerRunOpts.Tmpfs = def.Tmpfs
+		c.DockerRunOpts.Tty = def.Tty
+		c.DockerRunOpts.Ulimit = util.ExpandStringKeyMapWithEnv(def.Ulimit)
+		if def.User != nil {
+			c.DockerRunOpts.User = util.Pstr(util.ExpandColonDelimitedStringWithEnv(*def.User))
+		}
+		c.DockerRunOpts.Userns = def.Userns
+		c.DockerRunOpts.Uts = def.Uts
+		c.DockerRunOpts.Volume = util.ExpandColonDelimitedStringListWithEnv(def.Volume)
+		c.DockerRunOpts.VolumeDriver = def.VolumeDriver
+		c.DockerRunOpts.VolumesFrom = def.VolumesFrom
+		c.DockerRunOpts.Workdir = def.Workdir
+
+		if len(def.Dependencies) > 0 {
+			for _, target := range def.Dependencies {
+				if dep, ok := pathMap[target]; ok {
+					c.Dependencies = append(c.Dependencies, dep)
+				} else {
+					return nil, errors.New(fmt.Sprintf("undefined dependency: `%s` in `%s.Dependencies[]`", target, key))
+				}
+			}
+
+			def.Privileged = util.Pbool(true)
+			cmd := exec.Command("docker")
+			if cmd.Path == "docker" {
+				return nil, errors.New("docker is not installed. see https://docs.docker.com/install/")
+			}
+			def.Volume = append(def.Volume, fmt.Sprintf("%s:/usr/local/bin/docker", cmd.Path))
+			// see: https://github.com/moby/moby/blob/bb1914b19572524b9f7d2b3415f146c545c1bb8b/client/client.go#L384
+			host := os.Getenv("DOCKER_HOST")
+			if host == "" {
+				sock := "/var/run/docker.sock"
+				if _, err := os.Stat(sock); err !=nil {
+					return nil, fmt.Errorf("%s: no such file. please set DOCKER_HOST", sock)
+				}
+				host = fmt.Sprintf("unix://%s", sock)
+			}
+			if strings.HasPrefix(host, "unix://") {
+				sock := strings.TrimPrefix(host, "unix://")
+				def.Volume = append(def.Volume, fmt.Sprintf("%s:/var/run/docker.sock", sock))
 			} else {
-				return nil, errors.New(fmt.Sprintf("undefined dependency: `%s` in `%s.Dependencies[]`", dep, path))
+				if def.Env == nil {
+					def.Env = make(map[string]string)
+				}
+				def.Env["DOCKER_HOST"] = host
+			}
+
+			c.DockerRunOpts.Env["ALIASES_PWD"] = "${ALIASES_PWD:-$PWD}"
+
+			for _, dep := range c.Dependencies {
+				from := fmt.Sprintf("%s/%s", ctx.GetBinaryPath(conf.Hash), path.Base(dep.Path))
+				volume := fmt.Sprintf("%s:/usr/local/bin/%s", from, path.Base(dep.Path))
+				c.DockerRunOpts.Volume = append(c.DockerRunOpts.Volume, volume)
 			}
 		}
 
-		c.DockerConf.Image = def.Image
-		c.DockerConf.Tag = def.Tag
-		c.DockerConf.Command = def.Command
-		c.DockerConf.Args = def.Args
-
-		c.DockerConf.DockerOpts.AddHost = util.ExpandColonDelimitedStringListWithEnv(def.AddHost)
-		c.DockerConf.DockerOpts.Attach = util.ExpandColonDelimitedStringListWithEnv(def.Attach)
-		c.DockerConf.DockerOpts.BlkioWeight = def.BlkioWeight
-		c.DockerConf.DockerOpts.BlkioWeightDevice = util.ExpandColonDelimitedStringListWithEnv(def.BlkioWeightDevice)
-		c.DockerConf.DockerOpts.CapAdd = def.CapAdd
-		c.DockerConf.DockerOpts.CapDrop = def.CapDrop
-		c.DockerConf.DockerOpts.CgroupParent = def.CgroupParent
-		c.DockerConf.DockerOpts.Cidfile = def.Cidfile
-		c.DockerConf.DockerOpts.CpuPeriod = def.CpuPeriod
-		c.DockerConf.DockerOpts.CpuQuota = def.CpuQuota
-		c.DockerConf.DockerOpts.CpuRtPeriod = def.CpuRtPeriod
-		c.DockerConf.DockerOpts.CpuRtRuntime = def.CpuRtRuntime
-		c.DockerConf.DockerOpts.CpuShares = def.CpuShares
-		c.DockerConf.DockerOpts.Cpus = def.Cpus
-		c.DockerConf.DockerOpts.CpusetCpus = def.CpusetCpus
-		c.DockerConf.DockerOpts.CpusetMems = def.CpusetMems
-		c.DockerConf.DockerOpts.Detach = def.Detach
-		c.DockerConf.DockerOpts.DetachKeys = def.DetachKeys
-		c.DockerConf.DockerOpts.Device = util.ExpandColonDelimitedStringListWithEnv(def.Device)
-		c.DockerConf.DockerOpts.DeviceCgroupRule = def.DeviceCgroupRule
-		c.DockerConf.DockerOpts.DeviceReadBps = util.ExpandColonDelimitedStringListWithEnv(def.DeviceReadBps)
-		c.DockerConf.DockerOpts.DeviceReadIops = util.ExpandColonDelimitedStringListWithEnv(def.DeviceReadIops)
-		c.DockerConf.DockerOpts.DeviceWriteBps = util.ExpandColonDelimitedStringListWithEnv(def.DeviceWriteBps)
-		c.DockerConf.DockerOpts.DeviceWriteIops = util.ExpandColonDelimitedStringListWithEnv(def.DeviceWriteIops)
-		c.DockerConf.DockerOpts.DisableContentTrust = def.DisableContentTrust
-		c.DockerConf.DockerOpts.Dns = def.Dns
-		c.DockerConf.DockerOpts.DnsOption = def.DnsOption
-		c.DockerConf.DockerOpts.DnsSearch = def.DnsSearch
-		c.DockerConf.DockerOpts.Entrypoint = def.Entrypoint
-		c.DockerConf.DockerOpts.Env = util.ExpandStringKeyMapWithEnv(def.Env)
-		c.DockerConf.DockerOpts.EnvFile = def.EnvFile
-		c.DockerConf.DockerOpts.Expose = def.Expose
-		c.DockerConf.DockerOpts.GroupAdd = def.GroupAdd
-		c.DockerConf.DockerOpts.HealthCmd = def.HealthCmd
-		c.DockerConf.DockerOpts.HealthInterval = def.HealthInterval
-		c.DockerConf.DockerOpts.HealthRetries = def.HealthRetries
-		c.DockerConf.DockerOpts.HealthStartPeriod = def.HealthStartPeriod
-		c.DockerConf.DockerOpts.HealthTimeout = def.HealthTimeout
-		c.DockerConf.DockerOpts.Hostname = def.Hostname
-		c.DockerConf.DockerOpts.Init = def.Init
-		c.DockerConf.DockerOpts.Interactive = def.Interactive
-		c.DockerConf.DockerOpts.Ip = def.Ip
-		c.DockerConf.DockerOpts.Ip6 = def.Ip6
-		c.DockerConf.DockerOpts.Ipc = def.Ipc
-		c.DockerConf.DockerOpts.Isolation = def.Isolation
-		c.DockerConf.DockerOpts.KernelMemory = def.KernelMemory
-		c.DockerConf.DockerOpts.Label = util.ExpandStringKeyMapWithEnv(def.Label)
-		c.DockerConf.DockerOpts.LabelFile = def.LabelFile
-		c.DockerConf.DockerOpts.Link = util.ExpandColonDelimitedStringListWithEnv(def.Link)
-		c.DockerConf.DockerOpts.LinkLocalIp = def.LinkLocalIp
-		c.DockerConf.DockerOpts.LogDriver = def.LogDriver
-		c.DockerConf.DockerOpts.LogOpt = util.ExpandStringKeyMapWithEnv(def.LogOpt)
-		c.DockerConf.DockerOpts.MacAddress = def.MacAddress
-		c.DockerConf.DockerOpts.Memory = def.Memory
-		c.DockerConf.DockerOpts.MemoryReservation = def.MemoryReservation
-		c.DockerConf.DockerOpts.MemorySwap = def.MemorySwap
-		c.DockerConf.DockerOpts.MemorySwappiness = def.MemorySwappiness
-		c.DockerConf.DockerOpts.Mount = util.ExpandStringKeyMapWithEnv(def.Mount)
-		c.DockerConf.DockerOpts.Name = def.Name
-		c.DockerConf.DockerOpts.Network = def.Network
-		c.DockerConf.DockerOpts.NetworkAlias = def.NetworkAlias
-		c.DockerConf.DockerOpts.NoHealthcheck = def.NoHealthcheck
-		c.DockerConf.DockerOpts.OomKillDisable = def.OomKillDisable
-		c.DockerConf.DockerOpts.OomScoreAdj = def.OomScoreAdj
-		c.DockerConf.DockerOpts.Pid = def.Pid
-		c.DockerConf.DockerOpts.PidsLimit = def.PidsLimit
-		c.DockerConf.DockerOpts.Platform = def.Platform
-		c.DockerConf.DockerOpts.Privileged = def.Privileged
-		c.DockerConf.DockerOpts.Publish = def.Publish
-		c.DockerConf.DockerOpts.PublishAll = def.PublishAll
-		c.DockerConf.DockerOpts.ReadOnly = def.ReadOnly
-		c.DockerConf.DockerOpts.Restart = def.Restart
-		c.DockerConf.DockerOpts.Rm = def.Rm
-		c.DockerConf.DockerOpts.Runtime = def.Runtime
-		c.DockerConf.DockerOpts.SecurityOpt = util.ExpandStringKeyMapWithEnv(def.SecurityOpt)
-		c.DockerConf.DockerOpts.ShmSize = def.ShmSize
-		c.DockerConf.DockerOpts.SigProxy = def.SigProxy
-		c.DockerConf.DockerOpts.StopSignal = def.StopSignal
-		c.DockerConf.DockerOpts.StopTimeout = def.StopTimeout
-		c.DockerConf.DockerOpts.StorageOpt = util.ExpandStringKeyMapWithEnv(def.StorageOpt)
-		c.DockerConf.DockerOpts.Sysctl = util.ExpandStringKeyMapWithEnv(def.Sysctl)
-		c.DockerConf.DockerOpts.Tmpfs = def.Tmpfs
-		c.DockerConf.DockerOpts.Tty = def.Tty
-		c.DockerConf.DockerOpts.Ulimit = util.ExpandStringKeyMapWithEnv(def.Ulimit)
-		c.DockerConf.DockerOpts.User = def.User
-		c.DockerConf.DockerOpts.Userns = def.Userns
-		c.DockerConf.DockerOpts.Uts = def.Uts
-		c.DockerConf.DockerOpts.Volume = util.ExpandColonDelimitedStringListWithEnv(def.Volume)
-		c.DockerConf.DockerOpts.VolumeDriver = def.VolumeDriver
-		c.DockerConf.DockerOpts.VolumesFrom = def.VolumesFrom
-		c.DockerConf.DockerOpts.Workdir = def.Workdir
-
-		conf.Aliases = append(conf.Aliases, *c)
+		conf.Commands = append(conf.Commands, *c)
 	}
 
 	return conf, nil
