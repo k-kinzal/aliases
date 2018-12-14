@@ -24,7 +24,7 @@ type AliasesConf struct {
 	Commands []CommandConf
 }
 
-func LoadConfFile(ctx Context) (*AliasesConf, error) {
+func LoadConfFile(ctx *Context) (*AliasesConf, error) {
 	if _, err := os.Stat(ctx.GetConfPath()); os.IsNotExist(err) {
 		return nil, fmt.Errorf("configuration file is not exists `%s`", ctx.GetConfPath())
 	}
@@ -51,7 +51,7 @@ func LoadConfFile(ctx Context) (*AliasesConf, error) {
 		c := pathMap[key]
 
 		c.Path = key
-		c.DockerRunOpts.Image = fmt.Sprintf("%s:${%s_VERSION:-%s}", def.Image, strings.ToUpper(path.Base(key)), key)
+		c.DockerRunOpts.Image = fmt.Sprintf("%s:${%s_VERSION:-\"%s\"}", def.Image, strings.ToUpper(path.Base(key)), def.Tag)
 		if def.Command != nil {
 			c.DockerRunOpts.Args = []string{*def.Command}
 		}
@@ -137,7 +137,7 @@ func LoadConfFile(ctx Context) (*AliasesConf, error) {
 		c.DockerRunOpts.ReadOnly = def.ReadOnly
 		c.DockerRunOpts.Restart = def.Restart
 		if def.Rm == nil {
-			c.DockerRunOpts.Rm = util.Pbool(false)
+			c.DockerRunOpts.Rm = util.Pbool(true)
 		} else {
 			c.DockerRunOpts.Rm = def.Rm
 		}
@@ -171,12 +171,12 @@ func LoadConfFile(ctx Context) (*AliasesConf, error) {
 				}
 			}
 
-			def.Privileged = util.Pbool(true)
+			c.DockerRunOpts.Privileged = util.Pbool(true)
 			cmd := exec.Command("docker")
 			if cmd.Path == "docker" {
 				return nil, errors.New("docker is not installed. see https://docs.docker.com/install/")
 			}
-			def.Volume = append(def.Volume, fmt.Sprintf("%s:/usr/local/bin/docker", cmd.Path))
+			c.DockerRunOpts.Volume = append(c.DockerRunOpts.Volume, fmt.Sprintf("%s:/usr/local/bin/docker", cmd.Path))
 			// see: https://github.com/moby/moby/blob/bb1914b19572524b9f7d2b3415f146c545c1bb8b/client/client.go#L384
 			host := os.Getenv("DOCKER_HOST")
 			if host == "" {
@@ -188,12 +188,12 @@ func LoadConfFile(ctx Context) (*AliasesConf, error) {
 			}
 			if strings.HasPrefix(host, "unix://") {
 				sock := strings.TrimPrefix(host, "unix://")
-				def.Volume = append(def.Volume, fmt.Sprintf("%s:/var/run/docker.sock", sock))
+				c.DockerRunOpts.Volume = append(c.DockerRunOpts.Volume, fmt.Sprintf("%s:/var/run/docker.sock", sock))
 			} else {
-				if def.Env == nil {
-					def.Env = make(map[string]string)
+				if c.DockerRunOpts.Env == nil {
+					c.DockerRunOpts.Env = make(map[string]string)
 				}
-				def.Env["DOCKER_HOST"] = host
+				c.DockerRunOpts.Env["DOCKER_HOST"] = host
 			}
 
 			c.DockerRunOpts.Env["ALIASES_PWD"] = "${ALIASES_PWD:-$PWD}"

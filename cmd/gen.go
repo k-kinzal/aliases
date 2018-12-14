@@ -31,7 +31,7 @@ func GenAction(c *cli.Context) error {
 	ctx := aliases.NewContext(c.GlobalString("home"), c.GlobalString("config"), c.String("binary-path"))
 
 	// configuration
-	conf, err := aliases.LoadConfFile(*ctx)
+	conf, err := aliases.LoadConfFile(ctx)
 	if err != nil {
 		return err
 	}
