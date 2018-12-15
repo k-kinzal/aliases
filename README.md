@@ -22,17 +22,15 @@ $ go get github.com/k-kinzal/aliases
   tag: 1.11.2
   volume:
   - $HOME/.kube:/root/.kube
-  network: host
+  - $PWD:/kube
+  workdir: /kube
 
-/usr/local/bin/helmfile:
-  image: chatwork/helmfile
-  tag: 0.36.1-2.10.0
+/usr/local/bin/alpine:
+  image: alpine
+  tag: 3.8
   volume:
-  - $HOME/.kube:/root/.kube
-  - $HOME/.helm:/root/.helm
-  - $PWD:/helmfile
-  workdir: /helmfile
-  network: host
+  - $PWD:/work
+  workdir: /work
   dependencies:
   - /usr/local/bin/kubectl
 ```
