@@ -10,19 +10,19 @@ import (
 type GenContext struct {
 	*context.Context
 
-	binary bool
+	export bool
 }
 
 func NewGenContext(c *cli.Context) *GenContext {
 	ctx := context.NewContext(
 		c.GlobalString("home"),
 		c.GlobalString("config"),
-		c.String("binary-path"),
+		c.String("export-path"),
 	)
 
 	return &GenContext{
 		Context: ctx,
-		binary: c.Bool("binary"),
+		export: c.Bool("export"),
 	}
 }
 
@@ -32,12 +32,12 @@ func GenCommand() cli.Command {
 		Usage:   "Generate aliases",
 		Flags: []cli.Flag {
 			cli.BoolFlag{
-				Name: "binary",
-				Usage: "",
+				Name: "export",
+				Usage: "If you pass true, you will return export instead of aliase",
 			},
 			cli.StringFlag{
-				Name: "binary-path",
-				Usage: "the directory to put binaries. works only when --binary is specified",
+				Name: "export-path",
+				Usage: "The directory to put binaries",
 			},
 		},
 		Action:  func(c *cli.Context) error {
@@ -51,16 +51,16 @@ func GenAction(c *cli.Context) error {
 	ctx := NewGenContext(c)
 
 	// configuration
-	conf, err := conf.LoadConfFile(ctx.Context)
+	cf, err := conf.LoadConfFile(ctx.Context)
 	if err != nil {
 		return err
 	}
 
 	// output aliases
-	if ctx.binary {
-		export.Path(ctx.Context, conf)
+	if ctx.export {
+		export.Path(ctx.Context, cf)
 	} else {
-		export.Aliases(ctx.Context, conf)
+		export.Aliases(ctx.Context, cf)
 	}
 
 	return nil

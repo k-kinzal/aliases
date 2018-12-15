@@ -10,17 +10,17 @@ import (
 type Context struct {
 	homePath string
 	confPath string
-	binaryPath string
+	exportPath string
 }
 
 func NewContext(
 		homePath string,
 		confPath string,
-		binaryPath string) *Context {
+		exportPath string) *Context {
 	return &Context{
 		homePath: homePath,
 		confPath: confPath,
-		binaryPath: binaryPath,
+		exportPath: exportPath,
 	}
 }
 
@@ -58,13 +58,13 @@ func (ctx *Context)GetConfPath() string {
 }
 
 
-func (ctx *Context)GetBinaryPath() string {
-	if ctx.binaryPath != "" {
-		return ctx.binaryPath
+func (ctx *Context)GetExportPath() string {
+	if ctx.exportPath != "" {
+		return ctx.exportPath
 	}
 
 	hash := uuid.NewMD5(uuid.UUID{}, []byte(ctx.GetHomePath())).String()
-	ctx.binaryPath = fmt.Sprintf("%s/%s", ctx.GetHomePath(), hash)
+	ctx.exportPath = fmt.Sprintf("%s/%s", ctx.GetHomePath(), hash)
 
-	return ctx.binaryPath
+	return ctx.exportPath
 }

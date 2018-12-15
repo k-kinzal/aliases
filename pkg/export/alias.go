@@ -12,7 +12,7 @@ import (
 
 
 func Aliases(ctx *context.Context, conf *conf.AliasesConf) {
-	dir := ctx.GetBinaryPath()
+	dir := ctx.GetExportPath()
 	os.Remove(dir)
 	os.Mkdir(dir, 0755)
 

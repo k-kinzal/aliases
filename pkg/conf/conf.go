@@ -204,7 +204,7 @@ func LoadConfFile(ctx *context.Context) (*AliasesConf, error) {
 			c.DockerRunOpts.Env["ALIASES_PWD"] = "${ALIASES_PWD:-$PWD}"
 
 			for _, dep := range c.Dependencies {
-				from := fmt.Sprintf("%s/%s", ctx.GetBinaryPath(), path.Base(dep.Path))
+				from := fmt.Sprintf("%s/%s", ctx.GetExportPath(), path.Base(dep.Path))
 				volume := fmt.Sprintf("%s:/usr/local/bin/%s", from, path.Base(dep.Path))
 				c.DockerRunOpts.Volume = append(c.DockerRunOpts.Volume, volume)
 			}
