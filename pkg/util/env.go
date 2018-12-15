@@ -1,4 +1,4 @@
-package aliases
+package util
 
 import (
 	"os"
@@ -13,7 +13,7 @@ func expandEnv(str string) string {
 	return str
 }
 
-func expandColonDelimitedStringWithEnv(s string) string {
+func ExpandColonDelimitedStringWithEnv(s string) string {
 	arr := strings.Split(s, ":")
 	if len(arr) > 0 {
 		arr[0] = expandEnv(arr[0])
@@ -21,16 +21,16 @@ func expandColonDelimitedStringWithEnv(s string) string {
 	return strings.Join(arr, ":")
 }
 
-func expandColonDelimitedStringListWithEnv(arr []string) []string {
+func ExpandColonDelimitedStringListWithEnv(arr []string) []string {
 	rets := make([]string, 0)
 	for _, v := range arr {
-		rets = append(rets, expandColonDelimitedStringWithEnv(v))
+		rets = append(rets, ExpandColonDelimitedStringWithEnv(v))
 	}
 
 	return rets
 }
 
-func expandStringKeyMapWithEnv(m map[string]string) map[string]string {
+func ExpandStringKeyMapWithEnv(m map[string]string) map[string]string {
 	rets := make(map[string]string, 0)
 	for k, v := range m {
 		rets[expandEnv(k)] = v

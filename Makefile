@@ -8,12 +8,17 @@ DIST_DIR := $(shell if [ -n "$(GOOS)$(GOARCH)" ]; then echo "./dist/$(GOOS)-$(GO
 
 .PHONY: build
 build:
-	go build -ldflags "-X github.com/$(USER)/$(REPO)/pkg/version.version=$(VERSION)" -o $(DIST_DIR)/aliases .
+	go build -ldflags "-s -w -X github.com/$(USER)/$(REPO)/pkg/version.version=$(VERSION)" -o $(DIST_DIR)/aliases .
 
 .PHONY: cross-build
 cross-build:
 	@make build GOOS=linux GOARCH=amd64
 	@make build GOOS=darwin GOARCH=amd64
+
+.PHONY: test
+test:
+	go test ./... -v
+
 
 .PHONY: clean
 clean:

@@ -2,9 +2,11 @@ package export
 
 import (
 	"fmt"
-	"github.com/k-kinzal/aliases/pkg"
+	"github.com/k-kinzal/aliases/pkg/conf"
+	"github.com/k-kinzal/aliases/pkg/docker"
 	"io/ioutil"
-	"os"
+	"path"
+	"strings"
 )
 
 var (
@@ -20,15 +22,10 @@ fi
 `
 )
 
-func WriteFiles(cmds []aliases.AliasCommand, conf aliases.AliasesConf, ctx aliases.Context) {
-	os.Remove(ctx.GetBinaryPath(conf.Hash))
-	os.Mkdir(ctx.GetBinaryPath(conf.Hash), 0755)
-
-	for _, cmd := range cmds {
-		str := cmd.ToString()
-		path := fmt.Sprintf("%s/%s", ctx.GetBinaryPath(conf.Hash), cmd.Filename)
-		content := fmt.Sprintf(tmpl, str, str)
-
-		ioutil.WriteFile(path, []byte(content), 0755)
-	}
+func writeFiles(conf *conf.CommandConf, dir string) {
+	cmd := docker.NewRunCmd(&conf.DockerRunOpts)
+	cmdStr := fmt.Sprintf("%s %s", cmd.Path, strings.Join(cmd.Args, " "))
+	writePath := fmt.Sprintf("%s/%s", dir, path.Base(conf.Path))
+	content := fmt.Sprintf(tmpl, cmdStr, cmdStr)
+	ioutil.WriteFile(writePath, []byte(content), 0755)
 }
