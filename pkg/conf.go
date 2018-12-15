@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/k-kinzal/aliases/pkg/context"
 	"github.com/k-kinzal/aliases/pkg/docker"
 	"github.com/k-kinzal/aliases/pkg/util"
 	"io/ioutil"
@@ -24,7 +25,7 @@ type AliasesConf struct {
 	Commands []CommandConf
 }
 
-func LoadConfFile(ctx *Context) (*AliasesConf, error) {
+func LoadConfFile(ctx *context.Context) (*AliasesConf, error) {
 	if _, err := os.Stat(ctx.GetConfPath()); os.IsNotExist(err) {
 		return nil, fmt.Errorf("configuration file is not exists `%s`", ctx.GetConfPath())
 	}
@@ -199,7 +200,7 @@ func LoadConfFile(ctx *Context) (*AliasesConf, error) {
 			c.DockerRunOpts.Env["ALIASES_PWD"] = "${ALIASES_PWD:-$PWD}"
 
 			for _, dep := range c.Dependencies {
-				from := fmt.Sprintf("%s/%s", ctx.GetBinaryPath(conf.Hash), path.Base(dep.Path))
+				from := fmt.Sprintf("%s/%s", ctx.GetBinaryPath(), path.Base(dep.Path))
 				volume := fmt.Sprintf("%s:/usr/local/bin/%s", from, path.Base(dep.Path))
 				c.DockerRunOpts.Volume = append(c.DockerRunOpts.Volume, volume)
 			}

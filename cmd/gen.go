@@ -2,9 +2,29 @@ package cmd
 
 import (
 	"github.com/k-kinzal/aliases/pkg"
+	"github.com/k-kinzal/aliases/pkg/context"
 	"github.com/k-kinzal/aliases/pkg/export"
 	"github.com/urfave/cli"
 )
+
+type GenContext struct {
+	*context.Context
+
+	binary bool
+}
+
+func NewGenContext(c *cli.Context) *GenContext {
+	ctx := context.NewContext(
+		c.GlobalString("home"),
+		c.GlobalString("config"),
+		c.String("binary-path"),
+	)
+
+	return &GenContext{
+		Context: ctx,
+		binary: c.Bool("binary"),
+	}
+}
 
 func GenCommand() cli.Command {
 	return cli.Command {
@@ -28,19 +48,19 @@ func GenCommand() cli.Command {
 
 func GenAction(c *cli.Context) error {
 	// context
-	ctx := aliases.NewContext(c.GlobalString("home"), c.GlobalString("config"), c.String("binary-path"))
+	ctx := NewGenContext(c)
 
 	// configuration
-	conf, err := aliases.LoadConfFile(ctx)
+	conf, err := aliases.LoadConfFile(ctx.Context)
 	if err != nil {
 		return err
 	}
 
 	// output aliases
-	if c.Bool("binary") {
-		export.Path(conf, ctx)
+	if ctx.binary {
+		export.Path(ctx.Context, conf)
 	} else {
-		export.Aliases(conf, ctx)
+		export.Aliases(ctx.Context, conf)
 	}
 
 	return nil

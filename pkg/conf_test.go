@@ -3,6 +3,7 @@ package aliases_test
 import (
 	"fmt"
 	"github.com/k-kinzal/aliases/pkg"
+	"github.com/k-kinzal/aliases/pkg/context"
 	"io/ioutil"
 	"os"
 	"path"
@@ -18,7 +19,7 @@ func TestLoadConfFile(t *testing.T) {
 `
 	file, _ := ioutil.TempFile("", "")
 	file.Write([]byte(yaml))
-	ctx := aliases.NewContext("", file.Name(), "")
+	ctx := context.NewContext("", file.Name(), "")
 
 	conf, err := aliases.LoadConfFile(ctx)
 	if err != nil {
@@ -45,7 +46,7 @@ func TestLoadConfFile_ShouldBeSetDefaultValue(t *testing.T) {
 `
 	file, _ := ioutil.TempFile("", "")
 	file.Write([]byte(yaml))
-	ctx := aliases.NewContext("", file.Name(), "")
+	ctx := context.NewContext("", file.Name(), "")
 
 	conf, err := aliases.LoadConfFile(ctx)
 	if err != nil {
@@ -77,7 +78,7 @@ func TestUnmarshalConfFile_ShouldBeSetDependenciesWithUnixSock(t *testing.T) {
 `
 	file, _ := ioutil.TempFile("", "")
 	file.Write([]byte(yaml))
-	ctx := aliases.NewContext("", file.Name(), "")
+	ctx := context.NewContext("", file.Name(), "")
 
 	conf, err := aliases.LoadConfFile(ctx)
 	if err != nil {
@@ -99,7 +100,7 @@ func TestUnmarshalConfFile_ShouldBeSetDependenciesWithUnixSock(t *testing.T) {
 	if command.DockerRunOpts.Volume[1] != "/var/run/docker.sock:/var/run/docker.sock" {
 		t.Errorf("expected `/var/run/docker.sock:/var/run/docker.sock`, but in actual `%s` has been set in dockerrunopts.volume[1]", command.DockerRunOpts.Volume[1])
 	}
-	mauntPath := fmt.Sprintf("%s/%s", ctx.GetBinaryPath(conf.Hash), path.Base(command.Dependencies[0].Path))
+	mauntPath := fmt.Sprintf("%s/%s", ctx.GetBinaryPath(), path.Base(command.Dependencies[0].Path))
 	volume := fmt.Sprintf("%s:%s", mauntPath, command.Dependencies[0].Path)
 	if command.DockerRunOpts.Volume[2] != volume {
 		t.Errorf("expected `%s`, but in actual `%s` has been set in dockerrunopts.volume[2]", volume, command.DockerRunOpts.Volume[1])
@@ -123,7 +124,7 @@ func TestUnmarshalConfFile_ShouldBeSetDependenciesWithHost(t *testing.T) {
 `
 	file, _ := ioutil.TempFile("", "")
 	file.Write([]byte(yaml))
-	ctx := aliases.NewContext("", file.Name(), "")
+	ctx := context.NewContext("", file.Name(), "")
 
 	conf, err := aliases.LoadConfFile(ctx)
 	if err != nil {
@@ -142,7 +143,7 @@ func TestUnmarshalConfFile_ShouldBeSetDependenciesWithHost(t *testing.T) {
 	if command.DockerRunOpts.Volume[0] != "/usr/local/bin/docker:/usr/local/bin/docker" {
 		t.Errorf("expected `/usr/local/bin/docker:/usr/local/bin/docker`, but in actual `%s` has been set in dockerrunopts.volume[0]", command.DockerRunOpts.Volume[0])
 	}
-	mauntPath := fmt.Sprintf("%s/%s", ctx.GetBinaryPath(conf.Hash), path.Base(command.Dependencies[0].Path))
+	mauntPath := fmt.Sprintf("%s/%s", ctx.GetBinaryPath(), path.Base(command.Dependencies[0].Path))
 	volume := fmt.Sprintf("%s:%s", mauntPath, command.Dependencies[0].Path)
 	if command.DockerRunOpts.Volume[1] != volume {
 		t.Errorf("expected `%s`, but in actual `%s` has been set in dockerrunopts.volume[1]", volume, command.DockerRunOpts.Volume[1])
@@ -170,7 +171,7 @@ func TestUnmarshalConfFile_ShouldBeExpandEnv(t *testing.T) {
 `
 	file, _ := ioutil.TempFile("", "")
 	file.Write([]byte(yaml))
-	ctx := aliases.NewContext("", file.Name(), "")
+	ctx := context.NewContext("", file.Name(), "")
 
 	conf, err := aliases.LoadConfFile(ctx)
 	if err != nil {

@@ -3,6 +3,7 @@ package export
 import (
 	"fmt"
 	"github.com/k-kinzal/aliases/pkg"
+	"github.com/k-kinzal/aliases/pkg/context"
 	"github.com/k-kinzal/aliases/pkg/docker"
 	"os"
 	"path"
@@ -10,8 +11,8 @@ import (
 )
 
 
-func Aliases(conf *aliases.AliasesConf, ctx *aliases.Context) {
-	dir := ctx.GetBinaryPath(conf.Hash)
+func Aliases(ctx *context.Context, conf *aliases.AliasesConf) {
+	dir := ctx.GetBinaryPath()
 	os.Remove(dir)
 	os.Mkdir(dir, 0755)
 
