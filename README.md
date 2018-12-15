@@ -44,11 +44,11 @@ $ eval "$(aliases gen)"
 or 
 
 ```
-$ eval "$(aliases gen --binary)"
+$ eval "$(aliases gen --export)"
 ```
 
 
-Using the option of `--binary` can be used as a command instead of an alias.
+Using the option of `--export` can be used as a command instead of an alias.
 
 ## CLI
 
