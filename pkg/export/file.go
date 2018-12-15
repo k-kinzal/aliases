@@ -24,7 +24,7 @@ fi
 
 func writeFiles(conf *conf.CommandConf, dir string) {
 	cmd := docker.NewRunCmd(&conf.DockerRunOpts)
-	cmdStr := fmt.Sprintf("%s %s", cmd.Path, strings.Join(cmd.Args, " "))
+	cmdStr := fmt.Sprintf("%s %s", cmd.Path, strings.Join(cmd.Args[1:], " "))
 	writePath := fmt.Sprintf("%s/%s", dir, path.Base(conf.Path))
 	content := fmt.Sprintf(tmpl, cmdStr, cmdStr)
 	ioutil.WriteFile(writePath, []byte(content), 0755)
