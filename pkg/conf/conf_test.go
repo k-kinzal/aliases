@@ -2,7 +2,7 @@ package conf_test
 
 import (
 	"fmt"
-	"github.com/k-kinzal/aliases/pkg"
+	"github.com/k-kinzal/aliases/pkg/conf"
 	"github.com/k-kinzal/aliases/pkg/context"
 	"io/ioutil"
 	"os"
@@ -12,23 +12,23 @@ import (
 )
 
 func TestLoadConfFile(t *testing.T) {
-	yaml := `---
+	content := `---
 /usr/local/bin/kubectl:
   image: chatwork/kubectl
   tag: 1.11.2
 `
 	file, _ := ioutil.TempFile("", "")
-	file.Write([]byte(yaml))
+	file.Write([]byte(content))
 	ctx := context.NewContext("", file.Name(), "")
 
-	conf, err := aliases.LoadConfFile(ctx)
+	cf, err := conf.LoadConfFile(ctx)
 	if err != nil {
 		t.Errorf("load config error: %v", err)
 	}
-	if len(conf.Commands) != 1 {
-		t.Errorf("expected `1`, but in actual the load configuration length is `%d`", len(conf.Commands))
+	if len(cf.Commands) != 1 {
+		t.Errorf("expected `1`, but in actual the load configuration length is `%d`", len(cf.Commands))
 	}
-	command := conf.Commands[0]
+	command := cf.Commands[0]
 	if command.Path != "/usr/local/bin/kubectl" {
 		t.Error("/usr/local/bin/kubectl does not exist in load configuration")
 	}
@@ -39,20 +39,20 @@ func TestLoadConfFile(t *testing.T) {
 }
 
 func TestLoadConfFile_ShouldBeSetDefaultValue(t *testing.T) {
-	yaml := `---
+	content := `---
 /usr/local/bin/kubectl:
   image: chatwork/kubectl
   tag: 1.11.2
 `
 	file, _ := ioutil.TempFile("", "")
-	file.Write([]byte(yaml))
+	file.Write([]byte(content))
 	ctx := context.NewContext("", file.Name(), "")
 
-	conf, err := aliases.LoadConfFile(ctx)
+	cf, err := conf.LoadConfFile(ctx)
 	if err != nil {
 		t.Errorf("load config error: %v", err)
 	}
-	command := conf.Commands[0]
+	command := cf.Commands[0]
 	if *command.DockerRunOpts.Interactive != true {
 		t.Errorf("expected `true`, but in actual `%s` has been set in dockerrunopts.interactive", strconv.FormatBool(*command.DockerRunOpts.Interactive))
 	}
@@ -66,7 +66,7 @@ func TestLoadConfFile_ShouldBeSetDefaultValue(t *testing.T) {
 
 func TestUnmarshalConfFile_ShouldBeSetDependenciesWithUnixSock(t *testing.T) {
 	os.Setenv("DOCKER_HOST", "unix:///var/run/docker.sock")
-	yaml := `---
+	content := `---
 /usr/local/bin/kubectl:
   image: chatwork/kubectl
   tag: 1.11.2
@@ -77,18 +77,18 @@ func TestUnmarshalConfFile_ShouldBeSetDependenciesWithUnixSock(t *testing.T) {
   - /usr/local/bin/kubectl
 `
 	file, _ := ioutil.TempFile("", "")
-	file.Write([]byte(yaml))
+	file.Write([]byte(content))
 	ctx := context.NewContext("", file.Name(), "")
 
-	conf, err := aliases.LoadConfFile(ctx)
+	cf, err := conf.LoadConfFile(ctx)
 	if err != nil {
 		t.Errorf("load config error: %v", err)
 	}
-	command := aliases.CommandConf{}
-	if conf.Commands[0].Path == "/usr/local/bin/helmfile" {
-		command = conf.Commands[0]
+	command := conf.CommandConf{}
+	if cf.Commands[0].Path == "/usr/local/bin/helmfile" {
+		command = cf.Commands[0]
 	} else {
-		command = conf.Commands[1]
+		command = cf.Commands[1]
 	}
 
 	if *command.DockerRunOpts.Privileged != true {
@@ -112,7 +112,7 @@ func TestUnmarshalConfFile_ShouldBeSetDependenciesWithUnixSock(t *testing.T) {
 
 func TestUnmarshalConfFile_ShouldBeSetDependenciesWithHost(t *testing.T) {
 	os.Setenv("DOCKER_HOST", "tcp://localhost")
-	yaml := `---
+	content := `---
 /usr/local/bin/kubectl:
   image: chatwork/kubectl
   tag: 1.11.2
@@ -123,18 +123,18 @@ func TestUnmarshalConfFile_ShouldBeSetDependenciesWithHost(t *testing.T) {
   - /usr/local/bin/kubectl
 `
 	file, _ := ioutil.TempFile("", "")
-	file.Write([]byte(yaml))
+	file.Write([]byte(content))
 	ctx := context.NewContext("", file.Name(), "")
 
-	conf, err := aliases.LoadConfFile(ctx)
+	cf, err := conf.LoadConfFile(ctx)
 	if err != nil {
 		t.Errorf("load config error: %v", err)
 	}
-	command := aliases.CommandConf{}
-	if conf.Commands[0].Path == "/usr/local/bin/helmfile" {
-		command = conf.Commands[0]
+	command := conf.CommandConf{}
+	if cf.Commands[0].Path == "/usr/local/bin/helmfile" {
+		command = cf.Commands[0]
 	} else {
-		command = conf.Commands[1]
+		command = cf.Commands[1]
 	}
 
 	if *command.DockerRunOpts.Privileged != true {
@@ -157,7 +157,7 @@ func TestUnmarshalConfFile_ShouldBeSetDependenciesWithHost(t *testing.T) {
 }
 
 func TestUnmarshalConfFile_ShouldBeExpandEnv(t *testing.T) {
-	yaml := `---
+	content := `---
 /usr/local/bin/kubectl:
   image: chatwork/kubectl
   tag: 1.11.2
@@ -170,14 +170,14 @@ func TestUnmarshalConfFile_ShouldBeExpandEnv(t *testing.T) {
   workdir: /kube
 `
 	file, _ := ioutil.TempFile("", "")
-	file.Write([]byte(yaml))
+	file.Write([]byte(content))
 	ctx := context.NewContext("", file.Name(), "")
 
-	conf, err := aliases.LoadConfFile(ctx)
+	cf, err := conf.LoadConfFile(ctx)
 	if err != nil {
 		t.Errorf("load config error: %v", err)
 	}
-	command := conf.Commands[0]
+	command := cf.Commands[0]
 	if command.DockerRunOpts.Env["KUBECONFIG"] != "$HOME/.kube/config" {
 		t.Errorf("expected `$HOME/.kube/config`, but in actual `%s` has been set in dockerrunopts.env[\"KUBECONFIG\"]", command.DockerRunOpts.Env["KUBECONFIG"])
 	}

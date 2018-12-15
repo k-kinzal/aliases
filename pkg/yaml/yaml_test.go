@@ -1,8 +1,8 @@
 package yaml_test
 
 import (
-	"github.com/k-kinzal/aliases/pkg"
 	"github.com/k-kinzal/aliases/pkg/docker"
+	"github.com/k-kinzal/aliases/pkg/yaml"
 	"reflect"
 	"regexp"
 	"strings"
@@ -21,13 +21,13 @@ func toKebabCase(str string) string {
 }
 
 func TestUnmarshalConfFile(t *testing.T) {
-	yaml := `---
+	content := `---
 /usr/local/bin/kubectl:
   image: chatwork/kubectl
   tag: 1.11.2
 `
 
-	defs, err := aliases.UnmarshalConfFile([]byte(yaml))
+	defs, err := yaml.UnmarshalConfFile([]byte(content))
 	if err != nil {
 		t.Errorf("unmarshal configuration error: %v", err)
 	}
@@ -46,7 +46,7 @@ func TestUnmarshalConfFile(t *testing.T) {
 }
 
 func TestUnmarshalConfFile_ShouldBeKebabCaseOfFieldName(t *testing.T) {
-	val := reflect.New(reflect.TypeOf(aliases.YamlDefinition{})).Elem()
+	val := reflect.New(reflect.TypeOf(yaml.YamlDefinition{})).Elem()
 	for i := 0; i < val.NumField(); i++ {
 		field := val.Type().Field(i)
 
@@ -65,7 +65,7 @@ func TestUnmarshalConfFile_ShouldBeKebabCaseOfFieldName(t *testing.T) {
 
 func TestUnmarshalConfFile_ShouldBeSameFieldAsDockerRunOptsExist(t *testing.T) {
 	val1 := reflect.New(reflect.TypeOf(docker.RunOpts{})).Elem()
-	val2 := reflect.New(reflect.TypeOf(aliases.YamlDefinition{})).Elem()
+	val2 := reflect.New(reflect.TypeOf(yaml.YamlDefinition{})).Elem()
 	for i := 0; i < val1.NumField(); i++ {
 		field := val1.Type().Field(i)
 		if _, ok := val2.Type().FieldByName(field.Name); !ok {
