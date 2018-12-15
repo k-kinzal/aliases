@@ -15,6 +15,11 @@ cross-build:
 	@make build GOOS=linux GOARCH=amd64
 	@make build GOOS=darwin GOARCH=amd64
 
+.PHONY: test
+test:
+	go test ./... -v
+
+
 .PHONY: clean
 clean:
 	@rm -rf $(DIST_DIR)
