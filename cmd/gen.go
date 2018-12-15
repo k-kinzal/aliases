@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/k-kinzal/aliases/pkg"
+	"github.com/k-kinzal/aliases/pkg/conf"
 	"github.com/k-kinzal/aliases/pkg/context"
 	"github.com/k-kinzal/aliases/pkg/export"
 	"github.com/urfave/cli"
@@ -51,7 +51,7 @@ func GenAction(c *cli.Context) error {
 	ctx := NewGenContext(c)
 
 	// configuration
-	conf, err := aliases.LoadConfFile(ctx.Context)
+	conf, err := conf.LoadConfFile(ctx.Context)
 	if err != nil {
 		return err
 	}

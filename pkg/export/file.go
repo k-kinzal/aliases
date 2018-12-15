@@ -2,7 +2,7 @@ package export
 
 import (
 	"fmt"
-	"github.com/k-kinzal/aliases/pkg"
+	"github.com/k-kinzal/aliases/pkg/conf"
 	"github.com/k-kinzal/aliases/pkg/docker"
 	"io/ioutil"
 	"path"
@@ -22,7 +22,7 @@ fi
 `
 )
 
-func writeFiles(conf *aliases.CommandConf, dir string) {
+func writeFiles(conf *conf.CommandConf, dir string) {
 	cmd := docker.NewRunCmd(&conf.DockerRunOpts)
 	cmdStr := fmt.Sprintf("%s %s", cmd.Path, strings.Join(cmd.Args, " "))
 	writePath := fmt.Sprintf("%s/%s", dir, path.Base(conf.Path))

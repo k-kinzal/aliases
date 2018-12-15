@@ -1,4 +1,4 @@
-package aliases_test
+package conf_test
 
 import (
 	"fmt"
