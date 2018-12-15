@@ -12,8 +12,8 @@ func Path(ctx *context.Context, conf *conf.AliasesConf) {
 	os.Remove(dir)
 	os.Mkdir(dir, 0755)
 
-	for _, conf := range conf.Commands {
-		writeFiles(&conf, dir)
+	for _, cf := range conf.Commands {
+		writeFiles(&cf, dir)
 	}
 
 	fmt.Printf("export PATH=\"%s:$PATH\"", dir)

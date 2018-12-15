@@ -51,16 +51,16 @@ func GenAction(c *cli.Context) error {
 	ctx := NewGenContext(c)
 
 	// configuration
-	conf, err := conf.LoadConfFile(ctx.Context)
+	cf, err := conf.LoadConfFile(ctx.Context)
 	if err != nil {
 		return err
 	}
 
 	// output aliases
 	if ctx.export {
-		export.Path(ctx.Context, conf)
+		export.Path(ctx.Context, cf)
 	} else {
-		export.Aliases(ctx.Context, conf)
+		export.Aliases(ctx.Context, cf)
 	}
 
 	return nil
