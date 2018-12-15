@@ -8,7 +8,7 @@ DIST_DIR := $(shell if [ -n "$(GOOS)$(GOARCH)" ]; then echo "./dist/$(GOOS)-$(GO
 
 .PHONY: build
 build:
-	go build -ldflags "-X github.com/$(USER)/$(REPO)/pkg/version.version=$(VERSION)" -o $(DIST_DIR)/aliases .
+	go build -ldflags "-s -w -X github.com/$(USER)/$(REPO)/pkg/version.version=$(VERSION)" -o $(DIST_DIR)/aliases .
 
 .PHONY: cross-build
 cross-build:
