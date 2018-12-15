@@ -1,4 +1,4 @@
-package aliases
+package yaml
 
 import (
 	"gopkg.in/yaml.v2"

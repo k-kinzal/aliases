@@ -1,4 +1,4 @@
-package aliases_test
+package yaml_test
 
 import (
 	"github.com/k-kinzal/aliases/pkg"

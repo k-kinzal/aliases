@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/k-kinzal/aliases/pkg"
 	"github.com/k-kinzal/aliases/pkg/context"
 	"github.com/k-kinzal/aliases/pkg/docker"
 	"github.com/k-kinzal/aliases/pkg/util"
+	"github.com/k-kinzal/aliases/pkg/yaml"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -36,7 +36,7 @@ func LoadConfFile(ctx *context.Context) (*AliasesConf, error) {
 		return nil, fmt.Errorf("configuration file cannot read `%q`", err)
 	}
 
-	defs, err:= aliases.UnmarshalConfFile(buf)
+	defs, err:= yaml.UnmarshalConfFile(buf)
 	if err != nil {
 		return nil, err
 	}
