@@ -33,11 +33,11 @@ func GenCommand() cli.Command {
 		Flags: []cli.Flag {
 			cli.BoolFlag{
 				Name: "binary",
-				Usage: "",
+				Usage: "If you pass true, you will return export instead of aliase",
 			},
 			cli.StringFlag{
 				Name: "binary-path",
-				Usage: "the directory to put binaries. works only when --binary is specified",
+				Usage: "The directory to put binaries",
 			},
 		},
 		Action:  func(c *cli.Context) error {
