@@ -52,6 +52,12 @@ func LoadConfFile(ctx *context.Context) (*AliasesConf, error) {
 		c := pathMap[key]
 
 		c.Path = key
+		if def.Image == "" {
+			return nil, fmt.Errorf("image is required in %s.image", key)
+		}
+		if def.Tag == "" {
+			return nil, fmt.Errorf("tag is required in %s.tag", key)
+		}
 		c.DockerRunOpts.Image = fmt.Sprintf("%s:${%s_VERSION:-\"%s\"}", def.Image, strings.ToUpper(path.Base(key)), def.Tag)
 		if def.Command != nil {
 			c.DockerRunOpts.Args = []string{*def.Command}
@@ -168,7 +174,7 @@ func LoadConfFile(ctx *context.Context) (*AliasesConf, error) {
 				if dep, ok := pathMap[target]; ok {
 					c.Dependencies = append(c.Dependencies, dep)
 				} else {
-					return nil, errors.New(fmt.Sprintf("undefined dependency: `%s` in `%s.Dependencies[]`", target, key))
+					return nil, errors.New(fmt.Sprintf("undefined dependency: `%s` in `%s.dependencies[]`", target, key))
 				}
 			}
 
