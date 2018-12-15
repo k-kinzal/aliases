@@ -137,22 +137,19 @@ func TestUnmarshalConfFile_ShouldBeSetDependenciesWithHost(t *testing.T) {
 		command = cf.Commands[1]
 	}
 
-	if *command.DockerRunOpts.Privileged != true {
-		t.Errorf("expected `true`, but in actual `%s` has been set in dockerrunopts.privileged", strconv.FormatBool(*command.DockerRunOpts.Privileged))
-	}
-	if command.DockerRunOpts.Volume[0] != "/usr/local/bin/docker:/usr/local/bin/docker" {
-		t.Errorf("expected `/usr/local/bin/docker:/usr/local/bin/docker`, but in actual `%s` has been set in dockerrunopts.volume[0]", command.DockerRunOpts.Volume[0])
-	}
 	mauntPath := fmt.Sprintf("%s/%s", ctx.GetExportPath(), path.Base(command.Dependencies[0].Path))
 	volume := fmt.Sprintf("%s:%s", mauntPath, command.Dependencies[0].Path)
-	if command.DockerRunOpts.Volume[1] != volume {
-		t.Errorf("expected `%s`, but in actual `%s` has been set in dockerrunopts.volume[1]", volume, command.DockerRunOpts.Volume[1])
+	if command.DockerRunOpts.Volume[0] != volume {
+		t.Errorf("expected `%s`, but in actual `%s` has been set in dockerrunopts.volume[0]", volume, command.DockerRunOpts.Volume[0])
 	}
 	if command.DockerRunOpts.Env["DOCKER_HOST"] != "tcp://localhost" {
 		t.Errorf("expected `tcp://localhost`, but in actual `%s` has been set in dockerrunopts.env[\"DOCKER_HOST\"]", command.DockerRunOpts.Env["ALIASES_PWD"])
 	}
 	if command.DockerRunOpts.Env["ALIASES_PWD"] != "${ALIASES_PWD:-$PWD}" {
 		t.Errorf("expected `${ALIASES_PWD:-$PWD}`, but in actual `%s` has been set in dockerrunopts.env[\"ALIASES_PWD\"]", command.DockerRunOpts.Env["ALIASES_PWD"])
+	}
+	if *command.DockerRunOpts.Network != "host" {
+		t.Errorf("expected `host`, but in actual `%s` has been set in dockerrunopts.network", *command.DockerRunOpts.Network)
 	}
 }
 
