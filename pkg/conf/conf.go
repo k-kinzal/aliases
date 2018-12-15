@@ -3,7 +3,6 @@ package conf
 import (
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
 	"github.com/k-kinzal/aliases/pkg/context"
 	"github.com/k-kinzal/aliases/pkg/docker"
 	"github.com/k-kinzal/aliases/pkg/util"
@@ -22,7 +21,6 @@ type CommandConf struct {
 }
 
 type AliasesConf struct {
-	Hash string
 	Commands []CommandConf
 }
 
@@ -42,7 +40,6 @@ func LoadConfFile(ctx *context.Context) (*AliasesConf, error) {
 	}
 
 	conf := new(AliasesConf)
-	conf.Hash = uuid.NewMD5(uuid.UUID{}, buf).String()
 
 	pathMap := make(map[string]*CommandConf)
 	for key := range defs {
