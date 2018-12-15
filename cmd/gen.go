@@ -22,25 +22,25 @@ func NewGenContext(c *cli.Context) *GenContext {
 
 	return &GenContext{
 		Context: ctx,
-		export: c.Bool("export"),
+		export:  c.Bool("export"),
 	}
 }
 
 func GenCommand() cli.Command {
-	return cli.Command {
-		Name:    "gen",
-		Usage:   "Generate aliases",
-		Flags: []cli.Flag {
+	return cli.Command{
+		Name:  "gen",
+		Usage: "Generate aliases",
+		Flags: []cli.Flag{
 			cli.BoolFlag{
-				Name: "export",
+				Name:  "export",
 				Usage: "If you pass true, you will return export instead of aliase",
 			},
 			cli.StringFlag{
-				Name: "export-path",
+				Name:  "export-path",
 				Usage: "The directory to put binaries",
 			},
 		},
-		Action:  func(c *cli.Context) error {
+		Action: func(c *cli.Context) error {
 			return GenAction(c)
 		},
 	}

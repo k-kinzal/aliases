@@ -20,13 +20,13 @@ func main() {
 
 	app.Version = version.GetVersion()
 
-	app.Flags = []cli.Flag {
+	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name: "config, c",
+			Name:  "config, c",
 			Usage: "Load configuration from `FILE`",
 		},
 		cli.StringFlag{
-			Name: "home",
+			Name:  "home",
 			Usage: "Home directory for aliases",
 		},
 	}

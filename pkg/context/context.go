@@ -8,23 +8,23 @@ import (
 )
 
 type Context struct {
-	homePath string
-	confPath string
+	homePath   string
+	confPath   string
 	exportPath string
 }
 
 func NewContext(
-		homePath string,
-		confPath string,
-		exportPath string) *Context {
+	homePath string,
+	confPath string,
+	exportPath string) *Context {
 	return &Context{
-		homePath: homePath,
-		confPath: confPath,
+		homePath:   homePath,
+		confPath:   confPath,
 		exportPath: exportPath,
 	}
 }
 
-func (ctx *Context)GetHomePath() string {
+func (ctx *Context) GetHomePath() string {
 	if ctx.homePath != "" {
 		return ctx.homePath
 	}
@@ -42,7 +42,7 @@ func (ctx *Context)GetHomePath() string {
 	return ctx.homePath
 }
 
-func (ctx *Context)GetConfPath() string {
+func (ctx *Context) GetConfPath() string {
 	if ctx.confPath != "" {
 		return ctx.confPath
 	}
@@ -57,8 +57,7 @@ func (ctx *Context)GetConfPath() string {
 	return ctx.confPath
 }
 
-
-func (ctx *Context)GetExportPath() string {
+func (ctx *Context) GetExportPath() string {
 	if ctx.exportPath != "" {
 		return ctx.exportPath
 	}

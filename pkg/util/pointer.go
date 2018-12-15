@@ -1,6 +1,5 @@
 package util
 
-
 func Pbool(b bool) *bool {
 	return &b
 }

@@ -8,120 +8,120 @@ import (
 
 type RunOpts struct {
 	// see: https://github.com/docker/cli/blob/18.09/cli/command/container/run.go
-	Detach *bool       // Run container in background and print container ID
-	SigProxy *bool     // Proxy received signals to the process
-	Name *string      // Assign a name to the container
+	Detach     *bool   // Run container in background and print container ID
+	SigProxy   *bool   // Proxy received signals to the process
+	Name       *string // Assign a name to the container
 	DetachKeys *string // Override the key sequence for detaching a container
 
-	Platform *string          // Set platform if server is multi-platform capable
-	DisableContentTrust *bool // Skip image verification
+	Platform            *string // Set platform if server is multi-platform capable
+	DisableContentTrust *bool   // Skip image verification
 
 	// see: https://github.com/docker/cli/blob/18.09/cli/command/container/opts.go
 	// General purpose flags
-	Attach []string           // Attach to STDIN, STDOUT or STDERR
-	DeviceCgroupRule []string // Add a rule to the cgroup allowed devices list
-	Device []string           // Add a host device to the container
-	Env map[string]string     // Set environment variables
-	EnvFile []string          // Read in a file of environment variables
-	Entrypoint *string        // Overwrite the default ENTRYPOINT of the image
-	GroupAdd []string         // Add additional groups to join
-	Hostname *string          // Container host name
-	Domainname *string        // Container NIS domain name
-	Interactive *bool          // Keep STDIN open even if not attached
-	Label map[string]string   // Set meta data on a container
-	LabelFile []string        // Read in a line delimited file of labels
-	ReadOnly *bool             // Mount the container's root filesystem as read only
-	Restart *string           // Restart policy to apply when a container exits
-	StopSignal *string        // Signal to stop a container
-	StopTimeout *int          // Timeout (in seconds) to stop a container
-	Sysctl map[string]string  // Sysctl options
-	Tty *bool                  // Allocate a pseudo-TTY
-	Ulimit map[string]string  // Ulimit options
-	User *string              // Username or UID (format: <name|uid>[:<group|gid>])
-	Workdir *string           // Working directory inside the container
-	Rm *bool                   // Automatically remove the container when it exits
+	Attach           []string          // Attach to STDIN, STDOUT or STDERR
+	DeviceCgroupRule []string          // Add a rule to the cgroup allowed devices list
+	Device           []string          // Add a host device to the container
+	Env              map[string]string // Set environment variables
+	EnvFile          []string          // Read in a file of environment variables
+	Entrypoint       *string           // Overwrite the default ENTRYPOINT of the image
+	GroupAdd         []string          // Add additional groups to join
+	Hostname         *string           // Container host name
+	Domainname       *string           // Container NIS domain name
+	Interactive      *bool             // Keep STDIN open even if not attached
+	Label            map[string]string // Set meta data on a container
+	LabelFile        []string          // Read in a line delimited file of labels
+	ReadOnly         *bool             // Mount the container's root filesystem as read only
+	Restart          *string           // Restart policy to apply when a container exits
+	StopSignal       *string           // Signal to stop a container
+	StopTimeout      *int              // Timeout (in seconds) to stop a container
+	Sysctl           map[string]string // Sysctl options
+	Tty              *bool             // Allocate a pseudo-TTY
+	Ulimit           map[string]string // Ulimit options
+	User             *string           // Username or UID (format: <name|uid>[:<group|gid>])
+	Workdir          *string           // Working directory inside the container
+	Rm               *bool             // Automatically remove the container when it exits
 
 	// Security
-	CapAdd []string               // Add Linux capabilities
-	CapDrop []string              // Drop Linux capabilities
-	Privileged *bool               // Give extended privileges to this container
+	CapAdd      []string          // Add Linux capabilities
+	CapDrop     []string          // Drop Linux capabilities
+	Privileged  *bool             // Give extended privileges to this container
 	SecurityOpt map[string]string // Security Options
-	Userns *string                // User namespace to use
+	Userns      *string           // User namespace to use
 
 	// Network and port publishing flag
-	AddHost []string      // Add a custom host-to-IP mapping (host:ip)
-	Dns []string          // Set custom DNS servers
-	DnsOpt []string       // Set DNS options
-	DnsOption []string    // Set DNS options
-	DnsSearch []string    // Set custom DNS search domains
-	Expose []string       // Expose a port or a range of ports
-	Ip *string            // IPv4 address (e.g., 172.30.100.104)
-	Ip6 *string           // IPv6 address (e.g., 2001:db8::33)
-	Link []string         // Add link to another container
-	LinkLocalIp []string  // Container IPv4/IPv6 link-local addresses
-	MacAddress *string    // Container MAC address (e.g., 92:d0:c6:0a:29:33)
-	Publish []string      // Publish a container's port(s) to the host
-	PublishAll *bool       // Publish all exposed ports to random ports
-	Net *string           // Connect a container to a network
-	Network *string       // Connect a container to a network
-	NetAlias []string     // Add network-scoped alias for the container
+	AddHost      []string // Add a custom host-to-IP mapping (host:ip)
+	Dns          []string // Set custom DNS servers
+	DnsOpt       []string // Set DNS options
+	DnsOption    []string // Set DNS options
+	DnsSearch    []string // Set custom DNS search domains
+	Expose       []string // Expose a port or a range of ports
+	Ip           *string  // IPv4 address (e.g., 172.30.100.104)
+	Ip6          *string  // IPv6 address (e.g., 2001:db8::33)
+	Link         []string // Add link to another container
+	LinkLocalIp  []string // Container IPv4/IPv6 link-local addresses
+	MacAddress   *string  // Container MAC address (e.g., 92:d0:c6:0a:29:33)
+	Publish      []string // Publish a container's port(s) to the host
+	PublishAll   *bool    // Publish all exposed ports to random ports
+	Net          *string  // Connect a container to a network
+	Network      *string  // Connect a container to a network
+	NetAlias     []string // Add network-scoped alias for the container
 	NetworkAlias []string // Add network-scoped alias for the container
 
 	// Logging and storage
-	LogDriver *string            // Logging driver for the container
-	VolumeDriver *string         // Optional volume driver for the container
-	LogOpt map[string]string     // Log driver options
-	StorageOpt map[string]string // Storage driver options for the container
-	Tmpfs []string               // Mount a tmpfs directory
-	VolumesFrom []string         // Mount volumes from the specified container(s)
-	Volume []string              // Bind mount a volume
-	Mount map[string]string      // Attach a filesystem mount to the container
+	LogDriver    *string           // Logging driver for the container
+	VolumeDriver *string           // Optional volume driver for the container
+	LogOpt       map[string]string // Log driver options
+	StorageOpt   map[string]string // Storage driver options for the container
+	Tmpfs        []string          // Mount a tmpfs directory
+	VolumesFrom  []string          // Mount volumes from the specified container(s)
+	Volume       []string          // Bind mount a volume
+	Mount        map[string]string // Attach a filesystem mount to the container
 
 	// Health-checking
-	HealthCmd *string               // Command to run to check health
-	HealthInterval *time.Duration    // Time between running the check (ms|s|m|h) (default 0s)
-	HealthRetries *int              // Consecutive failures needed to report unhealthy
-	HealthTimeout *time.Duration     // Maximum time to allow one check to run (ms|s|m|h) (default 0s)
+	HealthCmd         *string        // Command to run to check health
+	HealthInterval    *time.Duration // Time between running the check (ms|s|m|h) (default 0s)
+	HealthRetries     *int           // Consecutive failures needed to report unhealthy
+	HealthTimeout     *time.Duration // Maximum time to allow one check to run (ms|s|m|h) (default 0s)
 	HealthStartPeriod *time.Duration // Start period for the container to initialize before starting health-retries countdown (ms|s|m|h) (default 0s)
-	NoHealthcheck *bool              // Disable any container-specified HEALTHCHECK
+	NoHealthcheck     *bool          // Disable any container-specified HEALTHCHECK
 
 	// Resource management
-	BlkioWeight *uint16        // Block IO (relative weight), between 10 and 1000, or 0 to disable (default 0)
+	BlkioWeight       *uint16  // Block IO (relative weight), between 10 and 1000, or 0 to disable (default 0)
 	BlkioWeightDevice []string // Block IO weight (relative device weight)
-	Cidfile *string            // Write the container ID to the file
-	CpusetCpus *string         // CPUs in which to allow execution (0-3, 0,1)
-	CpusetMems *string         // MEMs in which to allow execution (0-3, 0,1)
+	Cidfile           *string  // Write the container ID to the file
+	CpusetCpus        *string  // CPUs in which to allow execution (0-3, 0,1)
+	CpusetMems        *string  // MEMs in which to allow execution (0-3, 0,1)
 	//CpuCount *int64            // CPU count (Windows only)
 	//CpuPercent *int64          // CPU percent (Windows only)
-	CpuPeriod *int64           // Limit CPU CFS (Completely Fair Scheduler) period
-	CpuQuota *int64            // Limit CPU CFS (Completely Fair Scheduler) quota
-	CpuRtPeriod *int64         // Limit CPU real-time period in microseconds
-	CpuRtRuntime *int64        // Limit CPU real-time runtime in microseconds
-	CpuShares *int64           // CPU shares (relative weight)
-	Cpus *string               // Number of CPUs
-	DeviceReadBps []string     // Limit read rate (bytes per second) from a device
-	DeviceReadIops []string    // Limit read rate (IO per second) from a device
-	DeviceWriteBps []string    // Limit write rate (bytes per second) to a device
-	DeviceWriteIops []string   // Limit write rate (IO per second) to a device
+	CpuPeriod       *int64   // Limit CPU CFS (Completely Fair Scheduler) period
+	CpuQuota        *int64   // Limit CPU CFS (Completely Fair Scheduler) quota
+	CpuRtPeriod     *int64   // Limit CPU real-time period in microseconds
+	CpuRtRuntime    *int64   // Limit CPU real-time runtime in microseconds
+	CpuShares       *int64   // CPU shares (relative weight)
+	Cpus            *string  // Number of CPUs
+	DeviceReadBps   []string // Limit read rate (bytes per second) from a device
+	DeviceReadIops  []string // Limit read rate (IO per second) from a device
+	DeviceWriteBps  []string // Limit write rate (bytes per second) to a device
+	DeviceWriteIops []string // Limit write rate (IO per second) to a device
 	//IoMaxbandwidth *string     // Maximum IO bandwidth limit for the system drive (Windows only)
 	//IoMaxiops *uint64          // Maximum IOps limit for the system drive (Windows only)
-	KernelMemory *string       // Kernel memory limit
-	Memory *string             // Memory limit
-	MemoryReservation *string  // Memory soft limit
-	MemorySwap *string         // Swap limit equal to memory plus swap: '-1' to enable unlimited swap
-	MemorySwappiness *int64    // Tune container memory swappiness (0 to 100)
-	OomKillDisable *bool        // Disable OOM Killer
-	OomScoreAdj *int           // Tune host's OOM preferences (-1000 to 1000)
-	PidsLimit *int64           // Tune container pids limit (set -1 for unlimited)
+	KernelMemory      *string // Kernel memory limit
+	Memory            *string // Memory limit
+	MemoryReservation *string // Memory soft limit
+	MemorySwap        *string // Swap limit equal to memory plus swap: '-1' to enable unlimited swap
+	MemorySwappiness  *int64  // Tune container memory swappiness (0 to 100)
+	OomKillDisable    *bool   // Disable OOM Killer
+	OomScoreAdj       *int    // Tune host's OOM preferences (-1000 to 1000)
+	PidsLimit         *int64  // Tune container pids limit (set -1 for unlimited)
 
 	// Low-level execution (cgroups, namespaces, ...)
 	CgroupParent *string // Optional parent cgroup for the container
-	Ipc *string          // IPC mode to use
-	Isolation *string    // Container isolation technology
-	Pid *string          // PID namespace to use
-	ShmSize *string      // Size of /dev/shm
-	Uts *string          // UTS namespace to use
-	Runtime *string      // Runtime to use for this container
+	Ipc          *string // IPC mode to use
+	Isolation    *string // Container isolation technology
+	Pid          *string // PID namespace to use
+	ShmSize      *string // Size of /dev/shm
+	Uts          *string // UTS namespace to use
+	Runtime      *string // Runtime to use for this container
 
 	Init *bool // Run an init inside the container that forwards signals and reaps processes
 
@@ -129,7 +129,7 @@ type RunOpts struct {
 	Args  []string
 }
 
-func (opt *RunOpts)toArguments() []string {
+func (opt *RunOpts) toArguments() []string {
 	args := make([]string, 0)
 	for _, v := range opt.AddHost {
 		args = append(args, "--add-host", strconv.Quote(v))

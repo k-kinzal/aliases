@@ -16,7 +16,7 @@ var (
 
 func toKebabCase(str string) string {
 	kebab := matchFirstCap.ReplaceAllString(str, "${1}-${2}")
-	kebab  = matchAllCap.ReplaceAllString(kebab, "${1}-${2}")
+	kebab = matchAllCap.ReplaceAllString(kebab, "${1}-${2}")
 	return strings.ToLower(kebab)
 }
 

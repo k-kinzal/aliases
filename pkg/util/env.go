@@ -8,7 +8,7 @@ import (
 func expandEnv(str string) string {
 	str = strings.Replace(str, "$PWD", "{{ ALIASES_PWD }}", -1)
 	str = os.ExpandEnv(str)
-	str = strings.Replace(str,"{{ ALIASES_PWD }}", "${ALIASES_PWD:-$PWD}", -1)
+	str = strings.Replace(str, "{{ ALIASES_PWD }}", "${ALIASES_PWD:-$PWD}", -1)
 
 	return str
 }

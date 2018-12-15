@@ -34,7 +34,7 @@ func LoadConfFile(ctx *context.Context) (*AliasesConf, error) {
 		return nil, fmt.Errorf("configuration file cannot read `%q`", err)
 	}
 
-	defs, err:= yaml.UnmarshalConfFile(buf)
+	defs, err := yaml.UnmarshalConfFile(buf)
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +186,7 @@ func LoadConfFile(ctx *context.Context) (*AliasesConf, error) {
 			host := os.Getenv("DOCKER_HOST")
 			if host == "" {
 				sock := "/var/run/docker.sock"
-				if _, err := os.Stat(sock); err !=nil {
+				if _, err := os.Stat(sock); err != nil {
 					return nil, fmt.Errorf("%s: no such file. please set DOCKER_HOST", sock)
 				}
 				host = fmt.Sprintf("unix://%s", sock)
