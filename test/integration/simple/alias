@@ -1,0 +1,1 @@
+alias alpine='/usr/local/bin/docker run --interactive --network "host" --rm alpine:${ALPINE_VERSION:-"3.8"}'

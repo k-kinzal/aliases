@@ -19,6 +19,9 @@ cross-build:
 test:
 	go test ./... -v
 
+.PHONY: integration
+integration: build
+	find test/integration/*/test.sh | xargs -I{} /bin/sh -c "{} || exit 255"
 
 .PHONY: clean
 clean:
