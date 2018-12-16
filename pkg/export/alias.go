@@ -20,6 +20,6 @@ func Aliases(ctx *context.Context, conf *conf.AliasesConf) {
 			writeFiles(dep, dir)
 		}
 		cmd := docker.NewRunCmd(&c.DockerRunOpts)
-		fmt.Printf(fmt.Sprintf("alias %s='%s %s'\n", path.Base(cmd.Path), cmd.Path, strings.Join(cmd.Args[1:], " ")))
+		fmt.Printf(fmt.Sprintf("alias %s='%s %s'\n", path.Base(c.Path), cmd.Path, strings.Join(cmd.Args[1:], " ")))
 	}
 }
