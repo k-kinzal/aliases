@@ -1,0 +1,1 @@
+export PATH="[TEMP_DIR]:$PATH"
