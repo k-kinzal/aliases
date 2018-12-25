@@ -2,23 +2,13 @@ package yaml_test
 
 import (
 	"reflect"
-	"regexp"
 	"strings"
 	"testing"
 
+	"github.com/iancoleman/strcase"
+
 	"github.com/k-kinzal/aliases/pkg/yaml"
 )
-
-var (
-	matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
-	matchAllCap   = regexp.MustCompile("([a-z0-9])([A-Z])")
-)
-
-func toKebabCase(str string) string {
-	kebab := matchFirstCap.ReplaceAllString(str, "${1}-${2}")
-	kebab = matchAllCap.ReplaceAllString(kebab, "${1}-${2}")
-	return strings.ToLower(kebab)
-}
 
 func TestUnmarshalConfFile(t *testing.T) {
 	content := `---
@@ -57,8 +47,8 @@ func TestUnmarshalConfFile_ShouldBeKebabCaseOfFieldName(t *testing.T) {
 		arr := strings.Split(tag, ",")
 		name := arr[0]
 
-		if name != toKebabCase(field.Name) {
-			t.Errorf("expected yaml key name of %s is %s, but %s is defined", field.Name, toKebabCase(field.Name), name)
+		if name != strcase.ToLowerCamel(field.Name) {
+			t.Errorf("expected yaml key name of %s is %s, but %s is defined", field.Name, strcase.ToLowerCamel(field.Name), name)
 		}
 	}
 }

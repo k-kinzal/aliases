@@ -16,95 +16,95 @@ type Schema struct {
 	Dependencies []string `yaml:"dependencies"`
 	// docker run options
 	Detach              *string           `yaml:"detach" validate:"omitempty,bool|script"`
-	SigProxy            *string           `yaml:"sig-proxy" validate:"omitempty,bool|script"`
+	SigProxy            *string           `yaml:"sigProxy" validate:"omitempty,bool|script"`
 	Name                *string           `yaml:"name"`
-	DetachKeys          *string           `yaml:"detach-keys"`
+	DetachKeys          *string           `yaml:"detachKeys"`
 	Platform            *string           `yaml:"platform"`
-	DisableContentTrust *string           `yaml:"disable-content-trust" validate:"omitempty,bool|script"`
+	DisableContentTrust *string           `yaml:"disableContentTrust" validate:"omitempty,bool|script"`
 	Attach              []string          `yaml:"attach"`
-	DeviceCgroupRule    []string          `yaml:"device-cgroup-rule"`
+	DeviceCgroupRule    []string          `yaml:"deviceCgroupRule"`
 	Device              []string          `yaml:"device"`
 	Env                 map[string]string `yaml:"env"`
-	EnvFile             []string          `yaml:"env-file"`
+	EnvFile             []string          `yaml:"envFile"`
 	Entrypoint          *string           `yaml:"entrypoint"`
-	GroupAdd            []string          `yaml:"group-add"`
+	GroupAdd            []string          `yaml:"groupAdd"`
 	Hostname            *string           `yaml:"hostname"`
 	Domainname          *string           `yaml:"domainname"`
 	Interactive         *string           `yaml:"interactive" validate:"omitempty,bool|script" default:"true"`
 	Label               map[string]string `yaml:"label"`
-	LabelFile           []string          `yaml:"label-file"`
-	ReadOnly            *string           `yaml:"read-only" validate:"omitempty,bool|script"`
+	LabelFile           []string          `yaml:"labelFile"`
+	ReadOnly            *string           `yaml:"readOnly" validate:"omitempty,bool|script"`
 	Restart             *string           `yaml:"restart"`
-	StopSignal          *string           `yaml:"stop-signal"`
-	StopTimeout         *string           `yaml:"stop-timeout" validate:"omitempty,int|script"`
+	StopSignal          *string           `yaml:"stopSignal"`
+	StopTimeout         *string           `yaml:"stopTimeout" validate:"omitempty,int|script"`
 	Sysctl              map[string]string `yaml:"sysctl"`
 	Tty                 *string           `yaml:"tty" validate:"omitempty,bool|script"`
 	Ulimit              map[string]string `yaml:"ulimit"`
 	User                *string           `yaml:"user"`
 	Workdir             *string           `yaml:"workdir"`
 	Rm                  *string           `yaml:"rm" validate:"omitempty,bool|script" default:"true"`
-	CapAdd              []string          `yaml:"cap-add"`
-	CapDrop             []string          `yaml:"cap-drop"`
+	CapAdd              []string          `yaml:"capAdd"`
+	CapDrop             []string          `yaml:"capDrop"`
 	Privileged          *string           `yaml:"privileged" validate:"omitempty,bool|script"`
-	SecurityOpt         map[string]string `yaml:"security-opt"`
+	SecurityOpt         map[string]string `yaml:"securityOpt"`
 	Userns              *string           `yaml:"userns"`
-	AddHost             []string          `yaml:"add-host"`
+	AddHost             []string          `yaml:"addHost"`
 	Dns                 []string          `yaml:"dns"`
-	DnsOpt              []string          `yaml:"dns-opt"`
-	DnsOption           []string          `yaml:"dns-option"`
-	DnsSearch           []string          `yaml:"dns-search"`
+	DnsOpt              []string          `yaml:"dnsOpt"`
+	DnsOption           []string          `yaml:"dnsOption"`
+	DnsSearch           []string          `yaml:"dnsSearch"`
 	Expose              []string          `yaml:"expose"`
 	Ip                  *string           `yaml:"ip"`
 	Ip6                 *string           `yaml:"ip6"`
 	Link                []string          `yaml:"link"`
-	LinkLocalIp         []string          `yaml:"link-local-ip"`
-	MacAddress          *string           `yaml:"mac-address"`
+	LinkLocalIp         []string          `yaml:"linkLocalIp"`
+	MacAddress          *string           `yaml:"macAddress"`
 	Publish             []string          `yaml:"publish"`
-	PublishAll          *string           `yaml:"publish-all" validate:"omitempty,bool|script"`
+	PublishAll          *string           `yaml:"publishAll" validate:"omitempty,bool|script"`
 	Network             *string           `yaml:"network" default:"host"`
-	NetworkAlias        []string          `yaml:"network-alias"`
-	LogDriver           *string           `yaml:"log-driver"`
-	VolumeDriver        *string           `yaml:"volume-driver"`
-	LogOpt              map[string]string `yaml:"log-opt"`
-	StorageOpt          map[string]string `yaml:"storage-opt"`
+	NetworkAlias        []string          `yaml:"networkAlias"`
+	LogDriver           *string           `yaml:"logDriver"`
+	VolumeDriver        *string           `yaml:"volumeDriver"`
+	LogOpt              map[string]string `yaml:"logOpt"`
+	StorageOpt          map[string]string `yaml:"storageOpt"`
 	Tmpfs               []string          `yaml:"tmpfs"`
-	VolumesFrom         []string          `yaml:"volumes-from"`
+	VolumesFrom         []string          `yaml:"volumesFrom"`
 	Volume              []string          `yaml:"volume"`
 	Mount               map[string]string `yaml:"mount"`
-	HealthCmd           *string           `yaml:"health-cmd"`
-	HealthInterval      *string           `yaml:"health-interval" validate:"omitempty,duration|script"`
-	HealthRetries       *string           `yaml:"health-retries" validate:"omitempty,int|script"`
-	HealthTimeout       *string           `yaml:"health-timeout" validate:"omitempty,duration|script"`
-	HealthStartPeriod   *string           `yaml:"health-start-period" validate:"omitempty,duration|script"`
-	NoHealthcheck       *string           `yaml:"no-healthcheck" validate:"omitempty,bool|script"`
-	BlkioWeight         *string           `yaml:"blkio-weight" validate:"omitempty,uint16|script"`
-	BlkioWeightDevice   []string          `yaml:"blkio-weight-device"`
+	HealthCmd           *string           `yaml:"healthCmd"`
+	HealthInterval      *string           `yaml:"healthInterval" validate:"omitempty,duration|script"`
+	HealthRetries       *string           `yaml:"healthRetries" validate:"omitempty,int|script"`
+	HealthTimeout       *string           `yaml:"healthTimeout" validate:"omitempty,duration|script"`
+	HealthStartPeriod   *string           `yaml:"healthStartPeriod" validate:"omitempty,duration|script"`
+	NoHealthcheck       *string           `yaml:"noHealthcheck" validate:"omitempty,bool|script"`
+	BlkioWeight         *string           `yaml:"blkioWeight" validate:"omitempty,uint16|script"`
+	BlkioWeightDevice   []string          `yaml:"blkioWeightDevice"`
 	Cidfile             *string           `yaml:"cidfile"`
-	CpusetCpus          *string           `yaml:"cpuset-cpus"`
-	CpusetMems          *string           `yaml:"cpuset-mems"`
-	CpuPeriod           *string           `yaml:"cpu-period" validate:"omitempty,nanocpus|script"`
-	CpuQuota            *string           `yaml:"cpu-quota" validate:"omitempty,int64|script"`
-	CpuRtPeriod         *string           `yaml:"cpu-rt-period" validate:"omitempty,int64|script"`
-	CpuRtRuntime        *string           `yaml:"cpu-rt-runtime" validate:"omitempty,int64|script"`
-	CpuShares           *string           `yaml:"cpu-shares" validate:"omitempty,int64|script"`
+	CpusetCpus          *string           `yaml:"cpusetCpus"`
+	CpusetMems          *string           `yaml:"cpusetMems"`
+	CpuPeriod           *string           `yaml:"cpuPeriod" validate:"omitempty,nanocpus|script"`
+	CpuQuota            *string           `yaml:"cpuQuota" validate:"omitempty,int64|script"`
+	CpuRtPeriod         *string           `yaml:"cpuRtPeriod" validate:"omitempty,int64|script"`
+	CpuRtRuntime        *string           `yaml:"cpuRtRuntime" validate:"omitempty,int64|script"`
+	CpuShares           *string           `yaml:"cpuShares" validate:"omitempty,int64|script"`
 	Cpus                *string           `yaml:"cpus"`
-	DeviceReadBps       []string          `yaml:"device-read-bps"`
-	DeviceReadIops      []string          `yaml:"device-read-iops"`
-	DeviceWriteBps      []string          `yaml:"device-write-bps"`
-	DeviceWriteIops     []string          `yaml:"device-write-iops"`
-	KernelMemory        *string           `yaml:"kernel-memory" validate:"omitempty,membytes|script"`
+	DeviceReadBps       []string          `yaml:"deviceReadBps"`
+	DeviceReadIops      []string          `yaml:"deviceReadIops"`
+	DeviceWriteBps      []string          `yaml:"deviceWriteBps"`
+	DeviceWriteIops     []string          `yaml:"deviceWriteIops"`
+	KernelMemory        *string           `yaml:"kernelMemory" validate:"omitempty,membytes|script"`
 	Memory              *string           `yaml:"memory" validate:"omitempty,membytes|script"`
-	MemoryReservation   *string           `yaml:"memory-reservation" validate:"omitempty,membytes|script"`
-	MemorySwap          *string           `yaml:"memory-swap" validate:"omitempty,memswapbytes|script"`
-	MemorySwappiness    *string           `yaml:"memory-swappiness" validate:"omitempty,int64|script"`
-	OomKillDisable      *string           `yaml:"oom-kill-disable" validate:"omitempty,bool|script"`
-	OomScoreAdj         *string           `yaml:"oom-score-adj" validate:"omitempty,int|script"`
-	PidsLimit           *string           `yaml:"pids-limit" validate:"omitempty,int64|script"`
-	CgroupParent        *string           `yaml:"cgroup-parent"`
+	MemoryReservation   *string           `yaml:"memoryReservation" validate:"omitempty,membytes|script"`
+	MemorySwap          *string           `yaml:"memorySwap" validate:"omitempty,memswapbytes|script"`
+	MemorySwappiness    *string           `yaml:"memorySwappiness" validate:"omitempty,int64|script"`
+	OomKillDisable      *string           `yaml:"oomKillDisable" validate:"omitempty,bool|script"`
+	OomScoreAdj         *string           `yaml:"oomScoreAdj" validate:"omitempty,int|script"`
+	PidsLimit           *string           `yaml:"pidsLimit" validate:"omitempty,int64|script"`
+	CgroupParent        *string           `yaml:"cgroupParent"`
 	Ipc                 *string           `yaml:"ipc"`
 	Isolation           *string           `yaml:"isolation"`
 	Pid                 *string           `yaml:"pid"`
-	ShmSize             *string           `yaml:"shm-size" validate:"omitempty,membytes|script"`
+	ShmSize             *string           `yaml:"shmSize" validate:"omitempty,membytes|script"`
 	Uts                 *string           `yaml:"uts"`
 	Runtime             *string           `yaml:"runtime"`
 	Init                *string           `yaml:"init" validate:"omitempty,bool|script"`
