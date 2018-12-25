@@ -51,12 +51,6 @@ func LoadConfFile(ctx *context.Context) (*AliasesConf, error) {
 		c := pathMap[key]
 
 		c.Path = key
-		if def.Image == "" {
-			return nil, fmt.Errorf("image is required in %s.image", key)
-		}
-		if def.Tag == "" {
-			return nil, fmt.Errorf("tag is required in %s.tag", key)
-		}
 		c.DockerRunOpts.Image = fmt.Sprintf("%s:${%s_VERSION:-\"%s\"}", def.Image, strings.ToUpper(path.Base(key)), def.Tag)
 		if def.Command != nil {
 			c.DockerRunOpts.Args = []string{*def.Command}

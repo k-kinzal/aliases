@@ -2,6 +2,9 @@ package yaml
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/pkg/errors"
 
 	"github.com/creasty/defaults"
 	"github.com/k-kinzal/aliases/pkg/validator"
@@ -105,16 +108,19 @@ type Schema struct {
 	Uts                 *string           `yaml:"uts"`
 	Runtime             *string           `yaml:"runtime"`
 	Init                *string           `yaml:"init" validate:"omitempty,bool|script"`
-	Image               string            `yaml:"image" validate:required"`
+	Image               string            `yaml:"image" validate:"required"`
 	Args                []string          `yaml:"args"`
 	// extra docker run options
-	Tag     string  `yaml:"tag" validate:required"`
+	Tag     string  `yaml:"tag" validate:"required"`
 	Command *string `yaml:"command"`
 }
 
 func UnmarshalConfFile(buf []byte) (map[string]Schema, error) {
 	schemas := make(map[string]Schema)
 	if err := yaml.UnmarshalStrict(buf, &schemas); err != nil {
+		if e, ok := err.(*yaml.TypeError); ok {
+			return nil, errors.New(strings.Replace(e.Errors[0], "in type yaml.Schema", "", 1))
+		}
 		return nil, err
 	}
 
@@ -124,11 +130,11 @@ func UnmarshalConfFile(buf []byte) (map[string]Schema, error) {
 			return nil, err
 		}
 		if err := validate.Struct(schema); err != nil {
-			return nil, err // FIXME: add key to error message `xxx in /path/to/cmd.interval`
+			return nil, fmt.Errorf("%s in `%s`", err, path)
 		}
 		for index, dep := range schema.Dependencies {
 			if _, ok := schemas[dep]; !ok {
-				return nil, fmt.Errorf("`%s` is an undefined dependency in %s.dependencies[%d]", path, dep, index)
+				return nil, fmt.Errorf("invalid parameter `%s` for `dependencies[%d]` is an undefined dependency in `%s`", dep, index, path)
 			}
 
 		}
