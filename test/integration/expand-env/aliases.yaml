@@ -1,0 +1,15 @@
+# Note: object in YAML are output in random order
+/usr/local/bin/alpine:
+  image: alpine
+  tag: 3.8
+  env:
+    $PWD: $PWD
+  label:
+    $HOME: $HOME
+  ulimit:
+    $(echo nofile): $(ulimit -n)
+  volume:
+  - $PWD:$PWD
+  - $HOME:$HOME
+  - $(echo $HOME):$(echo $HOME)
+  user: $USER:$USER

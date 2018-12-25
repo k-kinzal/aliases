@@ -21,7 +21,7 @@ test:
 
 .PHONY: integration
 integration: build
-	find test/integration/*/test.sh | xargs -I{} /bin/sh -c "{} || exit 255"
+	@find test/integration/*/test.sh | xargs -I{} /bin/sh -c "{} || exit 255 && echo pass {}"
 
 .PHONY: clean
 clean:
