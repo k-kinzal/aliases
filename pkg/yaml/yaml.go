@@ -36,7 +36,7 @@ type Schema struct {
 	StopSignal          *string           `yaml:"stopSignal"`
 	StopTimeout         *string           `yaml:"stopTimeout" validate:"omitempty,int|script"`
 	Sysctl              map[string]string `yaml:"sysctl"`
-	Tty                 *string           `yaml:"tty" validate:"omitempty,bool|script"`
+	Tty                 *string           `yaml:"tty" validate:"omitempty,bool|script" default:"$(if tty >/dev/null; then echo true; else echo false; fi)"`
 	Ulimit              map[string]string `yaml:"ulimit"`
 	User                *string           `yaml:"user"`
 	Workdir             *string           `yaml:"workdir"`

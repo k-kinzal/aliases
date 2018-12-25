@@ -88,7 +88,11 @@ func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error)
 		args = append(args, "--cpuset-mems", strconv.Quote(*v))
 	}
 	if v := schema.Detach; v != nil && *v != "false" {
-		args = append(args, "--detach")
+		if *v == "true" {
+			args = append(args, "--detach")
+		} else {
+			args = append(args, fmt.Sprintf("$(test %s = \"true\" && echo \"--detach\")", strconv.Quote(*v)))
+		}
 	}
 	if v := schema.DetachKeys; v != nil {
 		args = append(args, "--detach-keys", strconv.Quote(*v))
@@ -112,7 +116,11 @@ func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error)
 		args = append(args, "--device-write-iops", strconv.Quote(v))
 	}
 	if v := schema.DisableContentTrust; v != nil && *v != "false" {
-		args = append(args, "--disable-content-trust")
+		if *v == "true" {
+			args = append(args, "--disable-content-trust")
+		} else {
+			args = append(args, fmt.Sprintf("$(test %s = \"true\" && echo \"--disable-content-trust\")", strconv.Quote(*v)))
+		}
 	}
 	for _, v := range schema.Dns {
 		args = append(args, "--dns", strconv.Quote(v))
@@ -166,10 +174,18 @@ func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error)
 		args = append(args, "--hostname", strconv.Quote(*v))
 	}
 	if v := schema.Init; v != nil && *v != "false" {
-		args = append(args, "--init")
+		if *v == "true" {
+			args = append(args, "--init")
+		} else {
+			args = append(args, fmt.Sprintf("$(test %s = \"true\" && echo \"--init\")", strconv.Quote(*v)))
+		}
 	}
 	if v := schema.Interactive; v != nil && *v != "false" {
-		args = append(args, "--interactive")
+		if *v == "true" {
+			args = append(args, "--interactive")
+		} else {
+			args = append(args, fmt.Sprintf("$(test %s = \"true\" && echo \"--interactive\")", strconv.Quote(*v)))
+		}
 	}
 	if v := schema.Ip; v != nil {
 		args = append(args, "--ip", strconv.Quote(*v))
@@ -234,10 +250,18 @@ func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error)
 		args = append(args, "--network-alias", strconv.Quote(v))
 	}
 	if v := schema.NoHealthcheck; v != nil && *v != "false" {
-		args = append(args, "--no-healthcheck")
+		if *v == "true" {
+			args = append(args, "--no-healthcheck")
+		} else {
+			args = append(args, fmt.Sprintf("$(test %s = \"true\" && echo \"--no-healthcheck\")", strconv.Quote(*v)))
+		}
 	}
 	if v := schema.OomKillDisable; v != nil && *v != "false" {
-		args = append(args, "--oom-kill-disable")
+		if *v == "true" {
+			args = append(args, "--oom-kill-disable")
+		} else {
+			args = append(args, fmt.Sprintf("$(test %s = \"true\" && echo \"--oom-kill-disable\")", strconv.Quote(*v)))
+		}
 	}
 	if v := schema.OomScoreAdj; v != nil {
 		args = append(args, "--oom-secore-adj", strconv.Quote(*v))
@@ -251,23 +275,42 @@ func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error)
 	if v := schema.Platform; v != nil {
 		args = append(args, "--platform", strconv.Quote(*v))
 	}
-	if (schema.Privileged != nil && *schema.Privileged != "false") || (len(schema.Dependencies) > 0 && ctx.DockerSockType() == context.DockerSockTypeSock) {
-		args = append(args, "--privileged")
+	v := schema.Privileged
+	if v != nil && *v != "false" || (len(schema.Dependencies) > 0 && ctx.DockerSockType() == context.DockerSockTypeSock) {
+		if len(schema.Dependencies) > 0 && ctx.DockerSockType() == context.DockerSockTypeSock {
+			args = append(args, "--privileged")
+		} else if *v == "true" {
+			args = append(args, "--privileged")
+		} else {
+			args = append(args, fmt.Sprintf("$(test %s = \"true\" && echo \"--privileged\")", strconv.Quote(*v)))
+		}
 	}
 	for _, v := range schema.Publish {
 		args = append(args, "--publish", strconv.Quote(v))
 	}
 	if v := schema.PublishAll; v != nil && *v != "false" {
-		args = append(args, "--publish-all")
+		if *v == "true" {
+			args = append(args, "--publish-all")
+		} else {
+			args = append(args, fmt.Sprintf("$(test %s = \"true\" && echo \"--publish-all\")", strconv.Quote(*v)))
+		}
 	}
 	if v := schema.ReadOnly; v != nil && *v != "false" {
-		args = append(args, "--readonly")
+		if *v == "true" {
+			args = append(args, "--readonly")
+		} else {
+			args = append(args, fmt.Sprintf("$(test %s = \"true\" && echo \"--readonly\")", strconv.Quote(*v)))
+		}
 	}
 	if v := schema.Restart; v != nil {
 		args = append(args, "--restart", strconv.Quote(*v))
 	}
 	if v := schema.Rm; v != nil && *v != "false" {
-		args = append(args, "--rm")
+		if *v == "true" {
+			args = append(args, "--rm")
+		} else {
+			args = append(args, fmt.Sprintf("$(test %s = \"true\" && echo \"--rm\")", strconv.Quote(*v)))
+		}
 	}
 	if v := schema.Runtime; v != nil {
 		args = append(args, "--runtime", strconv.Quote(*v))
@@ -279,7 +322,11 @@ func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error)
 		args = append(args, "--shm-size", strconv.Quote(*v))
 	}
 	if v := schema.SigProxy; v != nil && *v != "false" {
-		args = append(args, "--sig-proxy")
+		if *v == "true" {
+			args = append(args, "--sig-proxy")
+		} else {
+			args = append(args, fmt.Sprintf("$(test %s = \"true\" && echo \"--sig-proxy\")", strconv.Quote(*v)))
+		}
 	}
 	if v := schema.StopSignal; v != nil {
 		args = append(args, "--stop-signal", strconv.Quote(*v))
@@ -297,7 +344,11 @@ func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error)
 		args = append(args, "--tmpfs", strconv.Quote(v))
 	}
 	if v := schema.Tty; v != nil && *v != "false" {
-		args = append(args, "--tty")
+		if *v == "true" {
+			args = append(args, "--tty")
+		} else {
+			args = append(args, fmt.Sprintf("$(test %s = \"true\" && echo \"--tty\")", strconv.Quote(*v)))
+		}
 	}
 	for k, v := range util.ExpandStringKeyMapWithEnv(schema.Ulimit) {
 		args = append(args, "--ulimit", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))

@@ -1,1 +1,1 @@
-/usr/bin/alias alpine='/usr/local/bin/docker run --interactive --network "host" --rm alpine:${ALPINE_VERSION:-"3.8"}'
+/usr/bin/alias alpine='/usr/local/bin/docker run --interactive --network "host" --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") alpine:${ALPINE_VERSION:-"3.8"}'
