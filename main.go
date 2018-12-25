@@ -1,17 +1,13 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/k-kinzal/aliases/cmd"
 	"github.com/k-kinzal/aliases/pkg/version"
-	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
-	"log"
-	"os"
 )
-
-func init() {
-	logrus.SetOutput(os.Stdout)
-}
 
 func main() {
 	app := cli.NewApp()
@@ -37,6 +33,7 @@ func main() {
 
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintf(os.Stderr, "%s", err)
+		os.Exit(1)
 	}
 }

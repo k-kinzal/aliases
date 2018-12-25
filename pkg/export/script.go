@@ -27,10 +27,10 @@ fi
 
 func Script(ctx *context.Context, commands map[string]exec.Cmd) error {
 	if err := os.RemoveAll(ctx.GetExportPath()); err != nil {
-		return err
+		return fmt.Errorf("runtime error: %s", err)
 	}
 	if err := os.Mkdir(ctx.GetExportPath(), 0755); err != nil {
-		return err
+		return fmt.Errorf("runtime error: %s", err)
 	}
 
 	for path, cmd := range commands {
