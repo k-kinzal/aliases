@@ -1,12 +1,13 @@
 package yaml_test
 
 import (
-	"github.com/k-kinzal/aliases/pkg/docker"
-	"github.com/k-kinzal/aliases/pkg/yaml"
 	"reflect"
 	"regexp"
 	"strings"
 	"testing"
+
+	"github.com/k-kinzal/aliases/pkg/docker"
+	"github.com/k-kinzal/aliases/pkg/yaml"
 )
 
 var (
@@ -46,7 +47,7 @@ func TestUnmarshalConfFile(t *testing.T) {
 }
 
 func TestUnmarshalConfFile_ShouldBeKebabCaseOfFieldName(t *testing.T) {
-	val := reflect.New(reflect.TypeOf(yaml.YamlDefinition{})).Elem()
+	val := reflect.New(reflect.TypeOf(yaml.Schema{})).Elem()
 	for i := 0; i < val.NumField(); i++ {
 		field := val.Type().Field(i)
 
@@ -65,11 +66,11 @@ func TestUnmarshalConfFile_ShouldBeKebabCaseOfFieldName(t *testing.T) {
 
 func TestUnmarshalConfFile_ShouldBeSameFieldAsDockerRunOptsExist(t *testing.T) {
 	val1 := reflect.New(reflect.TypeOf(docker.RunOpts{})).Elem()
-	val2 := reflect.New(reflect.TypeOf(yaml.YamlDefinition{})).Elem()
+	val2 := reflect.New(reflect.TypeOf(yaml.Schema{})).Elem()
 	for i := 0; i < val1.NumField(); i++ {
 		field := val1.Type().Field(i)
 		if _, ok := val2.Type().FieldByName(field.Name); !ok {
-			t.Errorf("field in %s does not exist in YamlDefinition", field.Name)
+			t.Errorf("field in %s does not exist in Schema", field.Name)
 		}
 	}
 }

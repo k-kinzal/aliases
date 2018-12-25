@@ -3,15 +3,16 @@ package conf
 import (
 	"errors"
 	"fmt"
-	"github.com/k-kinzal/aliases/pkg/context"
-	"github.com/k-kinzal/aliases/pkg/docker"
-	"github.com/k-kinzal/aliases/pkg/util"
-	"github.com/k-kinzal/aliases/pkg/yaml"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
+
+	"github.com/k-kinzal/aliases/pkg/context"
+	"github.com/k-kinzal/aliases/pkg/docker"
+	"github.com/k-kinzal/aliases/pkg/util"
+	"github.com/k-kinzal/aliases/pkg/yaml"
 )
 
 type CommandConf struct {
@@ -101,11 +102,7 @@ func LoadConfFile(ctx *context.Context) (*AliasesConf, error) {
 		c.DockerRunOpts.HealthTimeout = def.HealthTimeout
 		c.DockerRunOpts.Hostname = def.Hostname
 		c.DockerRunOpts.Init = def.Init
-		if def.Interactive == nil {
-			c.DockerRunOpts.Interactive = util.Pbool(true)
-		} else {
-			c.DockerRunOpts.Interactive = def.Interactive
-		}
+		c.DockerRunOpts.Interactive = def.Interactive
 		c.DockerRunOpts.Ip = def.Ip
 		c.DockerRunOpts.Ip6 = def.Ip6
 		c.DockerRunOpts.Ipc = def.Ipc
@@ -124,11 +121,7 @@ func LoadConfFile(ctx *context.Context) (*AliasesConf, error) {
 		c.DockerRunOpts.MemorySwappiness = def.MemorySwappiness
 		c.DockerRunOpts.Mount = util.ExpandStringKeyMapWithEnv(def.Mount)
 		c.DockerRunOpts.Name = def.Name
-		if def.Network == nil {
-			c.DockerRunOpts.Network = util.Pstr("host")
-		} else {
-			c.DockerRunOpts.Network = def.Network
-		}
+		c.DockerRunOpts.Network = def.Network
 		c.DockerRunOpts.NetworkAlias = def.NetworkAlias
 		c.DockerRunOpts.NoHealthcheck = def.NoHealthcheck
 		c.DockerRunOpts.OomKillDisable = def.OomKillDisable
@@ -141,11 +134,7 @@ func LoadConfFile(ctx *context.Context) (*AliasesConf, error) {
 		c.DockerRunOpts.PublishAll = def.PublishAll
 		c.DockerRunOpts.ReadOnly = def.ReadOnly
 		c.DockerRunOpts.Restart = def.Restart
-		if def.Rm == nil {
-			c.DockerRunOpts.Rm = util.Pbool(true)
-		} else {
-			c.DockerRunOpts.Rm = def.Rm
-		}
+		c.DockerRunOpts.Rm = def.Rm
 		c.DockerRunOpts.Runtime = def.Runtime
 		c.DockerRunOpts.SecurityOpt = util.ExpandStringKeyMapWithEnv(def.SecurityOpt)
 		c.DockerRunOpts.ShmSize = def.ShmSize
@@ -193,7 +182,7 @@ func LoadConfFile(ctx *context.Context) (*AliasesConf, error) {
 				sock := strings.TrimPrefix(host, "unix://")
 				c.DockerRunOpts.Volume = append(c.DockerRunOpts.Volume, fmt.Sprintf("%s:/usr/local/bin/docker", cmd.Path))
 				c.DockerRunOpts.Volume = append(c.DockerRunOpts.Volume, fmt.Sprintf("%s:/var/run/docker.sock", sock))
-				c.DockerRunOpts.Privileged = util.Pbool(true)
+				c.DockerRunOpts.Privileged = util.Pstr("true")
 			} else {
 				if c.DockerRunOpts.Env == nil {
 					c.DockerRunOpts.Env = make(map[string]string)

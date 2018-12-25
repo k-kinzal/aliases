@@ -2,13 +2,13 @@ package conf_test
 
 import (
 	"fmt"
-	"github.com/k-kinzal/aliases/pkg/conf"
-	"github.com/k-kinzal/aliases/pkg/context"
 	"io/ioutil"
 	"os"
 	"path"
-	"strconv"
 	"testing"
+
+	"github.com/k-kinzal/aliases/pkg/conf"
+	"github.com/k-kinzal/aliases/pkg/context"
 )
 
 func TestLoadConfFile(t *testing.T) {
@@ -53,11 +53,11 @@ func TestLoadConfFile_ShouldBeSetDefaultValue(t *testing.T) {
 		t.Errorf("load config error: %v", err)
 	}
 	command := cf.Commands[0]
-	if *command.DockerRunOpts.Interactive != true {
-		t.Errorf("expected `true`, but in actual `%s` has been set in dockerrunopts.interactive", strconv.FormatBool(*command.DockerRunOpts.Interactive))
+	if *command.DockerRunOpts.Interactive != "true" {
+		t.Errorf("expected `true`, but in actual `%s` has been set in dockerrunopts.interactive", *command.DockerRunOpts.Interactive)
 	}
-	if *command.DockerRunOpts.Rm != true {
-		t.Errorf("expected `true`, but in actual `%s` has been set in dockerrunopts.rm", strconv.FormatBool(*command.DockerRunOpts.Rm))
+	if *command.DockerRunOpts.Rm != "true" {
+		t.Errorf("expected `true`, but in actual `%s` has been set in dockerrunopts.rm", *command.DockerRunOpts.Rm)
 	}
 	if *command.DockerRunOpts.Network != "host" {
 		t.Errorf("expected `host`, but in actual `%s` has been set in dockerrunopts.interactive", *command.DockerRunOpts.Network)
@@ -91,8 +91,8 @@ func TestUnmarshalConfFile_ShouldBeSetDependenciesWithUnixSock(t *testing.T) {
 		command = cf.Commands[1]
 	}
 
-	if *command.DockerRunOpts.Privileged != true {
-		t.Errorf("expected `true`, but in actual `%s` has been set in dockerrunopts.privileged", strconv.FormatBool(*command.DockerRunOpts.Privileged))
+	if *command.DockerRunOpts.Privileged != "true" {
+		t.Errorf("expected `true`, but in actual `%s` has been set in dockerrunopts.privileged", *command.DockerRunOpts.Privileged)
 	}
 	if command.DockerRunOpts.Volume[0] != "/usr/local/bin/docker:/usr/local/bin/docker" {
 		t.Errorf("expected `/usr/local/bin/docker:/usr/local/bin/docker`, but in actual `%s` has been set in dockerrunopts.volume[0]", command.DockerRunOpts.Volume[0])

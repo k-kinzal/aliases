@@ -3,18 +3,17 @@ package docker
 import (
 	"fmt"
 	"strconv"
-	"time"
 )
 
 type RunOpts struct {
 	// see: https://github.com/docker/cli/blob/18.09/cli/command/container/run.go
-	Detach     *bool   // Run container in background and print container ID
-	SigProxy   *bool   // Proxy received signals to the process
+	Detach     *string // *bool   // Run container in background and print container ID
+	SigProxy   *string // *bool   // Proxy received signals to the process
 	Name       *string // Assign a name to the container
 	DetachKeys *string // Override the key sequence for detaching a container
 
 	Platform            *string // Set platform if server is multi-platform capable
-	DisableContentTrust *bool   // Skip image verification
+	DisableContentTrust *string // *bool   // Skip image verification
 
 	// see: https://github.com/docker/cli/blob/18.09/cli/command/container/opts.go
 	// General purpose flags
@@ -27,24 +26,24 @@ type RunOpts struct {
 	GroupAdd         []string          // Add additional groups to join
 	Hostname         *string           // Container host name
 	Domainname       *string           // Container NIS domain name
-	Interactive      *bool             // Keep STDIN open even if not attached
+	Interactive      *string           // *bool             // Keep STDIN open even if not attached
 	Label            map[string]string // Set meta data on a container
 	LabelFile        []string          // Read in a line delimited file of labels
-	ReadOnly         *bool             // Mount the container's root filesystem as read only
+	ReadOnly         *string           // *bool             // Mount the container's root filesystem as read only
 	Restart          *string           // Restart policy to apply when a container exits
 	StopSignal       *string           // Signal to stop a container
-	StopTimeout      *int              // Timeout (in seconds) to stop a container
+	StopTimeout      *string           // *int              // Timeout (in seconds) to stop a container
 	Sysctl           map[string]string // Sysctl options
-	Tty              *bool             // Allocate a pseudo-TTY
+	Tty              *string           // *bool             // Allocate a pseudo-TTY
 	Ulimit           map[string]string // Ulimit options
 	User             *string           // Username or UID (format: <name|uid>[:<group|gid>])
 	Workdir          *string           // Working directory inside the container
-	Rm               *bool             // Automatically remove the container when it exits
+	Rm               *string           // *bool             // Automatically remove the container when it exits
 
 	// Security
 	CapAdd      []string          // Add Linux capabilities
 	CapDrop     []string          // Drop Linux capabilities
-	Privileged  *bool             // Give extended privileges to this container
+	Privileged  *string           // *bool             // Give extended privileges to this container
 	SecurityOpt map[string]string // Security Options
 	Userns      *string           // User namespace to use
 
@@ -61,10 +60,8 @@ type RunOpts struct {
 	LinkLocalIp  []string // Container IPv4/IPv6 link-local addresses
 	MacAddress   *string  // Container MAC address (e.g., 92:d0:c6:0a:29:33)
 	Publish      []string // Publish a container's port(s) to the host
-	PublishAll   *bool    // Publish all exposed ports to random ports
-	Net          *string  // Connect a container to a network
+	PublishAll   *string  // *bool    // Publish all exposed ports to random ports
 	Network      *string  // Connect a container to a network
-	NetAlias     []string // Add network-scoped alias for the container
 	NetworkAlias []string // Add network-scoped alias for the container
 
 	// Logging and storage
@@ -78,26 +75,26 @@ type RunOpts struct {
 	Mount        map[string]string // Attach a filesystem mount to the container
 
 	// Health-checking
-	HealthCmd         *string        // Command to run to check health
-	HealthInterval    *time.Duration // Time between running the check (ms|s|m|h) (default 0s)
-	HealthRetries     *int           // Consecutive failures needed to report unhealthy
-	HealthTimeout     *time.Duration // Maximum time to allow one check to run (ms|s|m|h) (default 0s)
-	HealthStartPeriod *time.Duration // Start period for the container to initialize before starting health-retries countdown (ms|s|m|h) (default 0s)
-	NoHealthcheck     *bool          // Disable any container-specified HEALTHCHECK
+	HealthCmd         *string // Command to run to check health
+	HealthInterval    *string // *time.Duration // Time between running the check (ms|s|m|h) (default 0s)
+	HealthRetries     *string // *int    // Consecutive failures needed to report unhealthy
+	HealthTimeout     *string // *time.Duration // Maximum time to allow one check to run (ms|s|m|h) (default 0s)
+	HealthStartPeriod *string // *time.Duration // Start period for the container to initialize before starting health-retries countdown (ms|s|m|h) (default 0s)
+	NoHealthcheck     *string // *bool          // Disable any container-specified HEALTHCHECK
 
 	// Resource management
-	BlkioWeight       *uint16  // Block IO (relative weight), between 10 and 1000, or 0 to disable (default 0)
+	BlkioWeight       *string  // *uint16  // Block IO (relative weight), between 10 and 1000, or 0 to disable (default 0)
 	BlkioWeightDevice []string // Block IO weight (relative device weight)
 	Cidfile           *string  // Write the container ID to the file
 	CpusetCpus        *string  // CPUs in which to allow execution (0-3, 0,1)
 	CpusetMems        *string  // MEMs in which to allow execution (0-3, 0,1)
 	//CpuCount *int64            // CPU count (Windows only)
 	//CpuPercent *int64          // CPU percent (Windows only)
-	CpuPeriod       *int64   // Limit CPU CFS (Completely Fair Scheduler) period
-	CpuQuota        *int64   // Limit CPU CFS (Completely Fair Scheduler) quota
-	CpuRtPeriod     *int64   // Limit CPU real-time period in microseconds
-	CpuRtRuntime    *int64   // Limit CPU real-time runtime in microseconds
-	CpuShares       *int64   // CPU shares (relative weight)
+	CpuPeriod       *string  // *int64   // Limit CPU CFS (Completely Fair Scheduler) period
+	CpuQuota        *string  // *int64   // Limit CPU CFS (Completely Fair Scheduler) quota
+	CpuRtPeriod     *string  // *int64   // Limit CPU real-time period in microseconds
+	CpuRtRuntime    *string  // *int64   // Limit CPU real-time runtime in microseconds
+	CpuShares       *string  // *int64   // CPU shares (relative weight)
 	Cpus            *string  // Number of CPUs
 	DeviceReadBps   []string // Limit read rate (bytes per second) from a device
 	DeviceReadIops  []string // Limit read rate (IO per second) from a device
@@ -109,10 +106,10 @@ type RunOpts struct {
 	Memory            *string // Memory limit
 	MemoryReservation *string // Memory soft limit
 	MemorySwap        *string // Swap limit equal to memory plus swap: '-1' to enable unlimited swap
-	MemorySwappiness  *int64  // Tune container memory swappiness (0 to 100)
-	OomKillDisable    *bool   // Disable OOM Killer
-	OomScoreAdj       *int    // Tune host's OOM preferences (-1000 to 1000)
-	PidsLimit         *int64  // Tune container pids limit (set -1 for unlimited)
+	MemorySwappiness  *string // *int64  // Tune container memory swappiness (0 to 100)
+	OomKillDisable    *string // *bool   // Disable OOM Killer
+	OomScoreAdj       *string // *int    // Tune host's OOM preferences (-1000 to 1000)
+	PidsLimit         *string // *int64  // Tune container pids limit (set -1 for unlimited)
 
 	// Low-level execution (cgroups, namespaces, ...)
 	CgroupParent *string // Optional parent cgroup for the container
@@ -123,7 +120,7 @@ type RunOpts struct {
 	Uts          *string // UTS namespace to use
 	Runtime      *string // Runtime to use for this container
 
-	Init *bool // Run an init inside the container that forwards signals and reaps processes
+	Init *string // *bool // Run an init inside the container that forwards signals and reaps processes
 
 	Image string
 	Args  []string
@@ -138,7 +135,7 @@ func (opt *RunOpts) toArguments() []string {
 		args = append(args, "--attach", strconv.Quote(v))
 	}
 	if v := opt.BlkioWeight; v != nil {
-		args = append(args, fmt.Sprintf("--blkio-weight=%d", *v))
+		args = append(args, "--blkio-weight", strconv.Quote(*v))
 	}
 	for _, v := range opt.BlkioWeightDevice {
 		args = append(args, "--blkio-weight-device", strconv.Quote(v))
@@ -156,19 +153,19 @@ func (opt *RunOpts) toArguments() []string {
 		args = append(args, "--cidfile", strconv.Quote(*v))
 	}
 	if v := opt.CpuPeriod; v != nil {
-		args = append(args, "--cpu-period", strconv.FormatInt(*v, 10))
+		args = append(args, "--cpu-period", strconv.Quote(*v))
 	}
 	if v := opt.CpuQuota; v != nil {
-		args = append(args, "--cpu-quota", strconv.FormatInt(*v, 10))
+		args = append(args, "--cpu-quota", strconv.Quote(*v))
 	}
 	if v := opt.CpuRtPeriod; v != nil {
-		args = append(args, "--cpu-rt-period", strconv.FormatInt(*v, 10))
+		args = append(args, "--cpu-rt-period", strconv.Quote(*v))
 	}
 	if v := opt.CpuRtRuntime; v != nil {
-		args = append(args, "--cpu-rt-runtime", strconv.FormatInt(*v, 10))
+		args = append(args, "--cpu-rt-runtime", strconv.Quote(*v))
 	}
 	if v := opt.CpuShares; v != nil {
-		args = append(args, "--cpu-shares", strconv.FormatInt(*v, 10))
+		args = append(args, "--cpu-shares", strconv.Quote(*v))
 	}
 	if v := opt.Cpus; v != nil {
 		args = append(args, "--cpus", strconv.Quote(*v))
@@ -179,7 +176,7 @@ func (opt *RunOpts) toArguments() []string {
 	if v := opt.CpusetMems; v != nil {
 		args = append(args, "--cpuset-mems", strconv.Quote(*v))
 	}
-	if v := opt.Detach; v != nil && *v != false {
+	if v := opt.Detach; v != nil && *v != "false" {
 		args = append(args, "--detach")
 	}
 	if v := opt.DetachKeys; v != nil {
@@ -203,7 +200,7 @@ func (opt *RunOpts) toArguments() []string {
 	for _, v := range opt.DeviceWriteIops {
 		args = append(args, "--device-write-iops", strconv.Quote(v))
 	}
-	if v := opt.DisableContentTrust; v != nil && *v != false {
+	if v := opt.DisableContentTrust; v != nil && *v != "false" {
 		args = append(args, "--disable-content-trust")
 	}
 	for _, v := range opt.Dns {
@@ -237,24 +234,24 @@ func (opt *RunOpts) toArguments() []string {
 		args = append(args, "--health-cmd", strconv.Quote(*v))
 	}
 	if v := opt.HealthInterval; v != nil {
-		args = append(args, "--health-interval", (*v).String())
+		args = append(args, "--health-interval", strconv.Quote(*v))
 	}
 	if v := opt.HealthRetries; v != nil {
-		args = append(args, "--health-retries", strconv.Itoa(*v))
+		args = append(args, "--health-retries", strconv.Quote(*v))
 	}
 	if v := opt.HealthStartPeriod; v != nil {
-		args = append(args, "--health-start-period", (*v).String())
+		args = append(args, "--health-start-period", strconv.Quote(*v))
 	}
 	if v := opt.HealthTimeout; v != nil {
-		args = append(args, "--health-timeout", (*v).String())
+		args = append(args, "--health-timeout", strconv.Quote(*v))
 	}
 	if v := opt.Hostname; v != nil {
 		args = append(args, "--hostname", strconv.Quote(*v))
 	}
-	if v := opt.Init; v != nil && *v != false {
+	if v := opt.Init; v != nil && *v != "false" {
 		args = append(args, "--init")
 	}
-	if v := opt.Interactive; v != nil && *v != false {
+	if v := opt.Interactive; v != nil && *v != "false" {
 		args = append(args, "--interactive")
 	}
 	if v := opt.Ip; v != nil {
@@ -303,7 +300,7 @@ func (opt *RunOpts) toArguments() []string {
 		args = append(args, "--memory-swap", strconv.Quote(*v))
 	}
 	if v := opt.MemorySwappiness; v != nil {
-		args = append(args, "--memory-swappiness", strconv.FormatInt(*v, 10))
+		args = append(args, "--memory-swappiness", strconv.Quote(*v))
 	}
 	for k, v := range opt.Mount {
 		args = append(args, "--mount", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
@@ -311,49 +308,46 @@ func (opt *RunOpts) toArguments() []string {
 	if v := opt.Name; v != nil {
 		args = append(args, "--name", strconv.Quote(*v))
 	}
-	if v := opt.Net; v != nil {
-		args = append(args, "--network", strconv.Quote(*v))
-	}
 	if v := opt.Network; v != nil {
 		args = append(args, "--network", strconv.Quote(*v))
 	}
 	for _, v := range opt.NetworkAlias {
 		args = append(args, "--network-alias", strconv.Quote(v))
 	}
-	if v := opt.NoHealthcheck; v != nil && *v != false {
+	if v := opt.NoHealthcheck; v != nil && *v != "false" {
 		args = append(args, "--no-healthcheck")
 	}
-	if v := opt.OomKillDisable; v != nil && *v != false {
+	if v := opt.OomKillDisable; v != nil && *v != "false" {
 		args = append(args, "--oom-kill-disable")
 	}
 	if v := opt.OomScoreAdj; v != nil {
-		args = append(args, "--oom-secore-adj", strconv.Itoa(*v))
+		args = append(args, "--oom-secore-adj", strconv.Quote(*v))
 	}
 	if v := opt.Pid; v != nil {
 		args = append(args, "--pid", strconv.Quote(*v))
 	}
 	if v := opt.PidsLimit; v != nil {
-		args = append(args, "--pids-limit", strconv.FormatInt(*v, 10))
+		args = append(args, "--pids-limit", strconv.Quote(*v))
 	}
 	if v := opt.Platform; v != nil {
 		args = append(args, "--platform", strconv.Quote(*v))
 	}
-	if v := opt.Privileged; v != nil && *v != false {
+	if v := opt.Privileged; v != nil && *v != "false" {
 		args = append(args, "--privileged")
 	}
 	for _, v := range opt.Publish {
 		args = append(args, "--publish", strconv.Quote(v))
 	}
-	if v := opt.PublishAll; v != nil && *v != false {
+	if v := opt.PublishAll; v != nil && *v != "false" {
 		args = append(args, "--publish-all")
 	}
-	if v := opt.ReadOnly; v != nil && *v != false {
+	if v := opt.ReadOnly; v != nil && *v != "false" {
 		args = append(args, "--readonly")
 	}
 	if v := opt.Restart; v != nil {
 		args = append(args, "--restart", strconv.Quote(*v))
 	}
-	if v := opt.Rm; v != nil && *v != false {
+	if v := opt.Rm; v != nil && *v != "false" {
 		args = append(args, "--rm")
 	}
 	if v := opt.Runtime; v != nil {
@@ -365,14 +359,14 @@ func (opt *RunOpts) toArguments() []string {
 	if v := opt.ShmSize; v != nil {
 		args = append(args, "--shm-size", strconv.Quote(*v))
 	}
-	if v := opt.SigProxy; v != nil && *v != false {
+	if v := opt.SigProxy; v != nil && *v != "false" {
 		args = append(args, "--sig-proxy")
 	}
 	if v := opt.StopSignal; v != nil {
 		args = append(args, "--stop-signal", strconv.Quote(*v))
 	}
 	if v := opt.StopTimeout; v != nil {
-		args = append(args, "--stop-timeout", strconv.Itoa(*v))
+		args = append(args, "--stop-timeout", strconv.Quote(*v))
 	}
 	for k, v := range opt.StorageOpt {
 		args = append(args, "--storage-opt", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
@@ -383,7 +377,7 @@ func (opt *RunOpts) toArguments() []string {
 	for _, v := range opt.Tmpfs {
 		args = append(args, "--tmpfs", strconv.Quote(v))
 	}
-	if v := opt.Tty; v != nil && *v != false {
+	if v := opt.Tty; v != nil && *v != "false" {
 		args = append(args, "--tty")
 	}
 	for k, v := range opt.Ulimit {
