@@ -6,7 +6,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/k-kinzal/aliases/pkg/docker"
 	"github.com/k-kinzal/aliases/pkg/yaml"
 )
 
@@ -60,17 +59,6 @@ func TestUnmarshalConfFile_ShouldBeKebabCaseOfFieldName(t *testing.T) {
 
 		if name != toKebabCase(field.Name) {
 			t.Errorf("expected yaml key name of %s is %s, but %s is defined", field.Name, toKebabCase(field.Name), name)
-		}
-	}
-}
-
-func TestUnmarshalConfFile_ShouldBeSameFieldAsDockerRunOptsExist(t *testing.T) {
-	val1 := reflect.New(reflect.TypeOf(docker.RunOpts{})).Elem()
-	val2 := reflect.New(reflect.TypeOf(yaml.Schema{})).Elem()
-	for i := 0; i < val1.NumField(); i++ {
-		field := val1.Type().Field(i)
-		if _, ok := val2.Type().FieldByName(field.Name); !ok {
-			t.Errorf("field in %s does not exist in Schema", field.Name)
 		}
 	}
 }

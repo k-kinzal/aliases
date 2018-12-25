@@ -1,8 +1,13 @@
 package cmd
 
 import (
-	"github.com/k-kinzal/aliases/pkg/conf"
+	"fmt"
+	pathes "path"
+
+	"github.com/k-kinzal/aliases/pkg/posix"
+
 	"github.com/k-kinzal/aliases/pkg/context"
+	"github.com/k-kinzal/aliases/pkg/executor"
 	"github.com/k-kinzal/aliases/pkg/export"
 	"github.com/urfave/cli"
 )
@@ -37,7 +42,7 @@ func GenCommand() cli.Command {
 			},
 			cli.StringFlag{
 				Name:  "export-path",
-				Usage: "The directory to put binaries",
+				Usage: "The directory to export scripts",
 			},
 		},
 		Action: func(c *cli.Context) error {
@@ -47,20 +52,31 @@ func GenCommand() cli.Command {
 }
 
 func GenAction(c *cli.Context) error {
-	// context
 	ctx := NewGenContext(c)
 
-	// configuration
-	cf, err := conf.LoadConfFile(ctx.Context)
+	exec, err := executor.New(ctx.Context)
 	if err != nil {
 		return err
 	}
 
-	// output aliases
+	commands, err := exec.Commands(ctx.Context)
+	if err != nil {
+		return err
+	}
+
+	if err := export.Script(ctx.Context, commands); err != nil {
+		return err
+	}
+
 	if ctx.export {
-		export.Path(ctx.Context, cf)
+		exp := posix.PathExport(ctx.GetExportPath(), false)
+		fmt.Println(posix.String(*exp))
 	} else {
-		export.Aliases(ctx.Context, cf)
+		for path, cmd := range commands {
+			alias := posix.Alias(pathes.Base(path), posix.String(cmd))
+
+			fmt.Println(posix.String(*alias))
+		}
 	}
 
 	return nil

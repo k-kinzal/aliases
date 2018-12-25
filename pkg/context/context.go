@@ -2,15 +2,26 @@ package context
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"os"
+	"os/exec"
 	"os/user"
+	"strings"
+
+	"github.com/google/uuid"
+)
+
+var (
+	DockerSockTypeSock   = 1
+	DockerSockTypeRemote = 2
 )
 
 type Context struct {
-	homePath   string
-	confPath   string
-	exportPath string
+	homePath         string
+	confPath         string
+	exportPath       string
+	dockerPath       string
+	dockerSockPath   string
+	dockerRemoteHost string
 }
 
 func NewContext(
@@ -66,4 +77,58 @@ func (ctx *Context) GetExportPath() string {
 	ctx.exportPath = fmt.Sprintf("%s/%s", ctx.GetHomePath(), hash)
 
 	return ctx.exportPath
+}
+
+func (ctx *Context) DockerBinaryPath() string {
+	if ctx.dockerPath != "" {
+		return ctx.dockerPath
+	}
+	cmd := exec.Command("docker")
+	if cmd.Path == "docker" {
+		panic("docker is not installed. see https://docs.docker.com/install/")
+	}
+	ctx.dockerPath = cmd.Path
+
+	return ctx.dockerPath
+}
+
+func (ctx *Context) DockerSockType() int {
+	if ctx.DockerSockPath() != "" {
+		return 1
+	} else {
+		return 2
+	}
+}
+
+func (ctx *Context) DockerSockPath() string {
+	if ctx.dockerSockPath != "" {
+		return ctx.dockerSockPath
+	}
+	host := os.Getenv("DOCKER_HOST")
+	if host == "" {
+		sock := "/var/run/docker.sock"
+		if _, err := os.Stat(sock); err != nil {
+			panic(fmt.Sprintf("%s: no such file. please set DOCKER_HOST", sock))
+		}
+		host = fmt.Sprintf("unix://%s", sock)
+	}
+	if strings.HasPrefix(host, "unix://") {
+		ctx.dockerSockPath = strings.TrimPrefix(host, "unix://")
+	} else {
+		ctx.dockerSockPath = ""
+	}
+	return ctx.dockerSockPath
+}
+
+func (ctx *Context) DockerRemoteHost() string {
+	if ctx.dockerRemoteHost != "" {
+		return ctx.dockerRemoteHost
+	}
+	host := os.Getenv("DOCKER_HOST")
+	if !strings.HasPrefix(host, "unix://") {
+		ctx.dockerRemoteHost = host
+	} else {
+		ctx.dockerRemoteHost = ""
+	}
+	return ctx.dockerRemoteHost
 }
