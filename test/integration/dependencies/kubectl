@@ -1,9 +1,9 @@
 #!/bin/sh
 
 if [ -p /dev/stdin ]; then
-  cat - | /usr/local/bin/docker run --interactive --network "host" --rm --volume "[HOME]/.kube:/root/.kube" --volume "${ALIASES_PWD:-$PWD}:/kube" --workdir "/kube" chatwork/kubectl:${KUBECTL_VERSION:-"1.11.2"} "$@"
+  cat - | /usr/local/bin/docker run --interactive --network "host" --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") --volume "[HOME]/.kube:/root/.kube" --volume "${ALIASES_PWD:-$PWD}:/kube" --workdir "/kube" chatwork/kubectl:${KUBECTL_VERSION:-"1.11.2"} "$@"
   exit $?
 else
-  /usr/local/bin/docker run --interactive --network "host" --rm --volume "[HOME]/.kube:/root/.kube" --volume "${ALIASES_PWD:-$PWD}:/kube" --workdir "/kube" chatwork/kubectl:${KUBECTL_VERSION:-"1.11.2"} "$@"
+  /usr/local/bin/docker run --interactive --network "host" --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") --volume "[HOME]/.kube:/root/.kube" --volume "${ALIASES_PWD:-$PWD}:/kube" --workdir "/kube" chatwork/kubectl:${KUBECTL_VERSION:-"1.11.2"} "$@"
   exit $?
 fi
