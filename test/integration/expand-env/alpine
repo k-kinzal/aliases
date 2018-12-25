@@ -1,0 +1,9 @@
+#!/bin/sh
+
+if [ -p /dev/stdin ]; then
+  cat - | /usr/local/bin/docker run --env ${ALIASES_PWD:-$PWD}="$PWD" --interactive --label [HOME]="$HOME" --network "host" --rm --ulimit $(echo nofile)="$(ulimit -n)" --user "root:$USER" --volume "${ALIASES_PWD:-$PWD}:$PWD" --volume "[HOME]:$HOME" --volume "$(echo $HOME):$(echo $HOME)" alpine:${ALPINE_VERSION:-"3.8"} "$@"
+  exit $?
+else
+  /usr/local/bin/docker run --env ${ALIASES_PWD:-$PWD}="$PWD" --interactive --label [HOME]="$HOME" --network "host" --rm --ulimit $(echo nofile)="$(ulimit -n)" --user "root:$USER" --volume "${ALIASES_PWD:-$PWD}:$PWD" --volume "[HOME]:$HOME" --volume "$(echo $HOME):$(echo $HOME)" alpine:${ALPINE_VERSION:-"3.8"} "$@"
+  exit $?
+fi
