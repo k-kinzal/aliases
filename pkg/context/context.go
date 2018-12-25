@@ -85,7 +85,7 @@ func (ctx *Context) DockerBinaryPath() string {
 	}
 	cmd := exec.Command("docker")
 	if cmd.Path == "docker" {
-		panic("docker is not installed. see https://docs.docker.com/install/")
+		panic("runtime error: docker is not installed. see https://docs.docker.com/install/")
 	}
 	ctx.dockerPath = cmd.Path
 
@@ -107,13 +107,13 @@ func (ctx *Context) DockerSockPath() string {
 	host := os.Getenv("DOCKER_HOST")
 	if host == "" {
 		sock := "/var/run/docker.sock"
-		if _, err := os.Stat(sock); err != nil {
-			panic(fmt.Sprintf("%s: no such file. please set DOCKER_HOST", sock))
-		}
 		host = fmt.Sprintf("unix://%s", sock)
 	}
 	if strings.HasPrefix(host, "unix://") {
 		ctx.dockerSockPath = strings.TrimPrefix(host, "unix://")
+		if _, err := os.Stat(ctx.dockerSockPath); err != nil {
+			panic(fmt.Sprintf("runtime error: %s: no such file. please set DOCKER_HOST", ctx.dockerSockPath))
+		}
 	} else {
 		ctx.dockerSockPath = ""
 	}

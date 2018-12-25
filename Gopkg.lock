@@ -53,55 +53,12 @@
   revision = "3605ed457bf7f8caa1371b4fafadadc026673479"
 
 [[projects]]
-  digest = "1:0a69a1c0db3591fcefb47f115b224592c8dfa4368b7ba9fae509d5e16cdc95c8"
-  name = "github.com/konsorten/go-windows-terminal-sequences"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "5c8c8bd35d3832f5d134ae1e1e375b69a4d25242"
-  version = "v1.0.1"
-
-[[projects]]
-  digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
-  name = "github.com/pkg/errors"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
-  version = "v0.8.0"
-
-[[projects]]
-  digest = "1:3f53e9e4dfbb664cd62940c9c4b65a2171c66acd0b7621a1a6b8e78513525a52"
-  name = "github.com/sirupsen/logrus"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "ad15b42461921f1fb3529b058c6786c6a45d5162"
-  version = "v1.1.1"
-
-[[projects]]
   digest = "1:b24d38b282bacf9791408a080f606370efa3d364e4b5fd9ba0f7b87786d3b679"
   name = "github.com/urfave/cli"
   packages = ["."]
   pruneopts = "UT"
   revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
   version = "v1.20.0"
-
-[[projects]]
-  branch = "master"
-  digest = "1:3f3a05ae0b95893d90b9b3b5afdb79a9b3d96e4e36e099d841ae602e4aca0da8"
-  name = "golang.org/x/crypto"
-  packages = ["ssh/terminal"]
-  pruneopts = "UT"
-  revision = "0c41d7ab0a0ee717d4590a44bcb987dfd9e183eb"
-
-[[projects]]
-  branch = "master"
-  digest = "1:bececf436a23bf63181438c4ef4f7f47816b87ff879083d83ca1321f9001a354"
-  name = "golang.org/x/sys"
-  packages = [
-    "unix",
-    "windows",
-  ]
-  pruneopts = "UT"
-  revision = "8f1d3d21f81be6e86ebcd6febee89c89bc50719f"
 
 [[projects]]
   digest = "1:ac3731dc825de45ed32a21b671864202b29d9cfb7502986508c82d86d72f16a5"
@@ -127,8 +84,6 @@
     "github.com/docker/go-units",
     "github.com/google/uuid",
     "github.com/iancoleman/strcase",
-    "github.com/pkg/errors",
-    "github.com/sirupsen/logrus",
     "github.com/urfave/cli",
     "gopkg.in/go-playground/validator.v9",
     "gopkg.in/yaml.v2",

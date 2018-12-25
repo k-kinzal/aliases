@@ -33,7 +33,7 @@ func (e *Executor) Pathes(depth int) []string {
 func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error) {
 	schema, ok := e.schemas[path]
 	if !ok {
-		return nil, fmt.Errorf("%s is not defined", path)
+		return nil, fmt.Errorf("runtime error: %s is not defined", path)
 	}
 
 	cmd := exec.Command("docker", "run")
@@ -364,12 +364,12 @@ func (e *Executor) Commands(ctx *context.Context) (map[string]exec.Cmd, error) {
 
 func New(ctx *context.Context) (*Executor, error) {
 	if _, err := os.Stat(ctx.GetConfPath()); os.IsNotExist(err) {
-		return nil, fmt.Errorf("%s: no such file", ctx.GetConfPath())
+		return nil, fmt.Errorf("runtime error: %s", err)
 	}
 
 	buf, err := ioutil.ReadFile(ctx.GetConfPath())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("runtime error: %s", err)
 	}
 
 	schemas, err := yaml.UnmarshalConfFile(buf)
