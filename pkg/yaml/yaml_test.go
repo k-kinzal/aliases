@@ -5,8 +5,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/iancoleman/strcase"
-
 	"github.com/k-kinzal/aliases/pkg/yaml"
 )
 
@@ -47,8 +45,8 @@ func TestUnmarshalConfFile_ShouldBeKebabCaseOfFieldName(t *testing.T) {
 		arr := strings.Split(tag, ",")
 		name := arr[0]
 
-		if name != strcase.ToLowerCamel(field.Name) {
-			t.Errorf("expected yaml key name of %s is %s, but %s is defined", field.Name, strcase.ToLowerCamel(field.Name), name)
+		if strings.ToLower(name) != strings.ToLower(field.Name) {
+			t.Errorf("expected yaml key name of %s is %s, but %s is defined", field.Name, field.Name, name)
 		}
 	}
 }

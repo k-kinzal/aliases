@@ -2,12 +2,7 @@ package util
 
 import (
 	"os"
-	"regexp"
 	"strings"
-)
-
-var (
-	regex = regexp.MustCompile(`\$\(.*?\)`)
 )
 
 func expandEnv(str string) string {
@@ -45,7 +40,7 @@ func ExpandColonDelimitedStringListWithEnv(arr []string) []string {
 }
 
 func ExpandStringKeyMapWithEnv(m map[string]string) map[string]string {
-	rets := make(map[string]string, 0)
+	rets := make(map[string]string, len(m))
 	for k, v := range m {
 		rets[expandEnv(k)] = v
 	}

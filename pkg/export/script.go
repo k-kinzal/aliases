@@ -7,13 +7,12 @@ import (
 	"os/exec"
 	pathes "path"
 	"path/filepath"
-	"strings"
 
 	"github.com/k-kinzal/aliases/pkg/context"
+	"github.com/k-kinzal/aliases/pkg/posix"
 )
 
-var (
-	tmpl = `#!/bin/sh
+const tmpl = `#!/bin/sh
 
 if [ -p /dev/stdin ]; then
   cat - | %s "$@"
@@ -23,9 +22,8 @@ else
   exit $?
 fi
 `
-)
 
-func Script(ctx *context.Context, commands map[string]exec.Cmd) error {
+func Script(ctx context.Context, commands map[string]exec.Cmd) error {
 	if err := os.RemoveAll(ctx.GetExportPath()); err != nil {
 		return fmt.Errorf("runtime error: %s", err)
 	}
@@ -34,10 +32,12 @@ func Script(ctx *context.Context, commands map[string]exec.Cmd) error {
 	}
 
 	for path, cmd := range commands {
-		str := fmt.Sprintf("%s %s", cmd.Path, strings.Join(cmd.Args[1:], " "))
+		str := posix.String(cmd)
 		writePath := filepath.Join(ctx.GetExportPath(), pathes.Base(path))
 		content := fmt.Sprintf(tmpl, str, str)
-		ioutil.WriteFile(writePath, []byte(content), 0755)
+		if err := ioutil.WriteFile(writePath, []byte(content), 0755); err != nil {
+			return fmt.Errorf("runtime error: %s", err)
+		}
 	}
 
 	return nil

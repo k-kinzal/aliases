@@ -1,0 +1,15 @@
+linters:
+  enable-all: true
+  disable:
+  - goconst
+  - gocritic
+  - gocyclo
+  - gochecknoglobals
+  - lll
+  - scopelint
+  fast: false
+
+run:
+  deadline: 1m
+
+

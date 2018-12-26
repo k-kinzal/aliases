@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-var (
+const (
 	DockerSockTypeSock   = 1
 	DockerSockTypeRemote = 2
 )
@@ -24,7 +24,7 @@ type Context struct {
 	dockerRemoteHost string
 }
 
-func NewContext(
+func New(
 	homePath string,
 	confPath string,
 	exportPath string) *Context {
@@ -47,7 +47,9 @@ func (ctx *Context) GetHomePath() string {
 	}
 
 	if _, err := os.Stat(ctx.homePath); os.IsNotExist(err) {
-		os.Mkdir(ctx.homePath, 0755)
+		if err := os.Mkdir(ctx.homePath, 0755); err != nil {
+			panic(fmt.Sprintf("runtime error: %s", err)) // FIXME: handling error
+		}
 	}
 
 	return ctx.homePath
@@ -85,7 +87,7 @@ func (ctx *Context) DockerBinaryPath() string {
 	}
 	cmd := exec.Command("docker")
 	if cmd.Path == "docker" {
-		panic("runtime error: docker is not installed. see https://docs.docker.com/install/")
+		panic("runtime error: docker is not installed. see https://docs.docker.com/install/") // FIXME: handling error
 	}
 	ctx.dockerPath = cmd.Path
 
@@ -93,11 +95,13 @@ func (ctx *Context) DockerBinaryPath() string {
 }
 
 func (ctx *Context) DockerSockType() int {
-	if ctx.DockerSockPath() != "" {
-		return 1
-	} else {
-		return 2
+	switch ctx.DockerSockPath() == "" {
+	case true:
+		return DockerSockTypeRemote
+	case false:
+		return DockerSockTypeSock
 	}
+	return -1
 }
 
 func (ctx *Context) DockerSockPath() string {
@@ -112,7 +116,7 @@ func (ctx *Context) DockerSockPath() string {
 	if strings.HasPrefix(host, "unix://") {
 		ctx.dockerSockPath = strings.TrimPrefix(host, "unix://")
 		if _, err := os.Stat(ctx.dockerSockPath); err != nil {
-			panic(fmt.Sprintf("runtime error: %s: no such file. please set DOCKER_HOST", ctx.dockerSockPath))
+			panic(fmt.Sprintf("runtime error: %s: no such file. please set DOCKER_HOST", ctx.dockerSockPath)) // FIXME: handling error
 		}
 	} else {
 		ctx.dockerSockPath = ""

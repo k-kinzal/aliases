@@ -7,5 +7,6 @@ import (
 )
 
 func isScript(fl validator.FieldLevel) bool {
-	return strings.Index(fl.Field().String(), "$") != -1
+	index := strings.Index(fl.Field().String(), "$")
+	return index != -1
 }

@@ -15,7 +15,7 @@ func Export(name string, word string, print bool) *exec.Cmd {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	if print == true {
+	if print {
 		cmd.Args = append(cmd.Args, "-p")
 	}
 
