@@ -2,12 +2,7 @@ package util
 
 import (
 	"os"
-	"regexp"
 	"strings"
-)
-
-var (
-	regex = regexp.MustCompile(`\$\(.*?\)`)
 )
 
 func expandEnv(str string) string {
