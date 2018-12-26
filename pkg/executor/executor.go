@@ -60,31 +60,31 @@ func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error)
 	if v := schema.CgroupParent; v != nil {
 		args = append(args, fmt.Sprintf("--cgroup-parent==%s", strconv.Quote(*v)))
 	}
-	if v := schema.Cidfile; v != nil {
+	if v := schema.CIDFile; v != nil {
 		args = append(args, "--cidfile", strconv.Quote(*v))
 	}
-	if v := schema.CpuPeriod; v != nil {
+	if v := schema.CPUPeriod; v != nil {
 		args = append(args, "--cpu-period", strconv.Quote(*v))
 	}
-	if v := schema.CpuQuota; v != nil {
+	if v := schema.CPUQuota; v != nil {
 		args = append(args, "--cpu-quota", strconv.Quote(*v))
 	}
-	if v := schema.CpuRtPeriod; v != nil {
+	if v := schema.CPURtPeriod; v != nil {
 		args = append(args, "--cpu-rt-period", strconv.Quote(*v))
 	}
-	if v := schema.CpuRtRuntime; v != nil {
+	if v := schema.CPURtRuntime; v != nil {
 		args = append(args, "--cpu-rt-runtime", strconv.Quote(*v))
 	}
-	if v := schema.CpuShares; v != nil {
+	if v := schema.CPUShares; v != nil {
 		args = append(args, "--cpu-shares", strconv.Quote(*v))
 	}
-	if v := schema.Cpus; v != nil {
+	if v := schema.CPUs; v != nil {
 		args = append(args, "--cpus", strconv.Quote(*v))
 	}
-	if v := schema.CpusetCpus; v != nil {
+	if v := schema.CPUsetCPUs; v != nil {
 		args = append(args, "--cpuset-cpus", strconv.Quote(*v))
 	}
-	if v := schema.CpusetMems; v != nil {
+	if v := schema.CPUsetMems; v != nil {
 		args = append(args, "--cpuset-mems", strconv.Quote(*v))
 	}
 	if v := schema.Detach; v != nil && *v != "false" {
@@ -103,16 +103,16 @@ func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error)
 	for _, v := range schema.DeviceCgroupRule {
 		args = append(args, "--device-cgroup-rule", strconv.Quote(v))
 	}
-	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.DeviceReadBps) {
+	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.DeviceReadBPS) {
 		args = append(args, "--device-read-bps", strconv.Quote(v))
 	}
-	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.DeviceReadIops) {
+	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.DeviceReadIOPS) {
 		args = append(args, "--device-read-iops", strconv.Quote(v))
 	}
-	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.DeviceWriteBps) {
+	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.DeviceWriteBPS) {
 		args = append(args, "--device-write-bps", strconv.Quote(v))
 	}
-	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.DeviceWriteIops) {
+	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.DeviceWriteIOPS) {
 		args = append(args, "--device-write-iops", strconv.Quote(v))
 	}
 	if v := schema.DisableContentTrust; v != nil && *v != "false" {
@@ -122,16 +122,16 @@ func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error)
 			args = append(args, fmt.Sprintf("$(test %s = \"true\" && echo \"--disable-content-trust\")", strconv.Quote(*v)))
 		}
 	}
-	for _, v := range schema.Dns {
+	for _, v := range schema.DNS {
 		args = append(args, "--dns", strconv.Quote(v))
 	}
-	for _, v := range schema.DnsOpt {
+	for _, v := range schema.DNSOpt {
 		args = append(args, "--dns-option", strconv.Quote(v))
 	}
-	for _, v := range schema.DnsOption {
+	for _, v := range schema.DNSOption {
 		args = append(args, "--dns-option", strconv.Quote(v))
 	}
-	for _, v := range schema.DnsSearch {
+	for _, v := range schema.DNSSearch {
 		args = append(args, "--dns-search", strconv.Quote(v))
 	}
 	if v := schema.Entrypoint; v != nil {
@@ -140,7 +140,7 @@ func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error)
 	for k, v := range util.ExpandStringKeyMapWithEnv(schema.Env) {
 		args = append(args, "--env", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
 	}
-	if len(schema.Dependencies) > 0 && ctx.DockerSockType() == context.DockerSockTypeRemote {
+	if (len(schema.Dependencies) > 0) && (ctx.DockerSockType() == context.DockerSockTypeRemote) {
 		args = append(args, "--env", fmt.Sprintf("DOCKER_HOST=%s", strconv.Quote(ctx.DockerRemoteHost())))
 	}
 	if len(schema.Dependencies) > 0 {
@@ -187,13 +187,13 @@ func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error)
 			args = append(args, fmt.Sprintf("$(test %s = \"true\" && echo \"--interactive\")", strconv.Quote(*v)))
 		}
 	}
-	if v := schema.Ip; v != nil {
+	if v := schema.IP; v != nil {
 		args = append(args, "--ip", strconv.Quote(*v))
 	}
-	if v := schema.Ip6; v != nil {
+	if v := schema.IP; v != nil {
 		args = append(args, "--ip6", strconv.Quote(*v))
 	}
-	if v := schema.Ipc; v != nil {
+	if v := schema.IPC; v != nil {
 		args = append(args, "--ipc", strconv.Quote(*v))
 	}
 	if v := schema.Isolation; v != nil {
@@ -211,7 +211,7 @@ func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error)
 	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.Link) {
 		args = append(args, "--link", strconv.Quote(v))
 	}
-	for _, v := range schema.LinkLocalIp {
+	for _, v := range schema.LinkLocalIP {
 		args = append(args, "--link-loal-ip", strconv.Quote(v))
 	}
 	if v := schema.LogDriver; v != nil {
@@ -241,7 +241,7 @@ func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error)
 	if v := schema.Name; v != nil {
 		args = append(args, "--name", strconv.Quote(*v))
 	}
-	if len(schema.Dependencies) > 0 && ctx.DockerSockType() == context.DockerSockTypeRemote {
+	if (len(schema.Dependencies) > 0) && (ctx.DockerSockType() == context.DockerSockTypeRemote) {
 		args = append(args, "--network", strconv.Quote("host"))
 	} else if v := schema.Network; v != nil {
 		args = append(args, "--network", strconv.Quote(*v))
@@ -256,17 +256,17 @@ func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error)
 			args = append(args, fmt.Sprintf("$(test %s = \"true\" && echo \"--no-healthcheck\")", strconv.Quote(*v)))
 		}
 	}
-	if v := schema.OomKillDisable; v != nil && *v != "false" {
+	if v := schema.OOMKillDisable; v != nil && *v != "false" {
 		if *v == "true" {
 			args = append(args, "--oom-kill-disable")
 		} else {
 			args = append(args, fmt.Sprintf("$(test %s = \"true\" && echo \"--oom-kill-disable\")", strconv.Quote(*v)))
 		}
 	}
-	if v := schema.OomScoreAdj; v != nil {
+	if v := schema.OOMScoreAdj; v != nil {
 		args = append(args, "--oom-secore-adj", strconv.Quote(*v))
 	}
-	if v := schema.Pid; v != nil {
+	if v := schema.PID; v != nil {
 		args = append(args, "--pid", strconv.Quote(*v))
 	}
 	if v := schema.PidsLimit; v != nil {
@@ -275,11 +275,10 @@ func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error)
 	if v := schema.Platform; v != nil {
 		args = append(args, "--platform", strconv.Quote(*v))
 	}
-	v := schema.Privileged
-	if v != nil && *v != "false" || (len(schema.Dependencies) > 0 && ctx.DockerSockType() == context.DockerSockTypeSock) {
-		if len(schema.Dependencies) > 0 && ctx.DockerSockType() == context.DockerSockTypeSock {
-			args = append(args, "--privileged")
-		} else if *v == "true" {
+	if (len(schema.Dependencies) > 0) && (ctx.DockerSockType() == context.DockerSockTypeSock) {
+		args = append(args, "--privileged")
+	} else if v := schema.Privileged; v != nil && *v != "false" {
+		if *v == "true" {
 			args = append(args, "--privileged")
 		} else {
 			args = append(args, fmt.Sprintf("$(test %s = \"true\" && echo \"--privileged\")", strconv.Quote(*v)))
@@ -343,7 +342,7 @@ func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error)
 	for _, v := range schema.Tmpfs {
 		args = append(args, "--tmpfs", strconv.Quote(v))
 	}
-	if v := schema.Tty; v != nil && *v != "false" {
+	if v := schema.TTY; v != nil && *v != "false" {
 		if *v == "true" {
 			args = append(args, "--tty")
 		} else {
@@ -359,13 +358,13 @@ func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error)
 	if v := schema.Userns; v != nil {
 		args = append(args, "--userns", strconv.Quote(*v))
 	}
-	if v := schema.Uts; v != nil {
+	if v := schema.UTS; v != nil {
 		args = append(args, "--uts", strconv.Quote(*v))
 	}
 	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.Volume) {
 		args = append(args, "--volume", strconv.Quote(v))
 	}
-	if len(schema.Dependencies) > 0 && ctx.DockerSockType() == context.DockerSockTypeSock {
+	if (len(schema.Dependencies) > 0) && (ctx.DockerSockType() == context.DockerSockTypeSock) {
 		args = append(args, "--volume", strconv.Quote(fmt.Sprintf("%s:/usr/local/bin/docker", ctx.DockerBinaryPath())))
 		args = append(args, "--volume", strconv.Quote(fmt.Sprintf("%s:/var/run/docker.sock", ctx.DockerSockPath())))
 	}

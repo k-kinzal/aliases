@@ -36,7 +36,7 @@ type Schema struct {
 	StopSignal          *string           `yaml:"stopSignal"`
 	StopTimeout         *string           `yaml:"stopTimeout" validate:"omitempty,int|script"`
 	Sysctl              map[string]string `yaml:"sysctl"`
-	Tty                 *string           `yaml:"tty" validate:"omitempty,bool|script" default:"$(if tty >/dev/null; then echo true; else echo false; fi)"`
+	TTY                 *string           `yaml:"tty" validate:"omitempty,bool|script" default:"$(if tty >/dev/null; then echo true; else echo false; fi)"`
 	Ulimit              map[string]string `yaml:"ulimit"`
 	User                *string           `yaml:"user"`
 	Workdir             *string           `yaml:"workdir"`
@@ -47,15 +47,15 @@ type Schema struct {
 	SecurityOpt         map[string]string `yaml:"securityOpt"`
 	Userns              *string           `yaml:"userns"`
 	AddHost             []string          `yaml:"addHost"`
-	Dns                 []string          `yaml:"dns"`
-	DnsOpt              []string          `yaml:"dnsOpt"`
-	DnsOption           []string          `yaml:"dnsOption"`
-	DnsSearch           []string          `yaml:"dnsSearch"`
+	DNS                 []string          `yaml:"dns"`
+	DNSOpt              []string          `yaml:"dnsOpt"`
+	DNSOption           []string          `yaml:"dnsOption"`
+	DNSSearch           []string          `yaml:"dnsSearch"`
 	Expose              []string          `yaml:"expose"`
-	Ip                  *string           `yaml:"ip"`
-	Ip6                 *string           `yaml:"ip6"`
+	IP                  *string           `yaml:"ip"`
+	IP6                 *string           `yaml:"ip6"`
 	Link                []string          `yaml:"link"`
-	LinkLocalIp         []string          `yaml:"linkLocalIp"`
+	LinkLocalIP         []string          `yaml:"linkLocalIp"`
 	MacAddress          *string           `yaml:"macAddress"`
 	Publish             []string          `yaml:"publish"`
 	PublishAll          *string           `yaml:"publishAll" validate:"omitempty,bool|script"`
@@ -77,33 +77,33 @@ type Schema struct {
 	NoHealthcheck       *string           `yaml:"noHealthcheck" validate:"omitempty,bool|script"`
 	BlkioWeight         *string           `yaml:"blkioWeight" validate:"omitempty,uint16|script"`
 	BlkioWeightDevice   []string          `yaml:"blkioWeightDevice"`
-	Cidfile             *string           `yaml:"cidfile"`
-	CpusetCpus          *string           `yaml:"cpusetCpus"`
-	CpusetMems          *string           `yaml:"cpusetMems"`
-	CpuPeriod           *string           `yaml:"cpuPeriod" validate:"omitempty,nanocpus|script"`
-	CpuQuota            *string           `yaml:"cpuQuota" validate:"omitempty,int64|script"`
-	CpuRtPeriod         *string           `yaml:"cpuRtPeriod" validate:"omitempty,int64|script"`
-	CpuRtRuntime        *string           `yaml:"cpuRtRuntime" validate:"omitempty,int64|script"`
-	CpuShares           *string           `yaml:"cpuShares" validate:"omitempty,int64|script"`
-	Cpus                *string           `yaml:"cpus"`
-	DeviceReadBps       []string          `yaml:"deviceReadBps"`
-	DeviceReadIops      []string          `yaml:"deviceReadIops"`
-	DeviceWriteBps      []string          `yaml:"deviceWriteBps"`
-	DeviceWriteIops     []string          `yaml:"deviceWriteIops"`
+	CIDFile             *string           `yaml:"cidfile"`
+	CPUsetCPUs          *string           `yaml:"cpusetCpus"`
+	CPUsetMems          *string           `yaml:"cpusetMems"`
+	CPUPeriod           *string           `yaml:"cpuPeriod" validate:"omitempty,nanocpus|script"`
+	CPUQuota            *string           `yaml:"cpuQuota" validate:"omitempty,int64|script"`
+	CPURtPeriod         *string           `yaml:"cpuRtPeriod" validate:"omitempty,int64|script"`
+	CPURtRuntime        *string           `yaml:"cpuRtRuntime" validate:"omitempty,int64|script"`
+	CPUShares           *string           `yaml:"cpuShares" validate:"omitempty,int64|script"`
+	CPUs                *string           `yaml:"cpus"`
+	DeviceReadBPS       []string          `yaml:"deviceReadBps"`
+	DeviceReadIOPS      []string          `yaml:"deviceReadIops"`
+	DeviceWriteBPS      []string          `yaml:"deviceWriteBps"`
+	DeviceWriteIOPS     []string          `yaml:"deviceWriteIops"`
 	KernelMemory        *string           `yaml:"kernelMemory" validate:"omitempty,membytes|script"`
 	Memory              *string           `yaml:"memory" validate:"omitempty,membytes|script"`
 	MemoryReservation   *string           `yaml:"memoryReservation" validate:"omitempty,membytes|script"`
 	MemorySwap          *string           `yaml:"memorySwap" validate:"omitempty,memswapbytes|script"`
 	MemorySwappiness    *string           `yaml:"memorySwappiness" validate:"omitempty,int64|script"`
-	OomKillDisable      *string           `yaml:"oomKillDisable" validate:"omitempty,bool|script"`
-	OomScoreAdj         *string           `yaml:"oomScoreAdj" validate:"omitempty,int|script"`
+	OOMKillDisable      *string           `yaml:"oomKillDisable" validate:"omitempty,bool|script"`
+	OOMScoreAdj         *string           `yaml:"oomScoreAdj" validate:"omitempty,int|script"`
 	PidsLimit           *string           `yaml:"pidsLimit" validate:"omitempty,int64|script"`
 	CgroupParent        *string           `yaml:"cgroupParent"`
-	Ipc                 *string           `yaml:"ipc"`
+	IPC                 *string           `yaml:"ipc"`
 	Isolation           *string           `yaml:"isolation"`
-	Pid                 *string           `yaml:"pid"`
+	PID                 *string           `yaml:"pid"`
 	ShmSize             *string           `yaml:"shmSize" validate:"omitempty,membytes|script"`
-	Uts                 *string           `yaml:"uts"`
+	UTS                 *string           `yaml:"uts"`
 	Runtime             *string           `yaml:"runtime"`
 	Init                *string           `yaml:"init" validate:"omitempty,bool|script"`
 	Image               string            `yaml:"image" validate:"required"`

@@ -93,11 +93,13 @@ func (ctx *Context) DockerBinaryPath() string {
 }
 
 func (ctx *Context) DockerSockType() int {
-	if ctx.DockerSockPath() != "" {
-		return 1
-	} else {
-		return 2
+	switch ctx.DockerSockPath() == "" {
+	case true:
+		return DockerSockTypeRemote
+	case false:
+		return DockerSockTypeSock
 	}
+	return -1
 }
 
 func (ctx *Context) DockerSockPath() string {
