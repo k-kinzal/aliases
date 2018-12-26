@@ -1,20 +1,15 @@
+linters:
+  enable-all: true
+  disable:
+  - goconst
+  - gocritic
+  - gocyclo
+  - gochecknoglobals
+  - lll
+  - scopelint
+  fast: false
+
 run:
   deadline: 1m
 
 
-linters-settings:
-  errcheck:
-    check-type-assertions: false
-    check-blank: false
-    ignore: fmt:.*,gopkg.in/go-playground/validator.v9:.*RegisterValidation
-
-linters:
-  enable-all: true
-  disable:
-  - gocritic
-  - scopelint
-  - gocyclo
-  - lll
-  - goconst
-  - gochecknoglobals
-  fast: false
