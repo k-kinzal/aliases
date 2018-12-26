@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/k-kinzal/aliases/pkg/context"
 	"github.com/urfave/cli"
 )
