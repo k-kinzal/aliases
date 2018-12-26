@@ -19,7 +19,7 @@ type GenContext struct {
 }
 
 func NewGenContext(c *cli.Context) *GenContext {
-	ctx := context.NewContext(
+	ctx := context.New(
 		c.GlobalString("home"),
 		c.GlobalString("config"),
 		c.String("export-path"),

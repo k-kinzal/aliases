@@ -24,7 +24,7 @@ type Context struct {
 	dockerRemoteHost string
 }
 
-func NewContext(
+func New(
 	homePath string,
 	confPath string,
 	exportPath string) *Context {

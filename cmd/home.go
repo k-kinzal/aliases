@@ -19,7 +19,7 @@ func HomeCommand() cli.Command {
 
 func HomeAction(c *cli.Context) error {
 	// context
-	ctx := context.NewContext("", "", "")
+	ctx := context.New("", "", "")
 
 	// output
 	fmt.Print(ctx.GetHomePath())
