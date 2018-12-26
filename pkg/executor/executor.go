@@ -33,7 +33,7 @@ func (e *Executor) Pathes(depth int) []string {
 func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error) {
 	schema, ok := e.schemas[path]
 	if !ok {
-		return nil, fmt.Errorf("runtime error: %s is not defined", path)
+		return nil, fmt.Errorf("logic error: %s is not defined", path)
 	}
 
 	cmd := exec.Command("docker", "run")
