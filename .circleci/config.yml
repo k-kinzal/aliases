@@ -17,37 +17,24 @@ jobs:
         - /go/src/github.com/k-kinzal/aliases/vendor
     - run: go build -ldflags "-s -w" -o ./dist/aliases .
     - persist_to_workspace:
-        root: ./dist
+        root: ./
         paths:
-        - aliases
+        - "*"
 
   test:
     docker:
     - image: circleci/golang:1.11.4
     working_directory: /go/src/github.com/k-kinzal/aliases
     steps:
-    - checkout
-    - restore_cache:
-        key: gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
-        paths:
-        - /go/src/github.com/k-kinzal/aliases/vendor
-    - run: dep ensure -vendor-only=true
-    - save_cache:
-        key: gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
-        paths:
-        - /go/src/github.com/k-kinzal/aliases/vendor
+    - attach_workspace:
+        at: ./
     - run: go test ./... -v
 
   integration:
     machine: true
     steps:
-    - checkout
-    - restore_cache:
-        key: gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
-        paths:
-        - /go/src/github.com/k-kinzal/aliases/vendor
     - attach_workspace:
-        at: ./dist
+        at: ./
     - run:
         # FIXME: host: ubuntu, guest: alpine not working
         # https://twitter.com/amaya382/status/1077874567119396864
