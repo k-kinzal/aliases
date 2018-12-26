@@ -48,7 +48,7 @@ func (ctx *Context) GetHomePath() string {
 
 	if _, err := os.Stat(ctx.homePath); os.IsNotExist(err) {
 		if err := os.Mkdir(ctx.homePath, 0755); err != nil {
-			panic(fmt.Sprintf("runtime error: %s", err))
+			panic(fmt.Sprintf("runtime error: %s", err)) // FIXME: handling error
 		}
 	}
 
@@ -87,7 +87,7 @@ func (ctx *Context) DockerBinaryPath() string {
 	}
 	cmd := exec.Command("docker")
 	if cmd.Path == "docker" {
-		panic("runtime error: docker is not installed. see https://docs.docker.com/install/")
+		panic("runtime error: docker is not installed. see https://docs.docker.com/install/") // FIXME: handling error
 	}
 	ctx.dockerPath = cmd.Path
 
@@ -116,7 +116,7 @@ func (ctx *Context) DockerSockPath() string {
 	if strings.HasPrefix(host, "unix://") {
 		ctx.dockerSockPath = strings.TrimPrefix(host, "unix://")
 		if _, err := os.Stat(ctx.dockerSockPath); err != nil {
-			panic(fmt.Sprintf("runtime error: %s: no such file. please set DOCKER_HOST", ctx.dockerSockPath))
+			panic(fmt.Sprintf("runtime error: %s: no such file. please set DOCKER_HOST", ctx.dockerSockPath)) // FIXME: handling error
 		}
 	} else {
 		ctx.dockerSockPath = ""
