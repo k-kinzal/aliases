@@ -47,7 +47,9 @@ func (ctx *Context) GetHomePath() string {
 	}
 
 	if _, err := os.Stat(ctx.homePath); os.IsNotExist(err) {
-		os.Mkdir(ctx.homePath, 0755)
+		if err := os.Mkdir(ctx.homePath, 0755); err != nil {
+			panic(fmt.Sprintf("runtime error: %s", err))
+		}
 	}
 
 	return ctx.homePath
