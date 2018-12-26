@@ -1,0 +1,54 @@
+version: 2
+jobs:
+  build:
+    docker:
+    - image: circleci/golang:1.11.4
+    working_directory: /go/src/github.com/k-kinzal/aliases
+    steps:
+    - checkout
+    - restore_cache:
+        key: gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
+        paths:
+        - /go/src/github.com/k-kinzal/aliases/vendor
+    - save_cache:
+        key: gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
+        paths:
+        - /go/src/github.com/k-kinzal/aliases/vendor
+    - run: dep ensure -vendor-only=true
+    - run: go build -ldflags "-s -w" -o ./dist/aliases .
+    - persist_to_workspace:
+        root: /go/src/github.com/k-kinzal/aliases
+        paths:
+        - "*"
+
+  test:
+    docker:
+    - image: circleci/golang:1.11.4
+    working_directory: /go/src/github.com/k-kinzal/aliases
+    steps:
+    - attach_workspace:
+        at: /go/src/github.com/k-kinzal/aliases
+    - run: go test ./... -v
+
+  integration:
+    machine: true
+    working_directory: /go/src/github.com/k-kinzal/aliases
+    steps:
+    - attach_workspace:
+        at: /go/src/github.com/k-kinzal/aliases
+    - run: find test/integration/*/test.sh | xargs -I{} /bin/sh -c "{} || exit 255 && echo pass {}"
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+    - build
+    - test:
+        requires:
+        - build
+# FIXME: host: ubuntu, guest: alpine not working
+# https://twitter.com/amaya382/status/1077874567119396864
+# https://amaya382.hatenablog.jp/entry/2016/10/05/030254
+#    - integration:
+#        requires:
+#        - build

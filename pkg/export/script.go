@@ -7,9 +7,9 @@ import (
 	"os/exec"
 	pathes "path"
 	"path/filepath"
-	"strings"
 
 	"github.com/k-kinzal/aliases/pkg/context"
+	"github.com/k-kinzal/aliases/pkg/posix"
 )
 
 const tmpl = `#!/bin/sh
@@ -32,7 +32,7 @@ func Script(ctx context.Context, commands map[string]exec.Cmd) error {
 	}
 
 	for path, cmd := range commands {
-		str := fmt.Sprintf("%s %s", cmd.Path, strings.Join(cmd.Args[1:], " "))
+		str := posix.String(cmd)
 		writePath := filepath.Join(ctx.GetExportPath(), pathes.Base(path))
 		content := fmt.Sprintf(tmpl, str, str)
 		if err := ioutil.WriteFile(writePath, []byte(content), 0755); err != nil {
