@@ -12,8 +12,7 @@ import (
 	"github.com/k-kinzal/aliases/pkg/context"
 )
 
-var (
-	tmpl = `#!/bin/sh
+const tmpl = `#!/bin/sh
 
 if [ -p /dev/stdin ]; then
   cat - | %s "$@"
@@ -23,7 +22,6 @@ else
   exit $?
 fi
 `
-)
 
 func Script(ctx *context.Context, commands map[string]exec.Cmd) error {
 	if err := os.RemoveAll(ctx.GetExportPath()); err != nil {
