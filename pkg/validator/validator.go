@@ -43,7 +43,7 @@ func (v *Validate) Struct(s interface{}) error {
 	return err
 }
 
-func New() Validate {
+func New() *Validate {
 	validate := validator.New()
 	validate.RegisterValidation("bool", isBoolean)
 	validate.RegisterValidation("int", isInteger)
@@ -56,5 +56,6 @@ func New() Validate {
 	validate.RegisterValidation("memswapbytes", isMemorySwapBytes)
 	validate.RegisterValidation("script", isScript)
 
-	return Validate{validate}
+	v := Validate{validate}
+	return &v
 }

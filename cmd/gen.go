@@ -54,17 +54,17 @@ func GenCommand() cli.Command {
 func GenAction(c *cli.Context) error {
 	ctx := NewGenContext(c)
 
-	exec, err := executor.New(ctx.Context)
+	exec, err := executor.New(*ctx.Context)
 	if err != nil {
 		return err
 	}
 
-	commands, err := exec.Commands(ctx.Context)
+	commands, err := exec.Commands(*ctx.Context)
 	if err != nil {
 		return err
 	}
 
-	if err := export.Script(ctx.Context, commands); err != nil {
+	if err := export.Script(*ctx.Context, commands); err != nil {
 		return err
 	}
 

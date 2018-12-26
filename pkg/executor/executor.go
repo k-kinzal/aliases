@@ -30,7 +30,7 @@ func (e *Executor) Pathes(depth int) []string {
 	return keys
 }
 
-func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error) {
+func (e *Executor) Command(ctx context.Context, path string) (*exec.Cmd, error) {
 	schema, ok := e.schemas[path]
 	if !ok {
 		return nil, fmt.Errorf("logic error: %s is not defined", path)
@@ -400,7 +400,7 @@ func (e *Executor) Command(ctx *context.Context, path string) (*exec.Cmd, error)
 	return cmd, nil
 }
 
-func (e *Executor) Commands(ctx *context.Context) (map[string]exec.Cmd, error) {
+func (e *Executor) Commands(ctx context.Context) (map[string]exec.Cmd, error) {
 	commands := make(map[string]exec.Cmd, len(e.schemas))
 	for _, path := range e.Pathes(0) {
 		cmd, err := e.Command(ctx, path)
@@ -412,7 +412,7 @@ func (e *Executor) Commands(ctx *context.Context) (map[string]exec.Cmd, error) {
 	return commands, nil
 }
 
-func New(ctx *context.Context) (*Executor, error) {
+func New(ctx context.Context) (*Executor, error) {
 	if _, err := os.Stat(ctx.GetConfPath()); os.IsNotExist(err) {
 		return nil, fmt.Errorf("runtime error: %s", err)
 	}

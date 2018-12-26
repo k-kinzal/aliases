@@ -23,7 +23,7 @@ else
 fi
 `
 
-func Script(ctx *context.Context, commands map[string]exec.Cmd) error {
+func Script(ctx context.Context, commands map[string]exec.Cmd) error {
 	if err := os.RemoveAll(ctx.GetExportPath()); err != nil {
 		return fmt.Errorf("runtime error: %s", err)
 	}
