@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-var (
+const (
 	DockerSockTypeSock   = 1
 	DockerSockTypeRemote = 2
 )
