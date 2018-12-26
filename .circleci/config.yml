@@ -10,33 +10,58 @@ jobs:
         key: gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
         paths:
         - /go/src/github.com/k-kinzal/aliases/vendor
+    - run: dep ensure -vendor-only=true
     - save_cache:
         key: gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
         paths:
         - /go/src/github.com/k-kinzal/aliases/vendor
-    - run: dep ensure -vendor-only=true
     - run: go build -ldflags "-s -w" -o ./dist/aliases .
     - persist_to_workspace:
-        root: /go/src/github.com/k-kinzal/aliases
+        root: ./dist
         paths:
-        - "*"
+        - aliases
 
   test:
     docker:
     - image: circleci/golang:1.11.4
     working_directory: /go/src/github.com/k-kinzal/aliases
     steps:
-    - attach_workspace:
-        at: /go/src/github.com/k-kinzal/aliases
+    - checkout
+    - restore_cache:
+        key: gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
+        paths:
+        - /go/src/github.com/k-kinzal/aliases/vendor
+    - run: dep ensure -vendor-only=true
+    - save_cache:
+        key: gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
+        paths:
+        - /go/src/github.com/k-kinzal/aliases/vendor
     - run: go test ./... -v
 
   integration:
     machine: true
-    working_directory: /go/src/github.com/k-kinzal/aliases
     steps:
+    - checkout
+    - restore_cache:
+        key: gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
+        paths:
+        - /go/src/github.com/k-kinzal/aliases/vendor
     - attach_workspace:
-        at: /go/src/github.com/k-kinzal/aliases
-    - run: find test/integration/*/test.sh | xargs -I{} /bin/sh -c "{} || exit 255 && echo pass {}"
+        at: ./dist
+    - run:
+        # FIXME: host: ubuntu, guest: alpine not working
+        # https://twitter.com/amaya382/status/1077874567119396864
+        # https://amaya382.hatenablog.jp/entry/2016/10/05/030254
+        name: Download docker binary
+        command: |
+          mkdir -p bin
+          docker run -v $PWD/bin:/tmp/bin docker /bin/sh -c 'cp $(which docker) /tmp/bin'
+    - run:
+        name: Integration Test
+        command: |
+          echo 'export PATH='$PWD'/bin:$PATH' >> $BASH_ENV
+          source $BASH_ENV
+          find test/integration/*/test.sh | xargs -I{} /bin/sh -c "{} || exit 255 && echo pass {}"
 
 workflows:
   version: 2
@@ -46,9 +71,6 @@ workflows:
     - test:
         requires:
         - build
-# FIXME: host: ubuntu, guest: alpine not working
-# https://twitter.com/amaya382/status/1077874567119396864
-# https://amaya382.hatenablog.jp/entry/2016/10/05/030254
-#    - integration:
-#        requires:
-#        - build
+    - integration:
+        requires:
+        - build
