@@ -43,19 +43,39 @@ func (v *Validate) Struct(s interface{}) error {
 	return err
 }
 
-func New() *Validate {
+func New() (*Validate, error) {
 	validate := validator.New()
-	validate.RegisterValidation("bool", isBoolean)
-	validate.RegisterValidation("int", isInteger)
-	validate.RegisterValidation("int64", isInteger64)
-	validate.RegisterValidation("uint16", isUnsignedInteger16)
-	validate.RegisterValidation("uint64", isUnsignedInteger64)
-	validate.RegisterValidation("duration", isDuration)
-	validate.RegisterValidation("nanocpus", isNanoCPUs)
-	validate.RegisterValidation("membytes", isMemoryBytes)
-	validate.RegisterValidation("memswapbytes", isMemorySwapBytes)
-	validate.RegisterValidation("script", isScript)
+	if err := validate.RegisterValidation("bool", isBoolean); err != nil {
+		return nil, err
+	}
+	if err := validate.RegisterValidation("int", isInteger); err != nil {
+		return nil, err
+	}
+	if err := validate.RegisterValidation("int64", isInteger64); err != nil {
+		return nil, err
+	}
+	if err := validate.RegisterValidation("uint16", isUnsignedInteger16); err != nil {
+		return nil, err
+	}
+	if err := validate.RegisterValidation("uint64", isUnsignedInteger64); err != nil {
+		return nil, err
+	}
+	if err := validate.RegisterValidation("duration", isDuration); err != nil {
+		return nil, err
+	}
+	if err := validate.RegisterValidation("nanocpus", isNanoCPUs); err != nil {
+		return nil, err
+	}
+	if err := validate.RegisterValidation("membytes", isMemoryBytes); err != nil {
+		return nil, err
+	}
+	if err := validate.RegisterValidation("memswapbytes", isMemorySwapBytes); err != nil {
+		return nil, err
+	}
+	if err := validate.RegisterValidation("script", isScript); err != nil {
+		return nil, err
+	}
 
 	v := Validate{validate}
-	return &v
+	return &v, nil
 }

@@ -119,10 +119,13 @@ func UnmarshalConfFile(buf []byte) (map[string]Schema, error) {
 		if e, ok := err.(*yaml.TypeError); ok {
 			return nil, fmt.Errorf("yaml error: %s", strings.Replace(e.Errors[0], "in type yaml.Schema", "", 1))
 		}
-		return nil, fmt.Errorf("runtime error: %s", err)
+		return nil, err
 	}
 
-	validate := validator.New()
+	validate, err := validator.New()
+	if err != nil {
+		return nil, err
+	}
 	for path, schema := range schemas {
 		if err := defaults.Set(&schema); err != nil {
 			return nil, err

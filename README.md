@@ -1,6 +1,10 @@
 # aliases
 
- is a tool for resolving command dependencies with containers.
+[![CircleCI](https://circleci.com/gh/k-kinzal/aliases.svg?style=svg)](https://circleci.com/gh/k-kinzal/aliases)
+[![GolangCI](https://golangci.com/badges/github.com/k-kinzal/aliases.svg)](https://golangci.com/r/github.com/k-kinzal/aliases)
+
+
+aliases is a tool for resolving command dependencies with containers.
 
 * YAML-based command definition
 * Version of command with environment variable
