@@ -5,6 +5,7 @@ linters:
   - gocritic
   - gocyclo
   - gochecknoglobals
+  - gosec
   - lll
   - scopelint
   fast: false
