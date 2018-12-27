@@ -23,6 +23,7 @@ func NewGenContext(c *cli.Context) *GenContext {
 		c.GlobalString("home"),
 		c.GlobalString("config"),
 		c.String("export-path"),
+		c.GlobalBool("verbose"),
 	)
 
 	return &GenContext{

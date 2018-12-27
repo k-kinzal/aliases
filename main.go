@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"os"
+
+	"github.com/k-kinzal/aliases/pkg/logger"
 
 	"github.com/k-kinzal/aliases/cmd"
 	"github.com/k-kinzal/aliases/pkg/version"
@@ -13,6 +14,10 @@ func main() {
 	cli.HelpFlag = cli.BoolFlag{
 		Name:  "help",
 		Usage: "show help",
+	}
+	cli.VersionFlag = cli.BoolFlag{
+		Name:  "version",
+		Usage: "print the version",
 	}
 
 	app := cli.NewApp()
@@ -30,6 +35,10 @@ func main() {
 			Name:  "home",
 			Usage: "Home directory for aliases",
 		},
+		cli.BoolFlag{
+			Name:  "verbose, v",
+			Usage: "enable verbose output",
+		},
 	}
 	app.Commands = []cli.Command{
 		cmd.GenCommand(),
@@ -39,7 +48,7 @@ func main() {
 
 	err := app.Run(os.Args)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%s", err)
+		logger.Fatal(err)
 		os.Exit(1)
 	}
 }

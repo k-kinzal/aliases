@@ -4,6 +4,7 @@ import (
 	"github.com/k-kinzal/aliases/pkg/context"
 	"github.com/k-kinzal/aliases/pkg/executor"
 	"github.com/k-kinzal/aliases/pkg/export"
+	"github.com/k-kinzal/aliases/pkg/logger"
 	"github.com/k-kinzal/aliases/pkg/posix"
 	"github.com/k-kinzal/aliases/pkg/yaml"
 	"github.com/urfave/cli"
@@ -18,6 +19,7 @@ func NewRunContext(c *cli.Context) *runContext {
 		c.GlobalString("home"),
 		c.GlobalString("config"),
 		"",
+		c.GlobalBool("verbose"),
 	)
 
 	return &runContext{ctx}
@@ -264,6 +266,7 @@ func RunAction(c *cli.Context) error {
 	if err := export.Script(*ctx.Context, commands); err != nil {
 		return err
 	}
+	logger.Debug(posix.String(commands[*path]))
 
 	if err := posix.Run(commands[*path]); err != nil {
 		return err

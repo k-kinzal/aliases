@@ -8,6 +8,8 @@ import (
 	"os/exec"
 	"os/user"
 	"strings"
+
+	"github.com/k-kinzal/aliases/pkg/logger"
 )
 
 const (
@@ -27,7 +29,16 @@ type Context struct {
 func New(
 	homePath string,
 	confPath string,
-	exportPath string) *Context {
+	exportPath string,
+	verbose bool) *Context {
+
+	logger.SetOutput(os.Stderr)
+	if verbose {
+		logger.SetLogLevel(logger.DebugLevel)
+	} else {
+		logger.SetLogLevel(logger.WarnLevel)
+	}
+
 	return &Context{
 		homePath:   homePath,
 		confPath:   confPath,
@@ -135,7 +146,7 @@ func (ctx *Context) DockerRemoteHost() string {
 	host := os.Getenv("DOCKER_HOST")
 	if !strings.HasPrefix(host, "unix://") {
 		ctx.dockerRemoteHost = host
-		fmt.Fprintf(os.Stderr, "WARNGING: %s may not working possibility. Please same path that you use on the host and the host of `DOCKER_HOST`.", host)
+		logger.Warnf("%s may not working possibility. Please same path that you use on the host and the host of `DOCKER_HOST`.", host)
 	} else {
 		ctx.dockerRemoteHost = ""
 	}

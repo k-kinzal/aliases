@@ -20,6 +20,7 @@
 
 ### Go Patch ###
 /vendor/
+/_vendor*/
 /Godeps/
 
 ### Intellij ###
