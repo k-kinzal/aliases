@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/imdario/mergo"
 	"github.com/k-kinzal/aliases/pkg/context"
 	"github.com/k-kinzal/aliases/pkg/util"
 	"github.com/k-kinzal/aliases/pkg/yaml"
@@ -19,7 +20,13 @@ type Executor struct {
 }
 
 func (e *Executor) AddSchema(path string, schema yaml.Schema) {
-	e.schemas[path] = schema
+	dst := schema
+	if src, ok := e.schemas[path]; ok {
+		if err := mergo.Map(&dst, src, mergo.WithAppendSlice); err != nil {
+			panic(err)
+		}
+	}
+	e.schemas[path] = dst
 }
 
 func (e *Executor) Pathes(depth int) []string {
@@ -124,9 +131,6 @@ func (e *Executor) Command(ctx context.Context, path string) (*exec.Cmd, error) 
 	}
 	for _, v := range schema.DNS {
 		args = append(args, "--dns", strconv.Quote(v))
-	}
-	for _, v := range schema.DNSOpt {
-		args = append(args, "--dns-option", strconv.Quote(v))
 	}
 	for _, v := range schema.DNSOption {
 		args = append(args, "--dns-option", strconv.Quote(v))

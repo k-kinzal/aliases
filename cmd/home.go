@@ -9,11 +9,11 @@ import (
 
 func HomeCommand() cli.Command {
 	return cli.Command{
-		Name:  "home",
-		Usage: "Get aliases home path",
-		Action: func(c *cli.Context) error {
-			return HomeAction(c)
-		},
+		Name:                   "home",
+		Usage:                  "Get aliases home path",
+		Action:                 HomeAction,
+		SkipArgReorder:         true,
+		UseShortOptionHandling: true,
 	}
 }
 

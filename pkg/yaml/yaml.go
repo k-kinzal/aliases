@@ -48,7 +48,6 @@ type Schema struct {
 	Userns              *string           `yaml:"userns"`
 	AddHost             []string          `yaml:"addHost"`
 	DNS                 []string          `yaml:"dns"`
-	DNSOpt              []string          `yaml:"dnsOpt"`
 	DNSOption           []string          `yaml:"dnsOption"`
 	DNSSearch           []string          `yaml:"dnsSearch"`
 	Expose              []string          `yaml:"expose"`

@@ -45,9 +45,9 @@ func GenCommand() cli.Command {
 				Usage: "The directory to export scripts",
 			},
 		},
-		Action: func(c *cli.Context) error {
-			return GenAction(c)
-		},
+		Action:                 GenAction,
+		SkipArgReorder:         true,
+		UseShortOptionHandling: true,
 	}
 }
 

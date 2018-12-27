@@ -10,6 +10,11 @@ import (
 )
 
 func main() {
+	cli.HelpFlag = cli.BoolFlag{
+		Name:  "help",
+		Usage: "show help",
+	}
+
 	app := cli.NewApp()
 	app.Name = "aliases"
 	app.Usage = "Generate alias for command on container"
@@ -19,7 +24,7 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "config, c",
-			Usage: "Load configuration from `FILE`",
+			Usage: "Load configuration file",
 		},
 		cli.StringFlag{
 			Name:  "home",
@@ -28,6 +33,7 @@ func main() {
 	}
 	app.Commands = []cli.Command{
 		cmd.GenCommand(),
+		cmd.RunCommand(),
 		cmd.HomeCommand(),
 	}
 
