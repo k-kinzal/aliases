@@ -2,6 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/k-kinzal/aliases.svg?style=svg)](https://circleci.com/gh/k-kinzal/aliases)
 [![GolangCI](https://golangci.com/badges/github.com/k-kinzal/aliases.svg)](https://golangci.com/r/github.com/k-kinzal/aliases)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fk-kinzal%2Faliases.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fk-kinzal%2Faliases?ref=badge_shield)
 
 
 aliases is a tool for resolving command dependencies with containers.
@@ -128,3 +129,7 @@ Note that command is always executed on the machine (host or docker) that execut
 
 `$PWD` is a special environment variable.
 The `$PWD` specified on the left always points to `$PWD` of the host.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fk-kinzal%2Faliases.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fk-kinzal%2Faliases?ref=badge_large)
