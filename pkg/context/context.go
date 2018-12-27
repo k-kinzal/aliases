@@ -135,6 +135,7 @@ func (ctx *Context) DockerRemoteHost() string {
 	host := os.Getenv("DOCKER_HOST")
 	if !strings.HasPrefix(host, "unix://") {
 		ctx.dockerRemoteHost = host
+		fmt.Fprintf(os.Stderr, "WARNGING: %s may not working possibility. Please same path that you use on the host and the host of `DOCKER_HOST`.", host)
 	} else {
 		ctx.dockerRemoteHost = ""
 	}
