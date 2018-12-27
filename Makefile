@@ -15,6 +15,10 @@ cross-build:
 	@make build GOOS=linux GOARCH=amd64
 	@make build GOOS=darwin GOARCH=amd64
 
+.PHONY: package
+package: cross-build
+	find dist/*/aliases -type f -exec dirname {} \; | sed 's|^dist/||' | xargs -I{} tar cvzfh dist/{}.tar.gz -C dist/{} aliases
+
 .PHONY: test
 test:
 	go test ./... -v
