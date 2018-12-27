@@ -76,7 +76,9 @@ func (ctx *Context) GetExportPath() string {
 	}
 
 	hasher := md5.New()
-	hasher.Write([]byte(ctx.GetConfPath()))
+	if _, err := hasher.Write([]byte(ctx.GetConfPath())); err != nil {
+		panic(fmt.Sprintf("logic error: %s", err)) // FIXME: handling error
+	}
 
 	ctx.exportPath = fmt.Sprintf("%s/%s", ctx.GetHomePath(), hex.EncodeToString(hasher.Sum(nil)))
 
