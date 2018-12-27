@@ -76,7 +76,7 @@ func (ctx *Context) GetExportPath() string {
 	}
 
 	hasher := md5.New()
-	hasher.Write([]byte(ctx.GetHomePath()))
+	hasher.Write([]byte(ctx.GetConfPath()))
 
 	ctx.exportPath = fmt.Sprintf("%s/%s", ctx.GetHomePath(), hex.EncodeToString(hasher.Sum(nil)))
 
