@@ -37,14 +37,6 @@
   version = "v0.16.0"
 
 [[projects]]
-  digest = "1:3a26588bc48b96825977c1b3df964f8fd842cd6860cc26370588d3563433cf11"
-  name = "github.com/google/uuid"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "d460ce9f8df2e77fb1ba55ca87fafed96c607494"
-  version = "v1.0.0"
-
-[[projects]]
   branch = "master"
   digest = "1:89cd2208bdeb192cc83ee287216af3c987fc87a90b9087718ad6631b636cefcf"
   name = "github.com/iancoleman/strcase"
@@ -82,7 +74,6 @@
   input-imports = [
     "github.com/creasty/defaults",
     "github.com/docker/go-units",
-    "github.com/google/uuid",
     "github.com/iancoleman/strcase",
     "github.com/urfave/cli",
     "gopkg.in/go-playground/validator.v9",
