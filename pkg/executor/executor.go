@@ -427,10 +427,10 @@ func New(ctx context.Context) (*Executor, error) {
 		return nil, err
 	}
 
-	e := Executor{map[string]yaml.Schema{}}
+	executor := Executor{map[string]yaml.Schema{}}
 	for path, schema := range schemas {
-		e.AddSchema(path, schema)
+		executor.AddSchema(path, schema)
 	}
 
-	return &e, nil
+	return &executor, nil
 }

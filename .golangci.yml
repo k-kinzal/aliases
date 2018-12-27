@@ -1,6 +1,3 @@
-service:
-  golangci-lint-version: 1.12.5
-
 linters:
   enable-all: true
   disable:
@@ -14,7 +11,3 @@ linters:
 
 run:
   deadline: 1m
-
-linters-settings:
-  errcheck:
-    ignore: "fmt:.*,gopkg.in/go-playground/validator.v9:.*RegisterValidation"
