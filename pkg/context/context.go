@@ -1,13 +1,13 @@
 package context
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"os/exec"
 	"os/user"
 	"strings"
-
-	"github.com/google/uuid"
 )
 
 const (
@@ -75,8 +75,12 @@ func (ctx *Context) GetExportPath() string {
 		return ctx.exportPath
 	}
 
-	hash := uuid.NewMD5(uuid.UUID{}, []byte(ctx.GetHomePath())).String()
-	ctx.exportPath = fmt.Sprintf("%s/%s", ctx.GetHomePath(), hash)
+	hasher := md5.New()
+	if _, err := hasher.Write([]byte(ctx.GetConfPath())); err != nil {
+		panic(fmt.Sprintf("logic error: %s", err)) // FIXME: handling error
+	}
+
+	ctx.exportPath = fmt.Sprintf("%s/%s", ctx.GetHomePath(), hex.EncodeToString(hasher.Sum(nil)))
 
 	return ctx.exportPath
 }

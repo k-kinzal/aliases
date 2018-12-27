@@ -2,9 +2,13 @@ package validator
 
 import (
 	"math/big"
+	"regexp"
 
-	units "github.com/docker/go-units"
 	validator "gopkg.in/go-playground/validator.v9"
+)
+
+var (
+	sizeRegex = regexp.MustCompile(`^(\d+(\.\d+)*) ?([kKmMgGtTpP])?[iI]?[bB]?$`)
 )
 
 func isNanoCPUs(fl validator.FieldLevel) bool {
@@ -19,10 +23,7 @@ func isNanoCPUs(fl validator.FieldLevel) bool {
 }
 
 func isMemoryBytes(fl validator.FieldLevel) bool {
-	if _, err := units.RAMInBytes(fl.Field().String()); err != nil {
-		return false
-	}
-	return true
+	return sizeRegex.MatchString(fl.Field().String())
 }
 
 func isMemorySwapBytes(fl validator.FieldLevel) bool {
@@ -30,8 +31,5 @@ func isMemorySwapBytes(fl validator.FieldLevel) bool {
 	if val == "-1" {
 		return true
 	}
-	if _, err := units.RAMInBytes(val); err != nil {
-		return false
-	}
-	return true
+	return sizeRegex.MatchString(val)
 }

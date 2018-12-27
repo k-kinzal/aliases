@@ -25,11 +25,26 @@
 #   unused-packages = true
 
 
-[prune]
-  go-tests = true
-  unused-packages = true
+[[constraint]]
+  name = "github.com/creasty/defaults"
+  version = "1.2.1"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/iancoleman/strcase"
 
 [[constraint]]
   name = "github.com/urfave/cli"
   version = "1.20.0"
 
+[[constraint]]
+  name = "gopkg.in/go-playground/validator.v9"
+  version = "9.24.0"
+
+[[constraint]]
+  name = "gopkg.in/yaml.v2"
+  version = "2.2.2"
+
+[prune]
+  go-tests = true
+  unused-packages = true
