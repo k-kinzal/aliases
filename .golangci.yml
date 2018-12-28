@@ -12,3 +12,7 @@ linters:
 
 run:
   deadline: 1m
+
+issues:
+  exclude:
+  - "`aliases.Schema` composite literal uses unkeyed fields"
