@@ -122,7 +122,7 @@ func (h *helper) stringMap(names ...string) map[string]string {
 }
 
 func (h *helper) args() []string {
-	var args []string
+	args := make([]string, 0, h.Context.NArg()-1)
 	for _, arg := range h.Context.Args()[1:] {
 		if arg == "--" {
 			continue
