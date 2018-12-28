@@ -106,7 +106,9 @@ func NewLedgerFromConfig(path string) (*Ledger, error) {
 			}
 
 		}
-		ledger.Entry(index, schema)
+		if err := ledger.Entry(index, schema); err != nil {
+			return nil, err
+		}
 	}
 
 	return ledger, nil
