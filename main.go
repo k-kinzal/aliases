@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"github.com/k-kinzal/aliases/pkg/context"
 	"github.com/k-kinzal/aliases/pkg/logger"
 
 	"github.com/k-kinzal/aliases/cmd"
@@ -32,8 +33,9 @@ func main() {
 			Usage: "Load configuration file",
 		},
 		cli.StringFlag{
-			Name:  "home",
-			Usage: "Home directory for aliases",
+			Name:   "home",
+			Usage:  "Home directory for aliases",
+			EnvVar: "ALIASES_HOME",
 		},
 		cli.BoolFlag{
 			Name:  "verbose, v",
@@ -44,6 +46,31 @@ func main() {
 		cmd.GenCommand(),
 		cmd.RunCommand(),
 		cmd.HomeCommand(),
+	}
+	app.Before = func(ctx *cli.Context) error {
+		logger.SetOutput(os.Stderr)
+		if ctx.GlobalBool("verbose") {
+			logger.SetLogLevel(logger.DebugLevel)
+		} else {
+			logger.SetLogLevel(logger.WarnLevel)
+		}
+
+		homePath := ctx.GlobalString("home")
+		if homePath == "" {
+			ctx, err := context.New("", "")
+			if err != nil {
+				return err
+			}
+			homePath = ctx.HomePath()
+		}
+		if _, err := os.Stat(homePath); os.IsNotExist(err) {
+			if err := os.Mkdir(homePath, 0755); err != nil {
+				return err
+			}
+		}
+		ctx.GlobalSet("home", homePath)
+
+		return nil
 	}
 
 	err := app.Run(os.Args)

@@ -12,24 +12,33 @@ import (
 	"github.com/urfave/cli"
 )
 
-type GenContext struct {
-	*context.Context
-
-	export bool
+type genContext struct {
+	context.Context
+	cli cli.Context
 }
 
-func NewGenContext(c *cli.Context) *GenContext {
-	ctx := context.New(
+func (ctx *genContext) ExportPath() string {
+	path := ctx.cli.String("export-path")
+	if path == "" {
+		path = ctx.Context.ExportPath()
+	}
+	return path
+}
+
+func (ctx *genContext) isExport() bool {
+	return ctx.cli.Bool("export")
+}
+
+func NewGenContext(c *cli.Context) (*genContext, error) {
+	ctx, err := context.New(
 		c.GlobalString("home"),
 		c.GlobalString("config"),
-		c.String("export-path"),
-		c.GlobalBool("verbose"),
 	)
-
-	return &GenContext{
-		Context: ctx,
-		export:  c.Bool("export"),
+	if err != nil {
+		return nil, err
 	}
+
+	return &genContext{ctx, *c}, nil
 }
 
 func GenCommand() cli.Command {
@@ -53,24 +62,27 @@ func GenCommand() cli.Command {
 }
 
 func GenAction(c *cli.Context) error {
-	ctx := NewGenContext(c)
-
-	exec, err := executor.New(*ctx.Context)
+	ctx, err := NewGenContext(c)
 	if err != nil {
 		return err
 	}
 
-	commands, err := exec.Commands(*ctx.Context)
+	exec, err := executor.New(ctx)
 	if err != nil {
 		return err
 	}
 
-	if err := export.Script(*ctx.Context, commands); err != nil {
+	commands, err := exec.Commands(ctx)
+	if err != nil {
 		return err
 	}
 
-	if ctx.export {
-		exp := posix.PathExport(ctx.GetExportPath(), false)
+	if err := export.Script(ctx, commands); err != nil {
+		return err
+	}
+
+	if ctx.isExport() {
+		exp := posix.PathExport(ctx.ExportPath(), false)
 		fmt.Println(posix.String(*exp))
 	} else {
 		for path, cmd := range commands {

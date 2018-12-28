@@ -144,8 +144,8 @@ func (e *Executor) Command(ctx context.Context, path string) (*exec.Cmd, error) 
 	for k, v := range util.ExpandStringKeyMapWithEnv(schema.Env) {
 		args = append(args, "--env", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
 	}
-	if (len(schema.Dependencies) > 0) && (ctx.DockerSockType() == context.DockerSockTypeRemote) {
-		args = append(args, "--env", fmt.Sprintf("DOCKER_HOST=%s", strconv.Quote(ctx.DockerRemoteHost())))
+	if (len(schema.Dependencies) > 0) && !ctx.HasDockerSocket() {
+		args = append(args, "--env", fmt.Sprintf("DOCKER_HOST=%s", strconv.Quote(ctx.DockerHost())))
 	}
 	if len(schema.Dependencies) > 0 {
 		args = append(args, "--env", fmt.Sprintf("ALIASES_PWD=%s", strconv.Quote("${ALIASES_PWD:-$PWD}")))
@@ -245,7 +245,7 @@ func (e *Executor) Command(ctx context.Context, path string) (*exec.Cmd, error) 
 	if v := schema.Name; v != nil {
 		args = append(args, "--name", strconv.Quote(*v))
 	}
-	if (len(schema.Dependencies) > 0) && (ctx.DockerSockType() == context.DockerSockTypeRemote) {
+	if (len(schema.Dependencies) > 0) && !ctx.HasDockerSocket() {
 		args = append(args, "--network", strconv.Quote("host"))
 	} else if v := schema.Network; v != nil {
 		args = append(args, "--network", strconv.Quote(*v))
@@ -279,7 +279,7 @@ func (e *Executor) Command(ctx context.Context, path string) (*exec.Cmd, error) 
 	if v := schema.Platform; v != nil {
 		args = append(args, "--platform", strconv.Quote(*v))
 	}
-	if (len(schema.Dependencies) > 0) && (ctx.DockerSockType() == context.DockerSockTypeSock) {
+	if (len(schema.Dependencies) > 0) && ctx.HasDockerSocket() {
 		args = append(args, "--privileged")
 	} else if v := schema.Privileged; v != nil && *v != "false" {
 		if *v == "true" {
@@ -368,12 +368,14 @@ func (e *Executor) Command(ctx context.Context, path string) (*exec.Cmd, error) 
 	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.Volume) {
 		args = append(args, "--volume", strconv.Quote(v))
 	}
-	if (len(schema.Dependencies) > 0) && (ctx.DockerSockType() == context.DockerSockTypeSock) {
+	if (len(schema.Dependencies) > 0) && ctx.HasDockerSocket() {
 		args = append(args, "--volume", strconv.Quote(fmt.Sprintf("%s:/usr/local/bin/docker", ctx.DockerBinaryPath())))
-		args = append(args, "--volume", strconv.Quote(fmt.Sprintf("%s:/var/run/docker.sock", ctx.DockerSockPath())))
+		if sock := ctx.DockerSocketPath(); sock != nil {
+			args = append(args, "--volume", strconv.Quote(fmt.Sprintf("%s:/var/run/docker.sock", *sock)))
+		}
 	}
 	for _, dep := range schema.Dependencies {
-		args = append(args, "--volume", strconv.Quote(fmt.Sprintf("%s/%s:%s", ctx.GetExportPath(), pathes.Base(dep), dep)))
+		args = append(args, "--volume", strconv.Quote(fmt.Sprintf("%s/%s:%s", ctx.ExportPath(), pathes.Base(dep), dep)))
 	}
 	if v := schema.VolumeDriver; v != nil {
 		args = append(args, "--volume-driver", strconv.Quote(*v))
@@ -417,11 +419,11 @@ func (e *Executor) Commands(ctx context.Context) (map[string]exec.Cmd, error) {
 }
 
 func New(ctx context.Context) (*Executor, error) {
-	if _, err := os.Stat(ctx.GetConfPath()); os.IsNotExist(err) {
+	if _, err := os.Stat(ctx.ConfPath()); os.IsNotExist(err) {
 		return nil, fmt.Errorf("runtime error: %s", err)
 	}
 
-	buf, err := ioutil.ReadFile(ctx.GetConfPath())
+	buf, err := ioutil.ReadFile(ctx.ConfPath())
 	if err != nil {
 		return nil, fmt.Errorf("runtime error: %s", err)
 	}
@@ -434,6 +436,11 @@ func New(ctx context.Context) (*Executor, error) {
 	executor := Executor{map[string]yaml.Schema{}}
 	for path, schema := range schemas {
 		executor.AddSchema(path, schema)
+
+		if len(schema.Dependencies) > 0 {
+			s := yaml.Schema{}
+			executor.AddSchema(path, s)
+		}
 	}
 
 	return &executor, nil

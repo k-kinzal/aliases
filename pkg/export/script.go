@@ -24,16 +24,16 @@ fi
 `
 
 func Script(ctx context.Context, commands map[string]exec.Cmd) error {
-	if err := os.RemoveAll(ctx.GetExportPath()); err != nil {
+	if err := os.RemoveAll(ctx.ExportPath()); err != nil {
 		return fmt.Errorf("runtime error: %s", err)
 	}
-	if err := os.Mkdir(ctx.GetExportPath(), 0755); err != nil {
+	if err := os.Mkdir(ctx.ExportPath(), 0755); err != nil {
 		return fmt.Errorf("runtime error: %s", err)
 	}
 
 	for path, cmd := range commands {
 		str := posix.String(cmd)
-		writePath := filepath.Join(ctx.GetExportPath(), pathes.Base(path))
+		writePath := filepath.Join(ctx.ExportPath(), pathes.Base(path))
 		content := fmt.Sprintf(tmpl, str, str)
 		if err := ioutil.WriteFile(writePath, []byte(content), 0755); err != nil {
 			return fmt.Errorf("runtime error: %s", err)

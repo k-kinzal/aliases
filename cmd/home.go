@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/k-kinzal/aliases/pkg/context"
 	"github.com/urfave/cli"
 )
 
@@ -18,11 +17,7 @@ func HomeCommand() cli.Command {
 }
 
 func HomeAction(c *cli.Context) error {
-	// context
-	ctx := context.New("", "", "", false)
-
-	// output
-	fmt.Print(ctx.GetHomePath())
+	fmt.Print(c.GlobalString("home"))
 
 	return nil
 }

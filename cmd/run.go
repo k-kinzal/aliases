@@ -11,25 +11,133 @@ import (
 )
 
 type runContext struct {
-	*context.Context
+	context.Context
+	flags helper
 }
 
-func NewRunContext(c *cli.Context) *runContext {
-	ctx := context.New(
+func (ctx *runContext) GetCommandShema() *yaml.Schema {
+	flags := ctx.flags
+
+	args := flags.args()
+	schema := yaml.Schema{
+		nil,
+		flags.bool("detach", "d"),
+		flags.bool("sig-proxy"),
+		flags.string("name"),
+		flags.string("detach-keys"),
+		flags.string("platform"),
+		flags.bool("disable-content-trust"),
+		flags.stringSlice("attach", "a"),
+		flags.stringSlice("device-cgroup-rule"),
+		flags.stringSlice("device"),
+		flags.stringMap("env", "e"),
+		flags.stringSlice("env-file"),
+		flags.string("entrypoint"),
+		flags.stringSlice("group-add"),
+		flags.string("hostname"),
+		flags.string("domainname"),
+		flags.bool("interactive", "i"),
+		flags.stringMap("label", "l"),
+		flags.stringSlice("label-file"),
+		flags.bool("read-only"),
+		flags.string("restart"),
+		flags.string("stop-signal"),
+		flags.int("stop-timeout"),
+		flags.stringMap("sysctl"),
+		flags.bool("tty", "t"),
+		flags.stringMap("ulimit"),
+		flags.string("user", "u"),
+		flags.string("work-dir", "w"),
+		flags.bool("rm"),
+		flags.stringSlice("cap-add"),
+		flags.stringSlice("cap-drop"),
+		flags.string("privileged"),
+		flags.stringMap("security-opt"),
+		flags.string("userns"),
+		flags.stringSlice("add-host"),
+		flags.stringSlice("dns"),
+		flags.stringSlice("dns-option", "dns-opt"),
+		flags.stringSlice("dns-search"),
+		flags.stringSlice("expose"),
+		flags.string("ip"),
+		flags.string("ip6"),
+		flags.stringSlice("link"),
+		flags.stringSlice("link-local-ip"),
+		flags.string("mac-address"),
+		flags.stringSlice("publish", "p"),
+		flags.bool("publish-all", "P"),
+		flags.string("network", "net"),
+		flags.stringSlice("network-alias", "net-alias"),
+		flags.string("log-driver"),
+		flags.string("volume-driver"),
+		flags.stringMap("log-opt"),
+		flags.stringMap("storage-opt"),
+		flags.stringSlice("tmpfs"),
+		flags.stringSlice("volumes-from"),
+		flags.stringSlice("volume", "v"),
+		flags.stringMap("mount"),
+		flags.string("health-cmd"),
+		flags.string("health-interval"),
+		flags.int("health-retries"),
+		flags.string("health-timeout"),
+		flags.string("health-start-period"),
+		flags.bool("no-healthcheck"),
+		flags.uint16("blkio-weight"),
+		flags.stringSlice("blkio-weight-device"),
+		flags.string("cidFile"),
+		flags.string("cpuset-cpus"),
+		flags.string("cpuset-mems"),
+		flags.string("cpu-period"),
+		flags.int64("cpu-quota"),
+		flags.int64("cpu-rt-period"),
+		flags.int64("cpu-rt-runtime"),
+		flags.int64("cpu-shares", "c"),
+		flags.string("cpus"),
+		flags.stringSlice("device-read-bps"),
+		flags.stringSlice("device-read-iops"),
+		flags.stringSlice("device-write-bps"),
+		flags.stringSlice("device-write-iops"),
+		flags.string("kernel-memory"),
+		flags.string("memory"),
+		flags.string("memory-reservation"),
+		flags.string("memory-swap"),
+		flags.int64("memory-swappiness"),
+		flags.bool("oom-kill-disable"),
+		flags.int("oom-score-adj"),
+		flags.int64("pids-limit"),
+		flags.string("cgroup-parent"),
+		flags.string("ipc"),
+		flags.string("isolation"),
+		flags.string("pid"),
+		flags.string("shm-size"),
+		flags.string("uts"),
+		flags.string("runtime"),
+		flags.bool("init"),
+		"",
+		args[1:],
+		"",
+		&args[0],
+	}
+
+	return &schema
+}
+
+func NewRunContext(c *cli.Context) (*runContext, error) {
+	ctx, err := context.New(
 		c.GlobalString("home"),
 		c.GlobalString("config"),
-		"",
-		c.GlobalBool("verbose"),
 	)
-
-	return &runContext{ctx}
+	if err != nil {
+		return nil, err
+	}
+	return &runContext{ctx, helper{c}}, nil
 }
 
 func RunCommand() cli.Command {
 	return cli.Command{
 		Name:      "run",
 		Usage:     "Run aliases command",
-		UsageText: "aliases [global options] run [command options] [command] -- [arguments...]",
+		UsageText: "aliases [global options] run [command options] command [arguments...]",
 		Flags: []cli.Flag{
 			// see: https://github.com/docker/cli/blob/18.09/cli/command/container/run.go
 			cli.BoolFlag{Name: "detach, d", Usage: "Run container in background and print container ID"},
@@ -144,131 +252,31 @@ func RunAction(c *cli.Context) error {
 		return cli.ShowCommandHelp(c, "run")
 	}
 
-	ctx := NewRunContext(c)
-
-	exec, err := executor.New(*ctx.Context)
+	ctx, err := NewRunContext(c)
 	if err != nil {
 		return err
 	}
 
-	flags := helper{c}
-
-	path := flags.firstArg()
-	if path == nil {
-		return cli.ShowCommandHelp(c, "run")
-	}
-	args := flags.args()
-	exec.AddSchema(*path, yaml.Schema{
-		nil,
-		flags.bool("detach", "d"),
-		flags.bool("sig-proxy"),
-		flags.string("name"),
-		flags.string("detach-keys"),
-		flags.string("platform"),
-		flags.bool("disable-content-trust"),
-		flags.stringSlice("attach", "a"),
-		flags.stringSlice("device-cgroup-rule"),
-		flags.stringSlice("device"),
-		flags.stringMap("env", "e"),
-		flags.stringSlice("env-file"),
-		flags.string("entrypoint"),
-		flags.stringSlice("group-add"),
-		flags.string("hostname"),
-		flags.string("domainname"),
-		flags.bool("interactive", "i"),
-		flags.stringMap("label", "l"),
-		flags.stringSlice("label-file"),
-		flags.bool("read-only"),
-		flags.string("restart"),
-		flags.string("stop-signal"),
-		flags.int("stop-timeout"),
-		flags.stringMap("sysctl"),
-		flags.bool("tty", "t"),
-		flags.stringMap("ulimit"),
-		flags.string("user", "u"),
-		flags.string("work-dir", "w"),
-		flags.bool("rm"),
-		flags.stringSlice("cap-add"),
-		flags.stringSlice("cap-drop"),
-		flags.string("privileged"),
-		flags.stringMap("security-opt"),
-		flags.string("userns"),
-		flags.stringSlice("add-host"),
-		flags.stringSlice("dns"),
-		flags.stringSlice("dns-option", "dns-opt"),
-		flags.stringSlice("dns-search"),
-		flags.stringSlice("expose"),
-		flags.string("ip"),
-		flags.string("ip6"),
-		flags.stringSlice("link"),
-		flags.stringSlice("link-local-ip"),
-		flags.string("mac-address"),
-		flags.stringSlice("publish", "p"),
-		flags.bool("publish-all", "P"),
-		flags.string("network", "net"),
-		flags.stringSlice("network-alias", "net-alias"),
-		flags.string("log-driver"),
-		flags.string("volume-driver"),
-		flags.stringMap("log-opt"),
-		flags.stringMap("storage-opt"),
-		flags.stringSlice("tmpfs"),
-		flags.stringSlice("volumes-from"),
-		flags.stringSlice("volume", "v"),
-		flags.stringMap("mount"),
-		flags.string("health-cmd"),
-		flags.string("health-interval"),
-		flags.int("health-retries"),
-		flags.string("health-timeout"),
-		flags.string("health-start-period"),
-		flags.bool("no-healthcheck"),
-		flags.uint16("blkio-weight"),
-		flags.stringSlice("blkio-weight-device"),
-		flags.string("cidFile"),
-		flags.string("cpuset-cpus"),
-		flags.string("cpuset-mems"),
-		flags.string("cpu-period"),
-		flags.int64("cpu-quota"),
-		flags.int64("cpu-rt-period"),
-		flags.int64("cpu-rt-runtime"),
-		flags.int64("cpu-shares", "c"),
-		flags.string("cpus"),
-		flags.stringSlice("device-read-bps"),
-		flags.stringSlice("device-read-iops"),
-		flags.stringSlice("device-write-bps"),
-		flags.stringSlice("device-write-iops"),
-		flags.string("kernel-memory"),
-		flags.string("memory"),
-		flags.string("memory-reservation"),
-		flags.string("memory-swap"),
-		flags.int64("memory-swappiness"),
-		flags.bool("oom-kill-disable"),
-		flags.int("oom-score-adj"),
-		flags.int64("pids-limit"),
-		flags.string("cgroup-parent"),
-		flags.string("ipc"),
-		flags.string("isolation"),
-		flags.string("pid"),
-		flags.string("shm-size"),
-		flags.string("uts"),
-		flags.string("runtime"),
-		flags.bool("init"),
-		"",
-		args[1:],
-		"",
-		&args[0],
-	})
-
-	commands, err := exec.Commands(*ctx.Context)
+	exec, err := executor.New(ctx)
 	if err != nil {
 		return err
 	}
 
-	if err := export.Script(*ctx.Context, commands); err != nil {
+	path := c.Args()[0]
+	schema := ctx.GetCommandShema()
+	exec.AddSchema(path, *schema)
+
+	commands, err := exec.Commands(ctx)
+	if err != nil {
 		return err
 	}
-	logger.Debug(posix.String(commands[*path]))
 
-	if err := posix.Run(commands[*path]); err != nil {
+	if err := export.Script(ctx, commands); err != nil {
+		return err
+	}
+	logger.Debug(posix.String(commands[path]))
+
+	if err := posix.Run(commands[path]); err != nil {
 		return err
 	}
 
