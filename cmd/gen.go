@@ -28,7 +28,7 @@ func (ctx *genContext) isExport() bool {
 	return ctx.cli.Bool("export")
 }
 
-func NewGenContext(c *cli.Context) (*genContext, error) {
+func newGenContext(c *cli.Context) (*genContext, error) {
 	ctx, err := aliases.NewContext(
 		c.GlobalString("home"),
 		c.GlobalString("config"),
@@ -61,7 +61,7 @@ func GenCommand() cli.Command {
 }
 
 func GenAction(c *cli.Context) error {
-	ctx, err := NewGenContext(c)
+	ctx, err := newGenContext(c)
 	if err != nil {
 		return err
 	}

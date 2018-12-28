@@ -126,7 +126,7 @@ func (ctx *runContext) GetCommandShema() *aliases.Schema {
 	return &schema
 }
 
-func NewRunContext(c *cli.Context) (*runContext, error) {
+func newRunContext(c *cli.Context) (*runContext, error) {
 	ctx, err := aliases.NewContext(
 		c.GlobalString("home"),
 		c.GlobalString("config"),
@@ -256,7 +256,7 @@ func RunAction(c *cli.Context) error {
 		return cli.ShowCommandHelp(c, "run")
 	}
 
-	ctx, err := NewRunContext(c)
+	ctx, err := newRunContext(c)
 	if err != nil {
 		return err
 	}
