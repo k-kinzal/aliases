@@ -64,7 +64,9 @@ func main() {
 		if err := c.MakeHomeDir(); err != nil {
 			return err
 		}
-		_ := ctx.GlobalSet("home", c.HomePath())
+		if err := ctx.GlobalSet("home", c.HomePath()); err != nil {
+			return err
+		}
 
 		return nil
 	}
