@@ -367,7 +367,6 @@ func NewCommand(ctx Context, schema Schema) (*posix.Cmd, error) {
 			cmd.Args = append(cmd.Args, arg)
 		}
 	}
-	cmd.Args = append(cmd.Args, schema.Args...)
 
 	return cmd, nil
 }
