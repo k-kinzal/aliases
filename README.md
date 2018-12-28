@@ -57,25 +57,27 @@ Using the option of `--export` can be used as a command instead of an alias.
 
 ```
 $ aliases --help
-NAME:
-   aliases - Generate alias for command on container
-
-USAGE:
-   aliases [global options] command [command options] [arguments...]
-
-VERSION:
-   dev
-
-COMMANDS:
-     gen      Generate aliases
-     home     Get aliases home path
-     help, h  Shows a list of commands or help for one command
-
-GLOBAL OPTIONS:
-   --config FILE, -c FILE  Load configuration from FILE
-   --home value            Home directory for aliases
-   --help, -h              show help
-   --version, -v           print the version
+  NAME:
+     aliases - Generate alias for command on container
+  
+  USAGE:
+     aliases [global options] command [command options] [arguments...]
+  
+  VERSION:
+     v0.2.0
+  
+  COMMANDS:
+       gen      Generate aliases
+       run      Run aliases command
+       home     Get aliases home path
+       help, h  Shows a list of commands or help for one command
+  
+  GLOBAL OPTIONS:
+     --config value, -c value  Load configuration file
+     --home value              Home directory for aliases [$ALIASES_HOME]
+     --verbose, -v             enable verbose output
+     --help                    show help
+     --version                 print the version
 ```
 
 ## Version Environment variable
@@ -130,6 +132,22 @@ Note that command is always executed on the machine (host or docker) that execut
 `$PWD` is a special environment variable.
 The `$PWD` specified on the left always points to `$PWD` of the host.
 
+## How to debug aliases
+
+If you do not get what you expected, please use the `aliases run` command.
+
+```bash
+$ aliases run -it --entrypoint '' [command] sh
+```
+
+`aliases run` command overwrites the option of your defined command and executes it.
+
+```bash
+$ aliases --verbose run -it --entrypoint '' [command] sh
+docker run --entrypoint "" --interactive --network "host" --rm --tty [your image] sh
+```
+
+If you want to show the docker run command, please specify option of `--verbose`.
 
 ## License
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fk-kinzal%2Faliases.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fk-kinzal%2Faliases?ref=badge_large)
