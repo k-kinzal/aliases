@@ -3,7 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/k-kinzal/aliases/pkg/context"
+	"github.com/k-kinzal/aliases/pkg/aliases"
+
 	"github.com/k-kinzal/aliases/pkg/logger"
 
 	"github.com/k-kinzal/aliases/cmd"
@@ -56,19 +57,14 @@ func main() {
 		}
 
 		homePath := ctx.GlobalString("home")
-		if homePath == "" {
-			ctx, err := context.New("", "")
-			if err != nil {
-				return err
-			}
-			homePath = ctx.HomePath()
+		c, err := aliases.NewContext(homePath, "")
+		if err != nil {
+			return err
 		}
-		if _, err := os.Stat(homePath); os.IsNotExist(err) {
-			if err := os.Mkdir(homePath, 0755); err != nil {
-				return err
-			}
+		if err := c.MakeHomeDir(); err != nil {
+			return err
 		}
-		ctx.GlobalSet("home", homePath)
+		ctx.GlobalSet("home", c.HomePath())
 
 		return nil
 	}

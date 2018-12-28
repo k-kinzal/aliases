@@ -1,4 +1,4 @@
-package context
+package aliases
 
 import (
 	"crypto/md5"
@@ -16,6 +16,9 @@ type Context interface {
 	HomePath() string
 	ConfPath() string
 	ExportPath() string
+
+	MakeHomeDir() error
+	MakeExportDir() error
 
 	DockerBinaryPath() string
 	DockerHost() string
@@ -60,6 +63,25 @@ func (ctx *GlobalContext) ExportPath() string {
 	return ctx.exportPath
 }
 
+func (ctx *GlobalContext) MakeHomeDir() error {
+	if _, err := os.Stat(ctx.HomePath()); os.IsNotExist(err) {
+		if err := os.Mkdir(ctx.HomePath(), 0755); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (ctx *GlobalContext) MakeExportDir() error {
+	if err := os.RemoveAll(ctx.ExportPath()); err != nil {
+		return fmt.Errorf("runtime error: %s", err)
+	}
+	if err := os.Mkdir(ctx.ExportPath(), 0755); err != nil {
+		return fmt.Errorf("runtime error: %s", err)
+	}
+	return nil
+}
+
 func (ctx *GlobalContext) DockerBinaryPath() string {
 	return ctx.dockerBinPath
 }
@@ -81,7 +103,7 @@ func (ctx *GlobalContext) HasDockerSocket() bool {
 	return sock != nil && *sock != ""
 }
 
-func New(homePath string, confPath string) (Context, error) {
+func NewContext(homePath string, confPath string) (Context, error) {
 	ctx := new(GlobalContext)
 	ctx.homePath = homePath
 	ctx.confPath = confPath

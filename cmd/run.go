@@ -1,25 +1,28 @@
 package cmd
 
 import (
-	"github.com/k-kinzal/aliases/pkg/context"
-	"github.com/k-kinzal/aliases/pkg/executor"
+	"path"
+
+	"github.com/k-kinzal/aliases/pkg/aliases"
 	"github.com/k-kinzal/aliases/pkg/export"
 	"github.com/k-kinzal/aliases/pkg/logger"
 	"github.com/k-kinzal/aliases/pkg/posix"
-	"github.com/k-kinzal/aliases/pkg/yaml"
 	"github.com/urfave/cli"
 )
 
 type runContext struct {
-	context.Context
+	aliases.Context
 	flags helper
 }
 
-func (ctx *runContext) GetCommandShema() *yaml.Schema {
+func (ctx *runContext) GetCommandShema() *aliases.Schema {
 	flags := ctx.flags
 
+	index := flags.firstArg()
 	args := flags.args()
-	schema := yaml.Schema{
+	schema := aliases.Schema{
+		*index,
+		path.Base(*index),
 		nil,
 		flags.bool("detach", "d"),
 		flags.bool("sig-proxy"),
@@ -123,7 +126,7 @@ func (ctx *runContext) GetCommandShema() *yaml.Schema {
 }
 
 func NewRunContext(c *cli.Context) (*runContext, error) {
-	ctx, err := context.New(
+	ctx, err := aliases.NewContext(
 		c.GlobalString("home"),
 		c.GlobalString("config"),
 	)
@@ -257,26 +260,46 @@ func RunAction(c *cli.Context) error {
 		return err
 	}
 
-	exec, err := executor.New(ctx)
+	if err := ctx.MakeExportDir(); err != nil {
+		return err
+	}
+
+	ledger, err := aliases.NewLedgerFromConfig(ctx.ConfPath())
 	if err != nil {
 		return err
 	}
 
-	path := c.Args()[0]
-	schema := ctx.GetCommandShema()
-	exec.AddSchema(path, *schema)
+	index := c.Args()[0]
+	if err := ledger.Entry(index, *ctx.GetCommandShema()); err != nil {
+		return err
+	}
 
-	commands, err := exec.Commands(ctx)
+	schema, err := ledger.LookUp(index)
 	if err != nil {
 		return err
 	}
 
-	if err := export.Script(ctx, commands); err != nil {
+	for _, dependency := range schema.Dependencies {
+		s, err := ledger.LookUp(dependency)
+		if err != nil {
+			return err
+		}
+		cmd, err := aliases.NewCommand(ctx, *s)
+		if err != nil {
+			return err
+		}
+		if err := export.Script(path.Join(ctx.ExportPath(), schema.FileName), *cmd); err != nil {
+			return err
+		}
+	}
+	cmd, err := aliases.NewCommand(ctx, *schema)
+	if err != nil {
 		return err
 	}
-	logger.Debug(posix.String(commands[path]))
 
-	if err := posix.Run(commands[path]); err != nil {
+	logger.Debug(posix.String(*cmd))
+
+	if err := posix.Run(*cmd); err != nil {
 		return err
 	}
 

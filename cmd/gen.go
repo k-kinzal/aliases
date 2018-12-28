@@ -4,16 +4,15 @@ import (
 	"fmt"
 	pathes "path"
 
+	"github.com/k-kinzal/aliases/pkg/aliases"
 	"github.com/k-kinzal/aliases/pkg/posix"
 
-	"github.com/k-kinzal/aliases/pkg/context"
-	"github.com/k-kinzal/aliases/pkg/executor"
 	"github.com/k-kinzal/aliases/pkg/export"
 	"github.com/urfave/cli"
 )
 
 type genContext struct {
-	context.Context
+	aliases.Context
 	cli cli.Context
 }
 
@@ -30,7 +29,7 @@ func (ctx *genContext) isExport() bool {
 }
 
 func NewGenContext(c *cli.Context) (*genContext, error) {
-	ctx, err := context.New(
+	ctx, err := aliases.NewContext(
 		c.GlobalString("home"),
 		c.GlobalString("config"),
 	)
@@ -67,26 +66,48 @@ func GenAction(c *cli.Context) error {
 		return err
 	}
 
-	exec, err := executor.New(ctx)
-	if err != nil {
+	if err := ctx.MakeExportDir(); err != nil {
 		return err
 	}
 
-	commands, err := exec.Commands(ctx)
+	ledger, err := aliases.NewLedgerFromConfig(ctx.ConfPath())
 	if err != nil {
-		return err
-	}
-
-	if err := export.Script(ctx, commands); err != nil {
 		return err
 	}
 
 	if ctx.isExport() {
+		for _, schema := range ledger.Schemas() {
+			cmd, err := aliases.NewCommand(ctx, schema)
+			if err != nil {
+				return err
+			}
+			if err := export.Script(pathes.Join(ctx.ExportPath(), schema.FileName), *cmd); err != nil {
+				return err
+			}
+		}
 		exp := posix.PathExport(ctx.ExportPath(), false)
 		fmt.Println(posix.String(*exp))
 	} else {
-		for path, cmd := range commands {
-			alias := posix.Alias(pathes.Base(path), posix.String(cmd))
+		for _, schema := range ledger.Schemas() {
+			for _, dependency := range schema.Dependencies {
+				s, err := ledger.LookUp(dependency)
+				if err != nil {
+					return err
+				}
+				cmd, err := aliases.NewCommand(ctx, *s)
+				if err != nil {
+					return err
+				}
+				if err := export.Script(pathes.Join(ctx.ExportPath(), schema.FileName), *cmd); err != nil {
+					return err
+				}
+			}
+			cmd, err := aliases.NewCommand(ctx, schema)
+			if err != nil {
+				return err
+			}
+
+			alias := posix.Alias(schema.FileName, posix.String(*cmd))
 
 			fmt.Println(posix.String(*alias))
 		}
