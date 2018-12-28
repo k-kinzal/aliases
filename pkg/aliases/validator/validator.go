@@ -46,34 +46,34 @@ func (v *Validate) Struct(s interface{}) error {
 func New() (*Validate, error) {
 	validate := validator.New()
 	if err := validate.RegisterValidation("bool", isBoolean); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("logic error: %s", err)
 	}
 	if err := validate.RegisterValidation("int", isInteger); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("logic error: %s", err)
 	}
 	if err := validate.RegisterValidation("int64", isInteger64); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("logic error: %s", err)
 	}
 	if err := validate.RegisterValidation("uint16", isUnsignedInteger16); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("logic error: %s", err)
 	}
 	if err := validate.RegisterValidation("uint64", isUnsignedInteger64); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("logic error: %s", err)
 	}
 	if err := validate.RegisterValidation("duration", isDuration); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("logic error: %s", err)
 	}
 	if err := validate.RegisterValidation("nanocpus", isNanoCPUs); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("logic error: %s", err)
 	}
 	if err := validate.RegisterValidation("membytes", isMemoryBytes); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("logic error: %s", err)
 	}
 	if err := validate.RegisterValidation("memswapbytes", isMemorySwapBytes); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("logic error: %s", err)
 	}
 	if err := validate.RegisterValidation("script", isScript); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("logic error: %s", err)
 	}
 
 	v := Validate{validate}

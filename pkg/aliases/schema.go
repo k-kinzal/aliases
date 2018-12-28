@@ -1,16 +1,9 @@
-package yaml
-
-import (
-	"fmt"
-	"strings"
-
-	"github.com/creasty/defaults"
-	"github.com/k-kinzal/aliases/pkg/validator"
-	yaml "gopkg.in/yaml.v2"
-)
+package aliases
 
 type Schema struct {
 	// aliases configuration
+	Path         string
+	FileName     string
 	Dependencies []string `yaml:"dependencies"`
 	// docker run options
 	Detach              *string           `yaml:"detach" validate:"omitempty,bool|script"`
@@ -48,7 +41,6 @@ type Schema struct {
 	Userns              *string           `yaml:"userns"`
 	AddHost             []string          `yaml:"addHost"`
 	DNS                 []string          `yaml:"dns"`
-	DNSOpt              []string          `yaml:"dnsOpt"`
 	DNSOption           []string          `yaml:"dnsOption"`
 	DNSSearch           []string          `yaml:"dnsSearch"`
 	Expose              []string          `yaml:"expose"`
@@ -113,34 +105,6 @@ type Schema struct {
 	Command *string `yaml:"command"`
 }
 
-func UnmarshalConfFile(buf []byte) (map[string]Schema, error) {
-	schemas := make(map[string]Schema)
-	if err := yaml.UnmarshalStrict(buf, &schemas); err != nil {
-		if e, ok := err.(*yaml.TypeError); ok {
-			return nil, fmt.Errorf("yaml error: %s", strings.Replace(e.Errors[0], "in type yaml.Schema", "", 1))
-		}
-		return nil, err
-	}
-
-	validate, err := validator.New()
-	if err != nil {
-		return nil, err
-	}
-	for path, schema := range schemas {
-		if err := defaults.Set(&schema); err != nil {
-			return nil, err
-		}
-		if err := validate.Struct(schema); err != nil {
-			return nil, fmt.Errorf("yaml error: %s in `%s`", err, path)
-		}
-		for index, dep := range schema.Dependencies {
-			if _, ok := schemas[dep]; !ok {
-				return nil, fmt.Errorf("yaml error: invalid parameter `%s` for `dependencies[%d]` is an undefined dependency in `%s`", dep, index, path)
-			}
-
-		}
-		schemas[path] = schema
-	}
-
-	return schemas, nil
+func NewSchema() *Schema {
+	return new(Schema)
 }

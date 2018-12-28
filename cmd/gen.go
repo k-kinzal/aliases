@@ -4,31 +4,40 @@ import (
 	"fmt"
 	pathes "path"
 
+	"github.com/k-kinzal/aliases/pkg/aliases"
 	"github.com/k-kinzal/aliases/pkg/posix"
 
-	"github.com/k-kinzal/aliases/pkg/context"
-	"github.com/k-kinzal/aliases/pkg/executor"
 	"github.com/k-kinzal/aliases/pkg/export"
 	"github.com/urfave/cli"
 )
 
-type GenContext struct {
-	*context.Context
-
-	export bool
+type genContext struct {
+	aliases.Context
+	cli cli.Context
 }
 
-func NewGenContext(c *cli.Context) *GenContext {
-	ctx := context.New(
+func (ctx *genContext) ExportPath() string {
+	path := ctx.cli.String("export-path")
+	if path == "" {
+		path = ctx.Context.ExportPath()
+	}
+	return path
+}
+
+func (ctx *genContext) isExport() bool {
+	return ctx.cli.Bool("export")
+}
+
+func newGenContext(c *cli.Context) (*genContext, error) {
+	ctx, err := aliases.NewContext(
 		c.GlobalString("home"),
 		c.GlobalString("config"),
-		c.String("export-path"),
 	)
-
-	return &GenContext{
-		Context: ctx,
-		export:  c.Bool("export"),
+	if err != nil {
+		return nil, err
 	}
+
+	return &genContext{ctx, *c}, nil
 }
 
 func GenCommand() cli.Command {
@@ -45,37 +54,62 @@ func GenCommand() cli.Command {
 				Usage: "The directory to export scripts",
 			},
 		},
-		Action: func(c *cli.Context) error {
-			return GenAction(c)
-		},
+		Action:                 GenAction,
+		SkipArgReorder:         true,
+		UseShortOptionHandling: true,
 	}
 }
 
 func GenAction(c *cli.Context) error {
-	ctx := NewGenContext(c)
-
-	exec, err := executor.New(*ctx.Context)
+	ctx, err := newGenContext(c)
 	if err != nil {
 		return err
 	}
 
-	commands, err := exec.Commands(*ctx.Context)
+	if err := ctx.MakeExportDir(); err != nil {
+		return err
+	}
+
+	ledger, err := aliases.NewLedgerFromConfig(ctx.ConfPath())
 	if err != nil {
 		return err
 	}
 
-	if err := export.Script(*ctx.Context, commands); err != nil {
-		return err
-	}
-
-	if ctx.export {
-		exp := posix.PathExport(ctx.GetExportPath(), false)
-		fmt.Println(posix.String(*exp))
+	if ctx.isExport() {
+		for _, schema := range ledger.Schemas() {
+			cmd, err := aliases.NewCommand(ctx, schema)
+			if err != nil {
+				return err
+			}
+			if err := export.Script(pathes.Join(ctx.ExportPath(), schema.FileName), *cmd); err != nil {
+				return err
+			}
+		}
+		exp := posix.PathExport(ctx.ExportPath(), false)
+		fmt.Println(exp.String())
 	} else {
-		for path, cmd := range commands {
-			alias := posix.Alias(pathes.Base(path), posix.String(cmd))
+		for _, schema := range ledger.Schemas() {
+			for _, dependency := range schema.Dependencies {
+				s, err := ledger.LookUp(dependency)
+				if err != nil {
+					return err
+				}
+				cmd, err := aliases.NewCommand(ctx, *s)
+				if err != nil {
+					return err
+				}
+				if err := export.Script(pathes.Join(ctx.ExportPath(), schema.FileName), *cmd); err != nil {
+					return err
+				}
+			}
+			cmd, err := aliases.NewCommand(ctx, schema)
+			if err != nil {
+				return err
+			}
 
-			fmt.Println(posix.String(*alias))
+			alias := posix.Alias(schema.FileName, cmd.String())
+
+			fmt.Println(alias.String())
 		}
 	}
 

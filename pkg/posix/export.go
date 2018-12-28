@@ -2,18 +2,13 @@ package posix
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
 	"strconv"
 	"strings"
 )
 
 // http://pubs.opengroup.org/onlinepubs/007904975/utilities/export.html
-func Export(name string, word string, print bool) *exec.Cmd {
-	cmd := exec.Command("export")
-	cmd.Env = os.Environ()
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+func Export(name string, word string, print bool) *Cmd {
+	cmd := Command("export")
 
 	if print {
 		cmd.Args = append(cmd.Args, "-p")
@@ -28,6 +23,6 @@ func Export(name string, word string, print bool) *exec.Cmd {
 	return cmd
 }
 
-func PathExport(word string, print bool) *exec.Cmd {
+func PathExport(word string, print bool) *Cmd {
 	return Export("PATH", fmt.Sprintf("%s:$PATH", word), print)
 }
