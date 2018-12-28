@@ -361,7 +361,7 @@ func NewCommand(ctx Context, schema Schema) (*posix.Cmd, error) {
 		cmd.Args = append(cmd.Args, *schema.Command)
 	}
 	for _, arg := range schema.Args {
-		if strings.Index(arg, " ") != -1 {
+		if strings.Contains(arg, " ") {
 			cmd.Args = append(cmd.Args, strconv.Quote(arg))
 		} else {
 			cmd.Args = append(cmd.Args, arg)
