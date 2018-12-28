@@ -6,6 +6,7 @@ linters:
   - gocyclo
   - gochecknoglobals
   - gosec
+  - interfacer
   - lll
   - scopelint
   fast: false
