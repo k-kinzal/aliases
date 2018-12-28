@@ -86,7 +86,7 @@ func GenAction(c *cli.Context) error {
 			}
 		}
 		exp := posix.PathExport(ctx.ExportPath(), false)
-		fmt.Println(posix.String(*exp))
+		fmt.Println(exp.String())
 	} else {
 		for _, schema := range ledger.Schemas() {
 			for _, dependency := range schema.Dependencies {
@@ -107,9 +107,9 @@ func GenAction(c *cli.Context) error {
 				return err
 			}
 
-			alias := posix.Alias(schema.FileName, posix.String(*cmd))
+			alias := posix.Alias(schema.FileName, cmd.String())
 
-			fmt.Println(posix.String(*alias))
+			fmt.Println(alias.String())
 		}
 	}
 

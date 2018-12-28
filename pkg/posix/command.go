@@ -6,21 +6,25 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/kr/pty"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-func Run(cmd exec.Cmd) error {
-	sh := exec.Command("sh", "-c", String(cmd))
-	sh.Env = os.Environ()
-	sh.Stdin = os.Stdin
-	sh.Stdout = os.Stdout
-	sh.Stderr = os.Stderr
+type Cmd struct {
+	*exec.Cmd
+}
+
+func (sh *Cmd) Run() error {
+	sh.Cmd.Env = os.Environ()
+	sh.Cmd.Stdin = os.Stdin
+	sh.Cmd.Stdout = os.Stdout
+	sh.Cmd.Stderr = os.Stderr
 
 	if oldState, err := terminal.MakeRaw(int(os.Stdin.Fd())); err == nil {
-		ptmx, err := pty.Start(sh)
+		ptmx, err := pty.Start(sh.Cmd)
 		if err != nil {
 			return err
 		}
@@ -52,5 +56,16 @@ func Run(cmd exec.Cmd) error {
 		return nil
 	}
 
-	return sh.Run()
+	return sh.Cmd.Run()
+}
+
+func (sh *Cmd) String() string {
+	return strings.Join(sh.Cmd.Args, " ")
+}
+
+func Command(name string, arg ...string) *Cmd {
+	cmd := new(Cmd)
+	cmd.Cmd = exec.Command(name, arg...)
+
+	return cmd
 }

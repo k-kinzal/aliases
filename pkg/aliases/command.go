@@ -2,16 +2,16 @@ package aliases
 
 import (
 	"fmt"
-	"os/exec"
 	"path"
 	"strconv"
 	"strings"
 
+	"github.com/k-kinzal/aliases/pkg/posix"
 	"github.com/k-kinzal/aliases/pkg/util"
 )
 
-func NewCommand(ctx Context, schema Schema) (*exec.Cmd, error) {
-	cmd := exec.Command("docker", "run")
+func NewCommand(ctx Context, schema Schema) (*posix.Cmd, error) {
+	cmd := posix.Command("docker", "run")
 
 	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.AddHost) {
 		cmd.Args = append(cmd.Args, "--add-host", strconv.Quote(v))

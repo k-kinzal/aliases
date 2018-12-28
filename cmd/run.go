@@ -3,10 +3,11 @@ package cmd
 import (
 	"path"
 
+	"github.com/k-kinzal/aliases/pkg/posix"
+
 	"github.com/k-kinzal/aliases/pkg/aliases"
 	"github.com/k-kinzal/aliases/pkg/export"
 	"github.com/k-kinzal/aliases/pkg/logger"
-	"github.com/k-kinzal/aliases/pkg/posix"
 	"github.com/urfave/cli"
 )
 
@@ -297,9 +298,9 @@ func RunAction(c *cli.Context) error {
 		return err
 	}
 
-	logger.Debug(posix.String(*cmd))
+	logger.Debug(cmd)
 
-	if err := posix.Run(*cmd); err != nil {
+	if err := posix.Shell(cmd.String()).Run(); err != nil {
 		return err
 	}
 
