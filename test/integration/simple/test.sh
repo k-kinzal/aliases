@@ -14,3 +14,4 @@ ${ALIASES} gen --export --export-path "${TEMP_DIR}" | ${MASK} | ${DIFF} ${TEST_D
 cat ${TEMP_DIR}/alpine | ${MASK} | ${DIFF} ${TEST_DIR}/alpine -
 
 ${TEMP_DIR}/alpine /bin/sh -c "echo foo" | ${DIFF} ${TEST_DIR}/stdout -
+${ALIASES} run /usr/local/bin/alpine /bin/sh -c "echo foo" | ${DIFF} ${TEST_DIR}/stdout -

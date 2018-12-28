@@ -289,7 +289,7 @@ func RunAction(c *cli.Context) error {
 		if err != nil {
 			return err
 		}
-		if err := export.Script(path.Join(ctx.ExportPath(), schema.FileName), *cmd); err != nil {
+		if err := export.Script(path.Join(ctx.ExportPath(), s.FileName), *cmd); err != nil {
 			return err
 		}
 	}

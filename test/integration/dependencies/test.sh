@@ -15,3 +15,4 @@ cat ${TEMP_DIR}/kubectl | ${MASK} | ${DIFF} ${TEST_DIR}/kubectl -
 cat ${TEMP_DIR}/alpine | ${MASK} |${DIFF} ${TEST_DIR}/alpine -
 
 ${TEMP_DIR}/alpine /bin/sh -c "kubectl version --client" | ${MASK} | ${DIFF} ${TEST_DIR}/stdout -
+${ALIASES} run /usr/local/bin/alpine /bin/sh -c "ls -la /usr/local/bin"

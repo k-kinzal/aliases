@@ -360,6 +360,13 @@ func NewCommand(ctx Context, schema Schema) (*posix.Cmd, error) {
 	if schema.Command != nil {
 		cmd.Args = append(cmd.Args, *schema.Command)
 	}
+	for _, arg := range schema.Args {
+		if strings.Index(arg, " ") != -1 {
+			cmd.Args = append(cmd.Args, strconv.Quote(arg))
+		} else {
+			cmd.Args = append(cmd.Args, arg)
+		}
+	}
 	cmd.Args = append(cmd.Args, schema.Args...)
 
 	return cmd, nil
