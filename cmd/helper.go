@@ -120,28 +120,3 @@ func (h *helper) stringMap(names ...string) map[string]string {
 
 	return val
 }
-
-func (h *helper) args() []string {
-	args := make([]string, 0, h.Context.NArg()-1)
-	for _, arg := range h.Context.Args()[1:] {
-		if arg == "--" {
-			continue
-		}
-		args = append(args, arg)
-	}
-	return args
-}
-
-func (h *helper) firstArg() *string {
-	args := h.Context.Args()
-	if len(args) == 0 {
-		return nil
-	}
-	if args[0] == "--" {
-		if len(args) == 1 {
-			return nil
-		}
-		return &args[1]
-	}
-	return &args[0]
-}

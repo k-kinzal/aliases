@@ -18,12 +18,25 @@ type runContext struct {
 
 func (ctx *runContext) GetCommandShema() *aliases.Schema {
 	flags := ctx.flags
+	arguments := flags.Args()
 
-	index := flags.firstArg()
-	args := flags.args()
+	if len(arguments) == 0 {
+		return nil
+	}
+	index := arguments[0]
+
+	var command *string
+	if len(arguments) > 2 {
+		command = &arguments[1]
+	}
+	var args []string
+	if len(arguments) > 3 {
+		args = arguments[2:]
+	}
+
 	schema := aliases.Schema{
-		*index,
-		path.Base(*index),
+		index,
+		path.Base(index),
 		nil,
 		flags.bool("detach", "d"),
 		flags.bool("sig-proxy"),
@@ -118,9 +131,9 @@ func (ctx *runContext) GetCommandShema() *aliases.Schema {
 		flags.string("runtime"),
 		flags.bool("init"),
 		"",
-		args[1:],
+		args,
 		"",
-		&args[0],
+		command,
 	}
 
 	return &schema
@@ -271,7 +284,7 @@ func RunAction(c *cli.Context) error {
 	}
 
 	index := c.Args()[0]
-	if err := ledger.Entry(index, *ctx.GetCommandShema()); err != nil {
+	if err := ledger.Merge(index, *ctx.GetCommandShema()); err != nil {
 		return err
 	}
 
