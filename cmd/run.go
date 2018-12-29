@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+	"io/ioutil"
 	"path"
 
 	"github.com/k-kinzal/aliases/pkg/posix"
@@ -13,7 +15,12 @@ import (
 
 type runContext struct {
 	aliases.Context
-	flags helper
+	flags      helper
+	exportPath string
+}
+
+func (ctx *runContext) ExportPath() string {
+	return ctx.exportPath
 }
 
 func (ctx *runContext) GetCommandShema() *aliases.Schema {
@@ -147,7 +154,12 @@ func newRunContext(c *cli.Context) (*runContext, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &runContext{ctx, helper{c}}, nil
+	dir, err := ioutil.TempDir("/tmp", "")
+	if err != nil {
+		return nil, fmt.Errorf("runtime error: %s", err)
+	}
+
+	return &runContext{ctx, helper{c}, dir}, nil
 }
 
 func RunCommand() cli.Command {
