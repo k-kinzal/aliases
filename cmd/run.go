@@ -284,7 +284,7 @@ func RunAction(c *cli.Context) error {
 	}
 
 	index := c.Args()[0]
-	if err := ledger.Entry(index, *ctx.GetCommandShema()); err != nil {
+	if err := ledger.Merge(index, *ctx.GetCommandShema()); err != nil {
 		return err
 	}
 

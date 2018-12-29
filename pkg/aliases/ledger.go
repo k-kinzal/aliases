@@ -20,19 +20,48 @@ type Ledger struct {
 }
 
 func (ledger *Ledger) Entry(index string, schema Schema) error {
-	dst := schema
-	if src, ok := ledger.schemas[index]; ok {
-		if err := mergo.Map(&dst, src, mergo.WithAppendSlice); err != nil {
-			return fmt.Errorf("logic error: %s", err)
-		}
+	if _, ok := ledger.schemas[index]; ok {
+		return fmt.Errorf("runtime error: %s: schema is alread exists", index)
 	}
+
+	if schema.Path == "" {
+		schema.Path = index
+		schema.FileName = path.Base(index)
+	}
+
+	if err := defaults.Set(&schema); err != nil {
+		return err
+	}
+
+	if err := ledger.validator.Struct(schema); err != nil {
+		return fmt.Errorf("schema error: %s in `%s`", err, index)
+	}
+
+	ledger.schemas[index] = schema
+
+	return nil
+}
+
+func (ledger *Ledger) Merge(index string, schema Schema) error {
+	dst := schema
+	src, ok := ledger.schemas[index]
+	if !ok {
+		return fmt.Errorf("runtime error: %s: schema is not exists", index)
+	}
+
+	if err := mergo.Map(&dst, src, mergo.WithAppendSlice); err != nil {
+		return fmt.Errorf("runtime error: %s", err)
+	}
+
 	if dst.Path == "" {
 		dst.Path = index
 		dst.FileName = path.Base(index)
 	}
+
 	if err := defaults.Set(&dst); err != nil {
 		return err
 	}
+
 	if err := ledger.validator.Struct(dst); err != nil {
 		return fmt.Errorf("schema error: %s in `%s`", err, index)
 	}
