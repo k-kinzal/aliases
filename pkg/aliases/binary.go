@@ -41,7 +41,7 @@ func (manager *BinaryManager) download(image string, tag string) error {
 		"run",
 		"-v",
 		fmt.Sprintf("%s:%s", manager.binaryDir, "/data"),
-		image,
+		fmt.Sprintf("%s:%s", image, tag),
 		"sh",
 		"-c",
 		fmt.Sprintf("cp $(which docker) /data/%s", filename),
