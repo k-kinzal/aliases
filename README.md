@@ -149,5 +149,35 @@ docker run --entrypoint "" --interactive --network "host" --rm --tty [your image
 
 If you want to show the docker run command, please specify option of `--verbose`.
 
+## for CircleCI
+
+aliases supports [CircleCI Orb](https://circleci.com/orbs/registry/orb/k-kinzal/aliases).
+
+
+```yaml
+version: "2.1"
+
+orbs:
+  aliases: k-kinzal/aliases@dev:0.2-alpha
+
+jobs:
+  aliases:
+    machine: true
+    steps:
+    - checkout
+    - aliases/install
+    - aliases/gen
+    - run: [your command]
+
+workflows:
+  version: 2
+
+  aliases:
+    jobs:
+    - aliases
+```
+
+Please use [Machine Executor](https://circleci.com/docs/2.0/executor-types/#using-machine) when using `Dependencies`.
+
 ## License
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fk-kinzal%2Faliases.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fk-kinzal%2Faliases?ref=badge_large)
