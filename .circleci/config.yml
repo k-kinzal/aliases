@@ -3,7 +3,7 @@ version: "2.1"
 orbs:
   cli: circleci/circleci-cli@0.1.2
   orb-tools: circleci/orb-tools@2.0.2
-  aliases: k-kinzal/aliases@dev:0.2-alpha
+  aliases: k-kinzal/aliases@0.2.0
 
 commands:
   go_cache_restore:
@@ -34,7 +34,7 @@ jobs:
     - checkout
     - orb-tools/publish:
         orb-path: .circleci/orb.yml
-        orb-ref: k-kinzal/aliases@dev:${CIRCLE_TAG:-$CIRCLE_SHA1}
+        orb-ref: k-kinzal/aliases@dev:$CIRCLE_SHA1
         token-variable: $CIRCLE_TOKEN
 
   orb-publish-prod:
@@ -43,7 +43,7 @@ jobs:
     - checkout
     - orb-tools/publish:
         orb-path: .circleci/orb.yml
-        orb-ref: k-kinzal/aliases@$CIRCLE_TAG
+        orb-ref: k-kinzal/aliases@$(echo "$CIRCLE_TAG" | sed 's/^v//')
         token-variable: $CIRCLE_TOKEN
 
   test:
