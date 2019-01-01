@@ -1,5 +1,36 @@
-version: 2
+version: "2.1"
+
+orbs:
+  cli: circleci/circleci-cli@0.1.2
+  orb-tools: circleci/orb-tools@2.0.2
+  aliases: k-kinzal/aliases@dev:0.2-alpha
+
 jobs:
+  orb-validate:
+    executor: cli/default
+    steps:
+    - checkout
+    - orb-tools/validate:
+        orb-path: .circleci/orb.yml
+
+  orb-publish-dev:
+    executor: cli/default
+    steps:
+    - checkout
+    - orb-tools/publish:
+        orb-path: .circleci/orb.yml
+        orb-ref: k-kinzal/aliases@dev:${CIRCLE_TAG:-$CIRCLE_SHA1}
+        token-variable: $CIRCLE_TOKEN
+
+  orb-publish-prod:
+    executor: cli/default
+    steps:
+    - checkout
+    - orb-tools/publish:
+        orb-path: .circleci/orb.yml
+        orb-ref: k-kinzal/aliases@$CIRCLE_TAG
+        token-variable: $CIRCLE_TOKEN
+
   build:
     docker:
     - image: circleci/golang:1.11.4
@@ -42,6 +73,30 @@ jobs:
 
 workflows:
   version: 2
+
+  orb-build:
+    jobs:
+    - orb-validate:
+        filters:
+          tags:
+            only: /.*/
+    - orb-publish-dev:
+        requires:
+        - orb-validate
+        filters:
+          tags:
+            only: /.*/
+          branches:
+            only: /^(?!pull\/).*$/
+    - orb-publish-prod:
+        requires:
+        - orb-publish-dev
+        filters:
+          tags:
+            only: /^v.*/
+          branches:
+            only: master
+
   build_and_test:
     jobs:
     - build
