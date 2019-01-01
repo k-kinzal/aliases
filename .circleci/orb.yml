@@ -1,0 +1,47 @@
+version: "2.1"
+description: "Install and generate aliases."
+
+commands:
+  install:
+    description: Install the aliases.
+    parameters:
+      version:
+        description: Install version.
+        type: string
+        default: v0.2-alpha
+    steps:
+    - restore_cache:
+        key: aliases-<< parameters.version >>
+        paths:
+        - $HOME/.aliases/bin
+    - run:
+        name: Install aliases
+        command: |
+          if [ ! -f $HOME/.aliases/bin/aliases ]; then
+            mkdir -p $HOME/.aliases/bin
+            wget -O - 'https://github.com/k-kinzal/aliases/releases/download/<< parameters.version >>/linux-amd64.tar.gz' | tar xvz -C $HOME/.aliases/bin
+            chmod +x $HOME/.aliases/bin
+          fi
+
+          echo 'export PATH=$HOME/.aliases/bin:$PATH' >> $BASH_ENV
+          source $BASH_ENV
+        when:
+
+    - save_cache:
+        key: aliases-<< parameters.version >>
+        paths:
+        - $HOME/.aliases/bin
+
+  gen:
+    description: Generate aliases.
+    parameters:
+      config:
+        description: Load configuration file.
+        type: string
+        default: aliases.yaml
+    steps:
+    - run:
+        name: Generate aliases
+        command: |
+          aliases -c << parameters.config >> gen --export >> $BASH_ENV
+          source $BASH_ENV
