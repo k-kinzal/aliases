@@ -17,3 +17,4 @@ run:
 issues:
   exclude:
   - "`aliases.Schema` composite literal uses unkeyed fields"
+  - "`aliases.BinarySchema` composite literal uses unkeyed fields"

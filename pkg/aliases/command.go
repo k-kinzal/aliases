@@ -336,7 +336,12 @@ func NewCommand(ctx Context, schema Schema) (*posix.Cmd, error) {
 		cmd.Args = append(cmd.Args, "--volume", strconv.Quote(v))
 	}
 	if (len(schema.Dependencies) > 0) && ctx.HasDockerSocket() {
-		cmd.Args = append(cmd.Args, "--volume", strconv.Quote(fmt.Sprintf("%s:/usr/local/bin/docker", ctx.DockerBinaryPath())))
+		binary := BinaryManager{path.Join(ctx.HomePath(), "docker")}
+		binarypath, err := binary.Get(schema.Docker.Image, schema.Docker.Tag)
+		if err != nil {
+			return nil, err
+		}
+		cmd.Args = append(cmd.Args, "--volume", strconv.Quote(fmt.Sprintf("%s:/usr/local/bin/docker", *binarypath)))
 		if sock := ctx.DockerSocketPath(); sock != nil {
 			cmd.Args = append(cmd.Args, "--volume", strconv.Quote(fmt.Sprintf("%s:/var/run/docker.sock", *sock)))
 		}

@@ -44,6 +44,7 @@ func (ctx *runContext) GetCommandShema() *aliases.Schema {
 	schema := aliases.Schema{
 		index,
 		path.Base(index),
+		aliases.BinarySchema{"", ""},
 		nil,
 		flags.bool("detach", "d"),
 		flags.bool("sig-proxy"),

@@ -1,10 +1,16 @@
 package aliases
 
+type BinarySchema struct {
+	Image string `yaml:"image" validate:"required" default:"docker"`
+	Tag   string `yaml:"tag" validate:"required" default:"18.09.0"`
+}
+
 type Schema struct {
 	// aliases configuration
 	Path         string
 	FileName     string
-	Dependencies []string `yaml:"dependencies"`
+	Docker       BinarySchema `yaml:"docker"`
+	Dependencies []string     `yaml:"dependencies"`
 	// docker run options
 	Detach              *string           `yaml:"detach" validate:"omitempty,bool|script"`
 	SigProxy            *string           `yaml:"sigProxy" validate:"omitempty,bool|script"`
