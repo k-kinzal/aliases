@@ -1,0 +1,13 @@
+/usr/local/bin/kubectl:
+  image: chatwork/kubectl
+  tag: 1.11.2
+  volume:
+  - $HOME/.kube:/root/.kube
+  - $PWD:/kube
+  workdir: /kube
+
+/usr/local/bin/ubuntu:
+  image: amd64/ubuntu
+  tag: 19.04
+  dependencies:
+  - /usr/local/bin/kubectl
