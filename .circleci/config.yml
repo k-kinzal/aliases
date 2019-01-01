@@ -5,6 +5,21 @@ orbs:
   orb-tools: circleci/orb-tools@2.0.2
   aliases: k-kinzal/aliases@dev:0.2-alpha
 
+commands:
+  go_cache_restore:
+    steps:
+    - restore_cache:
+        key: v1-gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
+        paths:
+        - vendor
+
+  go_cache_save:
+    steps:
+    - save_cache:
+        key: v1-gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
+        paths:
+        - vendor
+
 jobs:
   orb-validate:
     executor: cli/default
@@ -37,16 +52,10 @@ jobs:
     - checkout
     - aliases/install
     - aliases/gen
-    - restore_cache:
-        key: gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
-        paths:
-        - vendor
+    - go_cache_restore
     - run: make build
     - run: make test
-    - save_cache:
-        key: gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
-        paths:
-        - vendor
+    - go_cache_save
 
   integration:
     machine: true
@@ -54,9 +63,9 @@ jobs:
     - checkout
     - aliases/install
     - aliases/gen
-    - run:
-        name: Integration Test
-        command: make integration
+    - go_cache_restore
+    - run: make integration
+    - go_cache_save
 
 workflows:
   version: 2
