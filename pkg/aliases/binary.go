@@ -66,7 +66,3 @@ func (manager *BinaryManager) Get(image string, tag string) (*string, error) {
 
 	return &filepath, nil
 }
-
-func NewBinary(binaryPath string) *BinaryManager {
-	return &BinaryManager{binaryPath}
-}
