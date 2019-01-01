@@ -57,27 +57,27 @@ Using the option of `--export` can be used as a command instead of an alias.
 
 ```
 $ aliases --help
-  NAME:
-     aliases - Generate alias for command on container
-  
-  USAGE:
-     aliases [global options] command [command options] [arguments...]
-  
-  VERSION:
-     v0.2.0
-  
-  COMMANDS:
-       gen      Generate aliases
-       run      Run aliases command
-       home     Get aliases home path
-       help, h  Shows a list of commands or help for one command
-  
-  GLOBAL OPTIONS:
-     --config value, -c value  Load configuration file
-     --home value              Home directory for aliases [$ALIASES_HOME]
-     --verbose, -v             enable verbose output
-     --help                    show help
-     --version                 print the version
+NAME:
+   aliases - Generate alias for command on container
+
+USAGE:
+   aliases [global options] command [command options] [arguments...]
+
+VERSION:
+   v0.2.0
+
+COMMANDS:
+     gen      Generate aliases
+     run      Run aliases command
+     home     Get aliases home path
+     help, h  Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --config value, -c value  Load configuration file
+   --home value              Home directory for aliases [$ALIASES_HOME]
+   --verbose, -v             enable verbose output
+   --help                    show help
+   --version                 print the version
 ```
 
 ## Version Environment variable
@@ -158,7 +158,7 @@ aliases supports [CircleCI Orb](https://circleci.com/orbs/registry/orb/k-kinzal/
 version: "2.1"
 
 orbs:
-  aliases: k-kinzal/aliases@dev:0.2-alpha
+  aliases: k-kinzal/aliases@0.2.0
 
 jobs:
   aliases:
