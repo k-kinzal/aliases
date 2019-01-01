@@ -31,45 +31,32 @@ jobs:
         orb-ref: k-kinzal/aliases@$CIRCLE_TAG
         token-variable: $CIRCLE_TOKEN
 
-  build:
-    docker:
-    - image: circleci/golang:1.11.4
-    working_directory: /go/src/github.com/k-kinzal/aliases
+  test:
+    machine: true
     steps:
     - checkout
+    - aliases/install
+    - aliases/gen
     - restore_cache:
         key: gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
         paths:
-        - /go/src/github.com/k-kinzal/aliases/vendor
-    - run: dep ensure -vendor-only=true
+        - vendor
+    - run: make build
+    - run: make test
     - save_cache:
         key: gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
         paths:
-        - /go/src/github.com/k-kinzal/aliases/vendor
-    - run: go build -ldflags "-s -w" -o ./dist/aliases .
-    - persist_to_workspace:
-        root: ./
-        paths:
-        - "*"
-
-  test:
-    docker:
-    - image: circleci/golang:1.11.4
-    working_directory: /go/src/github.com/k-kinzal/aliases
-    steps:
-    - attach_workspace:
-        at: ./
-    - run: go test ./... -v
+        - vendor
 
   integration:
     machine: true
     steps:
-    - attach_workspace:
-        at: ./
+    - checkout
+    - aliases/install
+    - aliases/gen
     - run:
         name: Integration Test
-        command: |
-          find test/integration/*/test.sh | xargs -I{} /bin/sh -c "{} || exit 255 && echo pass {}"
+        command: make integration
 
 workflows:
   version: 2
@@ -97,12 +84,7 @@ workflows:
           branches:
             only: master
 
-  build_and_test:
+  test:
     jobs:
-    - build
-    - test:
-        requires:
-        - build
-    - integration:
-        requires:
-        - build
+    - test
+    - integration
