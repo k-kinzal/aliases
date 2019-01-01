@@ -3,26 +3,21 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/k-kinzal/aliases/pkg/context"
 	"github.com/urfave/cli"
 )
 
 func HomeCommand() cli.Command {
 	return cli.Command{
-		Name:  "home",
-		Usage: "Get aliases home path",
-		Action: func(c *cli.Context) error {
-			return HomeAction(c)
-		},
+		Name:                   "home",
+		Usage:                  "Get aliases home path",
+		Action:                 HomeAction,
+		SkipArgReorder:         true,
+		UseShortOptionHandling: true,
 	}
 }
 
 func HomeAction(c *cli.Context) error {
-	// context
-	ctx := context.New("", "", "")
-
-	// output
-	fmt.Print(ctx.GetHomePath())
+	fmt.Print(c.GlobalString("home"))
 
 	return nil
 }

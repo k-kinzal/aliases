@@ -1,63 +1,99 @@
-version: 2
+version: "2.1"
+
+orbs:
+  cli: circleci/circleci-cli@0.1.2
+  orb-tools: circleci/orb-tools@2.0.2
+  aliases: k-kinzal/aliases@dev:0.2-alpha
+
+commands:
+  go_cache_restore:
+    steps:
+    - restore_cache:
+        key: v1-gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
+        paths:
+        - vendor
+
+  go_cache_save:
+    steps:
+    - save_cache:
+        key: v1-gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
+        paths:
+        - vendor
+
 jobs:
-  build:
-    docker:
-    - image: circleci/golang:1.11.4
-    working_directory: /go/src/github.com/k-kinzal/aliases
+  orb-validate:
+    executor: cli/default
     steps:
     - checkout
-    - restore_cache:
-        key: gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
-        paths:
-        - /go/src/github.com/k-kinzal/aliases/vendor
-    - run: dep ensure -vendor-only=true
-    - save_cache:
-        key: gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
-        paths:
-        - /go/src/github.com/k-kinzal/aliases/vendor
-    - run: go build -ldflags "-s -w" -o ./dist/aliases .
-    - persist_to_workspace:
-        root: ./
-        paths:
-        - "*"
+    - orb-tools/validate:
+        orb-path: .circleci/orb.yml
+
+  orb-publish-dev:
+    executor: cli/default
+    steps:
+    - checkout
+    - orb-tools/publish:
+        orb-path: .circleci/orb.yml
+        orb-ref: k-kinzal/aliases@dev:${CIRCLE_TAG:-$CIRCLE_SHA1}
+        token-variable: $CIRCLE_TOKEN
+
+  orb-publish-prod:
+    executor: cli/default
+    steps:
+    - checkout
+    - orb-tools/publish:
+        orb-path: .circleci/orb.yml
+        orb-ref: k-kinzal/aliases@$CIRCLE_TAG
+        token-variable: $CIRCLE_TOKEN
 
   test:
-    docker:
-    - image: circleci/golang:1.11.4
-    working_directory: /go/src/github.com/k-kinzal/aliases
+    machine: true
     steps:
-    - attach_workspace:
-        at: ./
-    - run: go test ./... -v
+    - checkout
+    - aliases/install
+    - aliases/gen
+    - go_cache_restore
+    - run: make build
+    - run: make test
+    - go_cache_save
 
   integration:
     machine: true
     steps:
-    - attach_workspace:
-        at: ./
-    - run:
-        # FIXME: host: ubuntu, guest: alpine not working
-        # https://twitter.com/amaya382/status/1077874567119396864
-        # https://amaya382.hatenablog.jp/entry/2016/10/05/030254
-        name: Download docker binary
-        command: |
-          mkdir -p bin
-          docker run -v $PWD/bin:/tmp/bin docker /bin/sh -c 'cp $(which docker) /tmp/bin'
-    - run:
-        name: Integration Test
-        command: |
-          echo 'export PATH='$PWD'/bin:$PATH' >> $BASH_ENV
-          source $BASH_ENV
-          find test/integration/*/test.sh | xargs -I{} /bin/sh -c "{} || exit 255 && echo pass {}"
+    - checkout
+    - aliases/install
+    - aliases/gen
+    - go_cache_restore
+    - run: make integration
+    - go_cache_save
 
 workflows:
   version: 2
-  build_and_test:
+
+  orb-build:
     jobs:
-    - build
-    - test:
+    - orb-validate:
+        filters:
+          tags:
+            only: /.*/
+    - orb-publish-dev:
         requires:
-        - build
-    - integration:
+        - orb-validate
+        filters:
+          tags:
+            only: /.*/
+          branches:
+            only: /^(?!pull\/).*$/
+    - orb-publish-prod:
         requires:
-        - build
+        - orb-publish-dev
+        filters:
+          tags:
+            only: /^v.*/
+          branches:
+            only: master
+
+  test:
+    jobs:
+    - test
+    - integration

@@ -6,9 +6,15 @@ linters:
   - gocyclo
   - gochecknoglobals
   - gosec
+  - interfacer
   - lll
   - scopelint
   fast: false
 
 run:
   deadline: 1m
+
+issues:
+  exclude:
+  - "`aliases.Schema` composite literal uses unkeyed fields"
+  - "`aliases.BinarySchema` composite literal uses unkeyed fields"

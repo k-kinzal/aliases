@@ -64,18 +64,20 @@ USAGE:
    aliases [global options] command [command options] [arguments...]
 
 VERSION:
-   dev
+   v0.2.0
 
 COMMANDS:
      gen      Generate aliases
+     run      Run aliases command
      home     Get aliases home path
      help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --config FILE, -c FILE  Load configuration from FILE
-   --home value            Home directory for aliases
-   --help, -h              show help
-   --version, -v           print the version
+   --config value, -c value  Load configuration file
+   --home value              Home directory for aliases [$ALIASES_HOME]
+   --verbose, -v             enable verbose output
+   --help                    show help
+   --version                 print the version
 ```
 
 ## Version Environment variable
@@ -130,6 +132,52 @@ Note that command is always executed on the machine (host or docker) that execut
 `$PWD` is a special environment variable.
 The `$PWD` specified on the left always points to `$PWD` of the host.
 
+## How to debug aliases
+
+If you do not get what you expected, please use the `aliases run` command.
+
+```bash
+$ aliases run -it --entrypoint '' [command] sh
+```
+
+`aliases run` command overwrites the option of your defined command and executes it.
+
+```bash
+$ aliases --verbose run -it --entrypoint '' [command] sh
+docker run --entrypoint "" --interactive --network "host" --rm --tty [your image] sh
+```
+
+If you want to show the docker run command, please specify option of `--verbose`.
+
+## for CircleCI
+
+aliases supports [CircleCI Orb](https://circleci.com/orbs/registry/orb/k-kinzal/aliases).
+
+
+```yaml
+version: "2.1"
+
+orbs:
+  aliases: k-kinzal/aliases@0.2.0
+
+jobs:
+  aliases:
+    machine: true
+    steps:
+    - checkout
+    - aliases/install
+    - aliases/gen
+    - run: [your command]
+
+workflows:
+  version: 2
+
+  aliases:
+    jobs:
+    - aliases
+```
+
+Please use [Machine Executor](https://circleci.com/docs/2.0/executor-types/#using-machine) when using `Dependencies`.
 
 ## License
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fk-kinzal%2Faliases.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fk-kinzal%2Faliases?ref=badge_large)
