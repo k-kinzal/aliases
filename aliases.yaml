@@ -1,0 +1,18 @@
+/usr/local/bin/go:
+  image: golang
+  tag: 1.11.4
+  command: go
+  env:
+    GOPATH: /go
+  volume:
+  - $PWD:/go/src/github.com/k-kinzal/aliases
+  workdir: /go/src/github.com/k-kinzal/aliases
+
+/usr/local/bin/dep:
+  image: instrumentisto/dep
+  tag: 0.5.0
+  env:
+    GOPATH: /go
+  volume:
+  - $PWD:/go/src/github.com/k-kinzal/aliases
+  workdir: /go/src/github.com/k-kinzal/aliases
