@@ -33,11 +33,11 @@ func (ctx *runContext) GetCommandShema() *aliases.Schema {
 	index := arguments[0]
 
 	var command *string
-	if len(arguments) > 2 {
+	if len(arguments) > 1 {
 		command = &arguments[1]
 	}
 	var args []string
-	if len(arguments) > 3 {
+	if len(arguments) > 2 {
 		args = arguments[2:]
 	}
 
