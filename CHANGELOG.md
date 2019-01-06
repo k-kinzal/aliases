@@ -1,3 +1,8 @@
+## v0.2.1 - 2019-01-06
+
+Bug Fixes:
+* command and arguments were not passed in `aliases run` (https://github.com/k-kinzal/aliases/pull/47)
+
 ## v0.2.0 - 2019-01-02
 
 New Features:

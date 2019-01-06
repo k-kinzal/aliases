@@ -64,7 +64,7 @@ USAGE:
    aliases [global options] command [command options] [arguments...]
 
 VERSION:
-   v0.2.0
+   v0.2.1
 
 COMMANDS:
      gen      Generate aliases
@@ -158,7 +158,7 @@ aliases supports [CircleCI Orb](https://circleci.com/orbs/registry/orb/k-kinzal/
 version: "2.1"
 
 orbs:
-  aliases: k-kinzal/aliases@0.2.0
+  aliases: k-kinzal/aliases@0.2.1
 
 jobs:
   aliases:
