@@ -47,11 +47,11 @@ func GenCommand() cli.Command {
 		Flags: []cli.Flag{
 			cli.BoolFlag{
 				Name:  "export",
-				Usage: "If you pass true, you will return export instead of aliase",
+				Usage: "if you pass true, you will return export instead of aliase",
 			},
 			cli.StringFlag{
 				Name:  "export-path",
-				Usage: "The directory to export scripts",
+				Usage: "the directory to export scripts",
 			},
 		},
 		Action:                 GenAction,

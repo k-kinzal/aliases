@@ -24,18 +24,18 @@ func main() {
 
 	app := cli.NewApp()
 	app.Name = "aliases"
-	app.Usage = "Generate alias for command on container"
+	app.Usage = "Generate alias for command on the container"
 
 	app.Version = version.GetVersion()
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "config, c",
-			Usage: "Load configuration file",
+			Usage: "load configuration file",
 		},
 		cli.StringFlag{
 			Name:   "home",
-			Usage:  "Home directory for aliases",
+			Usage:  "home directory for aliases",
 			EnvVar: "ALIASES_HOME",
 		},
 		cli.BoolFlag{
