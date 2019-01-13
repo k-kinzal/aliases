@@ -152,7 +152,7 @@ func NewLedgerFromConfig(configpath string) (*Ledger, error) {
 		inherits := util.NewStack()
 		callstack := util.NewStack()
 		callstack.Push(schema)
-		for true {
+		for {
 			value := callstack.Pop()
 			if value == nil {
 				break

@@ -47,5 +47,5 @@ func (stack *Stack) Slice() []interface{} {
 }
 
 func NewStack() *Stack {
-	return &Stack{make([]interface{}, 0), make(map[string]interface{}, 0)}
+	return &Stack{make([]interface{}, 0), make(map[string]interface{})}
 }
