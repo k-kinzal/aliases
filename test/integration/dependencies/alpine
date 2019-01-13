@@ -1,9 +1,9 @@
 #!/bin/sh
 
 if [ -p /dev/stdin ]; then
-  cat - | docker run --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --interactive --network "host" --privileged --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") --volume "[HOME]/.aliases/docker/docker-18-09-0:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "[TEMP_DIR]/kubectl:/usr/local/bin/kubectl" alpine:${ALPINE_VERSION:-"3.8"} "$@"
+  cat - | docker run --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --interactive --network "host" --privileged --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") --volume "[HOME]/.kube:/root/.kube" --volume "${ALIASES_PWD:-$PWD}:/kube" --volume "[HOME]/.aliases/docker/docker-18-09-0:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "[TEMP_DIR]/kubectl:/usr/local/bin/kubectl" --workdir "/kube" alpine:${ALPINE_VERSION:-"3.8"} "$@"
   exit $?
 else
-  docker run --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --interactive --network "host" --privileged --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") --volume "[HOME]/.aliases/docker/docker-18-09-0:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "[TEMP_DIR]/kubectl:/usr/local/bin/kubectl" alpine:${ALPINE_VERSION:-"3.8"} "$@"
+  docker run --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --interactive --network "host" --privileged --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") --volume "[HOME]/.kube:/root/.kube" --volume "${ALIASES_PWD:-$PWD}:/kube" --volume "[HOME]/.aliases/docker/docker-18-09-0:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "[TEMP_DIR]/kubectl:/usr/local/bin/kubectl" --workdir "/kube" alpine:${ALPINE_VERSION:-"3.8"} "$@"
   exit $?
 fi

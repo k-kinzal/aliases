@@ -297,7 +297,17 @@ func RunAction(c *cli.Context) error {
 	}
 
 	index := c.Args()[0]
-	if err := ledger.Merge(index, *ctx.GetCommandShema()); err != nil {
+
+	src, err := ledger.LookUp(index)
+	if err != nil {
+		return err
+	}
+	dst := ctx.GetCommandShema()
+	dst.Dependencies = src.Dependencies
+	dst.Image = src.Image
+	dst.Tag = src.Tag
+
+	if err := ledger.Merge(index, *dst); err != nil {
 		return err
 	}
 
