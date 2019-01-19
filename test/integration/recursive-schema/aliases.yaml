@@ -1,0 +1,19 @@
+/usr/local/bin/alpine1:
+  image: alpine
+  tag: 3.8
+
+/usr/local/bin/alpine2:
+  image: alpine
+  tag: 3.8
+  dependencies:
+  - /usr/local/bin/alpine1
+  - /usr/local/bin/alpine3:
+      image: alpine
+      tag: 3.8
+      dependencies:
+        - /usr/local/bin/alpine4:
+            image: alpine
+            tag: 3.8
+        - /usr/local/bin/alpine5:
+            image: alpine
+            tag: 3.8
