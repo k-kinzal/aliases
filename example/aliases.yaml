@@ -16,3 +16,12 @@
   workdir: /work
   dependencies:
   - /usr/local/bin/kubectl
+  - /usr/local/bin/kubectl:
+      image: chatwork/kubectl
+      tag: 1.11.2
+      env:
+        KUBECONFIG: $KUBECONFIG
+      volume:
+        - $HOME/.kube:/root/.kube
+        - $PWD:/kube
+      workdir: /kube

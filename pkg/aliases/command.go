@@ -347,7 +347,13 @@ func NewCommand(ctx Context, schema Schema) (*posix.Cmd, error) {
 		}
 	}
 	for _, dep := range schema.Dependencies {
-		cmd.Args = append(cmd.Args, "--volume", strconv.Quote(fmt.Sprintf("%s/%s:%s", ctx.ExportPath(), path.Base(dep), dep)))
+		if dep.IsSchema() {
+			for _, d := range dep.Schemas() {
+				cmd.Args = append(cmd.Args, "--volume", strconv.Quote(fmt.Sprintf("%s/%s:%s", ctx.ExportPath(), d.FileName, d.Path)))
+			}
+		} else {
+			cmd.Args = append(cmd.Args, "--volume", strconv.Quote(fmt.Sprintf("%s/%s:%s", ctx.ExportPath(), path.Base(dep.String()), dep)))
+		}
 	}
 	if v := schema.VolumeDriver; v != nil {
 		cmd.Args = append(cmd.Args, "--volume-driver", strconv.Quote(*v))

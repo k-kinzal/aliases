@@ -1,16 +1,67 @@
 package aliases
 
+import (
+	"fmt"
+	"github.com/k-kinzal/aliases/pkg/types"
+	"reflect"
+)
+
 type BinarySchema struct {
 	Image string `yaml:"image" validate:"required" default:"docker"`
 	Tag   string `yaml:"tag" validate:"required" default:"18.09.0"`
+}
+
+type UnionStringOrSchemas types.Union
+
+func (u *UnionStringOrSchemas) IsString() bool {
+	return (*types.Union)(u).Type() == (*types.Union)(u).Left()
+}
+func (u *UnionStringOrSchemas) IsSchema() bool {
+	return (*types.Union)(u).Type() == (*types.Union)(u).Right()
+}
+func (u *UnionStringOrSchemas) String() string {
+	v := (*types.Union)(u).Value()
+	return v.(string)
+}
+func (u *UnionStringOrSchemas) Schemas() map[string]Schema {
+	v := (*types.Union)(u).Value()
+	return v.(map[string]Schema)
+}
+func (u *UnionStringOrSchemas) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var v interface{}
+	err := unmarshal(&v)
+	if err != nil {
+		return err
+	}
+
+	switch raw := v.(type) {
+	case string:
+		*u = *NewUnionStringOrSchemas(raw)
+		break
+	case map[interface{}]interface{}:
+		var v map[string]Schema
+		err := unmarshal(&v)
+		if err != nil {
+			return err
+		}
+		*u = *NewUnionStringOrSchemas(v)
+		break
+	default:
+		return fmt.Errorf("")
+	}
+
+	return nil
+}
+func NewUnionStringOrSchemas(value interface{}) *UnionStringOrSchemas {
+	return (*UnionStringOrSchemas)(types.NewUnion(reflect.String, reflect.TypeOf(map[string]Schema{}).Kind(), value))
 }
 
 type Schema struct {
 	// aliases configuration
 	Path         string
 	FileName     string
-	Docker       BinarySchema `yaml:"docker"`
-	Dependencies []string     `yaml:"dependencies"`
+	Docker       BinarySchema           `yaml:"docker"`
+	Dependencies []UnionStringOrSchemas `yaml:"dependencies"`
 	// docker run options
 	Detach              *string           `yaml:"detach" validate:"omitempty,bool|script"`
 	SigProxy            *string           `yaml:"sigProxy" validate:"omitempty,bool|script"`

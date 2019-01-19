@@ -90,16 +90,28 @@ func GenAction(c *cli.Context) error {
 	} else {
 		for _, schema := range ledger.Schemas() {
 			for _, dependency := range schema.Dependencies {
-				s, err := ledger.LookUp(dependency)
-				if err != nil {
-					return err
-				}
-				cmd, err := aliases.NewCommand(ctx, *s)
-				if err != nil {
-					return err
-				}
-				if err := export.Script(pathes.Join(ctx.ExportPath(), schema.FileName), *cmd); err != nil {
-					return err
+				if dependency.IsSchema() {
+					for _, s := range dependency.Schemas() {
+						cmd, err := aliases.NewCommand(ctx, s)
+						if err != nil {
+							return err
+						}
+						if err := export.Script(pathes.Join(ctx.ExportPath(), schema.FileName), *cmd); err != nil {
+							return err
+						}
+					}
+				} else {
+					s, err := ledger.LookUp(dependency.String())
+					if err != nil {
+						return err
+					}
+					cmd, err := aliases.NewCommand(ctx, *s)
+					if err != nil {
+						return err
+					}
+					if err := export.Script(pathes.Join(ctx.ExportPath(), schema.FileName), *cmd); err != nil {
+						return err
+					}
 				}
 			}
 			cmd, err := aliases.NewCommand(ctx, schema)

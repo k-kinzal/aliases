@@ -12,7 +12,7 @@ import (
 
 	"github.com/creasty/defaults"
 	"github.com/k-kinzal/aliases/pkg/aliases/validator"
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 
 	"github.com/imdario/mergo"
 )
@@ -158,17 +158,36 @@ func NewLedgerFromConfig(configpath string) (*Ledger, error) {
 				break
 			}
 			for idx, dependency := range value.(Schema).Dependencies {
-				dep, ok := schemas[dependency]
-				if !ok {
-					return nil, fmt.Errorf("yaml error: invalid parameter `%s` for `dependencies[%d]` is an undefined dependency in `%s`", dependency, idx, value.(Schema).Path)
+				if dependency.IsSchema() {
+					for i, d := range dependency.Schemas() {
+						if d.Path != "" {
+							// FIXME: property path
+							return nil, fmt.Errorf("yaml error: field path not found in `%s`", index)
+						}
+						if d.FileName != "" {
+							// FIXME: property path
+							return nil, fmt.Errorf("yaml error: field filename not found in `%s`", index)
+						}
+						d.Path = i
+						d.FileName = path.Base(i)
+						callstack.Push(d)
+					}
+					continue
 				}
-				if inherits.Has(dep) {
-					break
+				if dependency.IsString() {
+					i := dependency.String()
+					if i == index {
+						break
+					}
+					sch, ok := schemas[i]
+					if !ok {
+						return nil, fmt.Errorf("yaml error: invalid parameter `%s` for `dependencies[%d]` is an undefined dependency in `%s`", dependency, idx, value.(Schema).Path)
+					}
+					if inherits.Has(sch) {
+						break
+					}
+					callstack.Push(sch)
 				}
-				if dependency == index {
-					break
-				}
-				callstack.Push(dep)
 			}
 			inherits.Push(value)
 		}
