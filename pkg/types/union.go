@@ -35,11 +35,13 @@ func (u *Union) Value() interface{} {
 
 // Union to String
 func (u *Union) String() string {
-	if reflect.TypeOf(u.value).Kind() == u.left {
+	switch u.Type() {
+	case u.Left():
 		return fmt.Sprintf("%s(%#v)", u.left, u.value)
-	} else {
+	case u.Right():
 		return fmt.Sprintf("%s(%#v)", u.right, u.value)
 	}
+	return ""
 }
 
 // NewUnion returns Union
