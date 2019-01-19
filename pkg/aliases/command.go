@@ -4,11 +4,12 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"github.com/k-kinzal/aliases/pkg/export"
-	"gopkg.in/yaml.v2"
 	"path"
 	"strconv"
 	"strings"
+
+	"github.com/k-kinzal/aliases/pkg/export"
+	yaml "gopkg.in/yaml.v2"
 
 	"github.com/k-kinzal/aliases/pkg/posix"
 	"github.com/k-kinzal/aliases/pkg/util"

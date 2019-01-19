@@ -2,10 +2,11 @@ package aliases
 
 import (
 	"fmt"
-	"github.com/creasty/defaults"
-	"github.com/k-kinzal/aliases/pkg/types"
 	"path"
 	"reflect"
+
+	"github.com/creasty/defaults"
+	"github.com/k-kinzal/aliases/pkg/types"
 )
 
 type BinarySchema struct {

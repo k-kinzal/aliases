@@ -12,7 +12,7 @@ import (
 
 	"github.com/creasty/defaults"
 	"github.com/k-kinzal/aliases/pkg/aliases/validator"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 
 	"github.com/imdario/mergo"
 )

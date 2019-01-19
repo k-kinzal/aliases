@@ -2,9 +2,10 @@ package types_test
 
 import (
 	"fmt"
-	"github.com/k-kinzal/aliases/pkg/types"
 	"reflect"
 	"testing"
+
+	"github.com/k-kinzal/aliases/pkg/types"
 )
 
 func ExampleNewUnion() {
