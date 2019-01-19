@@ -151,26 +151,38 @@ func NewLedgerFromConfig(configpath string) (*Ledger, error) {
 	for index, schema := range schemas {
 		inherits := util.NewStack()
 		callstack := util.NewStack()
-		callstack.Push(schema)
+		callstack.Push(&struct {
+			Path   string
+			Schema Schema
+		}{index, schema})
 		for {
-			value := callstack.Pop()
-			if value == nil {
+			var value *struct {
+				Path   string
+				Schema Schema
+			}
+			v := callstack.Pop()
+			if v == nil {
 				break
 			}
-			for idx, dependency := range value.(Schema).Dependencies {
+			value = v.(*struct {
+				Path   string
+				Schema Schema
+			})
+			for idx, dependency := range value.Schema.Dependencies {
 				if dependency.IsSchema() {
 					for i, d := range dependency.Schemas() {
 						if d.Path != "" {
-							// FIXME: property path
-							return nil, fmt.Errorf("yaml error: field path not found in `%s`", index)
+							return nil, fmt.Errorf("yaml error: field path not found in `%s.Dependencies[%d].%s`", value.Path, idx, i)
 						}
 						if d.FileName != "" {
-							// FIXME: property path
-							return nil, fmt.Errorf("yaml error: field filename not found in `%s`", index)
+							return nil, fmt.Errorf("yaml error: field path not found in `%s.Dependencies[%d].%s`", value.Path, idx, i)
 						}
 						d.Path = i
 						d.FileName = path.Base(i)
-						callstack.Push(d)
+						callstack.Push(&struct {
+							Path   string
+							Schema Schema
+						}{fmt.Sprintf("%s.Dependencies[%d].%s", value.Path, idx, i), d})
 					}
 					continue
 				}
@@ -181,15 +193,18 @@ func NewLedgerFromConfig(configpath string) (*Ledger, error) {
 					}
 					sch, ok := schemas[i]
 					if !ok {
-						return nil, fmt.Errorf("yaml error: invalid parameter `%s` for `dependencies[%d]` is an undefined dependency in `%s`", dependency, idx, value.(Schema).Path)
+						return nil, fmt.Errorf("yaml error: invalid parameter `%s` for `dependencies[%d]` is an undefined dependency in `%s`", i, idx, value.Path)
 					}
 					if inherits.Has(sch) {
 						break
 					}
-					callstack.Push(sch)
+					callstack.Push(&struct {
+						Path   string
+						Schema Schema
+					}{value.Schema.Path, sch})
 				}
 			}
-			inherits.Push(value)
+			inherits.Push(value.Schema)
 		}
 		for i, sch := range inherits.Slice() {
 			if i == 0 {
