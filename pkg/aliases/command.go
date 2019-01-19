@@ -1,10 +1,15 @@
 package aliases
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"path"
 	"strconv"
 	"strings"
+
+	"github.com/k-kinzal/aliases/pkg/export"
+	yaml "gopkg.in/yaml.v2"
 
 	"github.com/k-kinzal/aliases/pkg/posix"
 	"github.com/k-kinzal/aliases/pkg/util"
@@ -347,7 +352,27 @@ func NewCommand(ctx Context, schema Schema) (*posix.Cmd, error) {
 		}
 	}
 	for _, dep := range schema.Dependencies {
-		cmd.Args = append(cmd.Args, "--volume", strconv.Quote(fmt.Sprintf("%s/%s:%s", ctx.ExportPath(), path.Base(dep), dep)))
+		if dep.IsSchema() {
+			for i, d := range dep.Schemas() {
+				c, err := NewCommand(ctx, d)
+				if err != nil {
+					return nil, err
+				}
+				out, err := yaml.Marshal(d)
+				if err != nil {
+					return nil, err
+				}
+				hasher := md5.New()
+				_, _ = hasher.Write(out)
+				name := hex.EncodeToString(hasher.Sum(nil))
+				if err := export.Script(path.Join(ctx.ExportPath(), name), *c); err != nil {
+					return nil, err
+				}
+				cmd.Args = append(cmd.Args, "--volume", strconv.Quote(fmt.Sprintf("%s:%s", path.Join(ctx.ExportPath(), name), i)))
+			}
+		} else {
+			cmd.Args = append(cmd.Args, "--volume", strconv.Quote(fmt.Sprintf("%s/%s:%s", ctx.ExportPath(), path.Base(dep.String()), dep.String())))
+		}
 	}
 	if v := schema.VolumeDriver; v != nil {
 		cmd.Args = append(cmd.Args, "--volume-driver", strconv.Quote(*v))

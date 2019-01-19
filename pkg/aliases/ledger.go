@@ -151,26 +151,52 @@ func NewLedgerFromConfig(configpath string) (*Ledger, error) {
 	for index, schema := range schemas {
 		inherits := util.NewStack()
 		callstack := util.NewStack()
-		callstack.Push(schema)
+		callstack.Push(&struct {
+			Path   string
+			Schema Schema
+		}{index, schema})
 		for {
-			value := callstack.Pop()
-			if value == nil {
+			var value *struct {
+				Path   string
+				Schema Schema
+			}
+			v := callstack.Pop()
+			if v == nil {
 				break
 			}
-			for idx, dependency := range value.(Schema).Dependencies {
-				dep, ok := schemas[dependency]
-				if !ok {
-					return nil, fmt.Errorf("yaml error: invalid parameter `%s` for `dependencies[%d]` is an undefined dependency in `%s`", dependency, idx, value.(Schema).Path)
+			value = v.(*struct {
+				Path   string
+				Schema Schema
+			})
+			for idx, dependency := range value.Schema.Dependencies {
+				if dependency.IsSchema() {
+					for i, d := range dependency.Schemas() {
+						callstack.Push(&struct {
+							Path   string
+							Schema Schema
+						}{fmt.Sprintf("%s.Dependencies[%d].%s", value.Path, idx, i), d})
+					}
+					continue
 				}
-				if inherits.Has(dep) {
-					break
+				if dependency.IsString() {
+					i := dependency.String()
+					if i == index {
+						break
+					}
+					sch, ok := schemas[i]
+					if !ok {
+						return nil, fmt.Errorf("yaml error: invalid parameter `%s` for `dependencies[%d]` is an undefined dependency in `%s`", i, idx, value.Path)
+					}
+					if inherits.Has(sch) {
+						break
+					}
+					callstack.Push(&struct {
+						Path   string
+						Schema Schema
+					}{value.Schema.Path, sch})
 				}
-				if dependency == index {
-					break
-				}
-				callstack.Push(dep)
 			}
-			inherits.Push(value)
+			inherits.Push(value.Schema)
 		}
 		for i, sch := range inherits.Slice() {
 			if i == 0 {
