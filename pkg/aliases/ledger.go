@@ -171,14 +171,6 @@ func NewLedgerFromConfig(configpath string) (*Ledger, error) {
 			for idx, dependency := range value.Schema.Dependencies {
 				if dependency.IsSchema() {
 					for i, d := range dependency.Schemas() {
-						if d.Path != "" {
-							return nil, fmt.Errorf("yaml error: field path not found in `%s.Dependencies[%d].%s`", value.Path, idx, i)
-						}
-						if d.FileName != "" {
-							return nil, fmt.Errorf("yaml error: field path not found in `%s.Dependencies[%d].%s`", value.Path, idx, i)
-						}
-						d.Path = i
-						d.FileName = path.Base(i)
 						callstack.Push(&struct {
 							Path   string
 							Schema Schema

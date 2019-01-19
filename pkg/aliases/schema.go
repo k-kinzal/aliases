@@ -2,7 +2,9 @@ package aliases
 
 import (
 	"fmt"
+	"github.com/creasty/defaults"
 	"github.com/k-kinzal/aliases/pkg/types"
+	"path"
 	"reflect"
 )
 
@@ -43,6 +45,20 @@ func (u *UnionStringOrSchemas) UnmarshalYAML(unmarshal func(interface{}) error) 
 		err := unmarshal(&v)
 		if err != nil {
 			return err
+		}
+		for i, s := range v {
+			if s.Path != "" {
+				return fmt.Errorf("yaml error: field path not found in `%s`", i)
+			}
+			if s.FileName != "" {
+				return fmt.Errorf("yaml error: field path not found in `%s", i)
+			}
+			s.Path = i
+			s.FileName = path.Base(i)
+			if err := defaults.Set(&s); err != nil {
+				return err
+			}
+			v[i] = s
 		}
 		*u = *NewUnionStringOrSchemas(v)
 		break
