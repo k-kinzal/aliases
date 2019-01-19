@@ -19,10 +19,8 @@ func ExampleUnion_Type() {
 	switch union.Type() {
 	case union.Left():
 		fmt.Printf("Union is `%s`", union.Left())
-		break
 	case union.Right():
 		fmt.Printf("Union is `%s`", union.Right())
-		break
 	}
 	// Output: Union is `string`
 }

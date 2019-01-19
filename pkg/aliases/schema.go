@@ -40,7 +40,6 @@ func (u *UnionStringOrSchemas) UnmarshalYAML(unmarshal func(interface{}) error) 
 	switch raw := v.(type) {
 	case string:
 		*u = *NewUnionStringOrSchemas(raw)
-		break
 	case map[interface{}]interface{}:
 		var v map[string]Schema
 		err := unmarshal(&v)
@@ -62,7 +61,6 @@ func (u *UnionStringOrSchemas) UnmarshalYAML(unmarshal func(interface{}) error) 
 			v[i] = s
 		}
 		*u = *NewUnionStringOrSchemas(v)
-		break
 	default:
 		return fmt.Errorf("")
 	}
