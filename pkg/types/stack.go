@@ -1,16 +1,19 @@
 package types
 
+// Stack is the FILO data structure.
 type Stack struct {
-	hash  func(v interface{}) string
+	hash  Hasher
 	slice []interface{}
 	index map[string]interface{}
 }
 
+// Push adds data to last of Stack.
 func (stack *Stack) Push(v interface{}) {
 	stack.slice = append(stack.slice, v)
-	stack.index[stack.hash(v)] = v
+	stack.index[stack.hash(v)] = &v
 }
 
+// Pop get data from first.
 func (stack *Stack) Pop() interface{} {
 	if len(stack.slice) == 0 {
 		return nil
@@ -21,11 +24,13 @@ func (stack *Stack) Pop() interface{} {
 	return v
 }
 
+// Has returns whether there is the same data.
 func (stack *Stack) Has(v interface{}) bool {
 	_, ok := stack.index[stack.hash(v)]
 	return ok
 }
 
+// Slice converts from Stack to Slice.
 func (stack *Stack) Slice() []interface{} {
 	slice := make([]interface{}, len(stack.slice))
 	for i := len(stack.slice) - 1; i >= 0; i-- {
@@ -34,10 +39,10 @@ func (stack *Stack) Slice() []interface{} {
 	return slice
 }
 
-func NewStack(hasher *func(v interface{}) string) *Stack {
+// NewStack creates a new Stack.
+func NewStack(hasher Hasher) *Stack {
 	if hasher == nil {
-		fn := SHA256
-		hasher = &fn
+		hasher = MD5
 	}
-	return &Stack{*hasher, make([]interface{}, 0), make(map[string]interface{})}
+	return &Stack{hasher, make([]interface{}, 0), make(map[string]interface{})}
 }

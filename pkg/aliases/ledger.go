@@ -8,7 +8,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/k-kinzal/aliases/pkg/util"
+	"github.com/k-kinzal/aliases/pkg/types"
 
 	"github.com/creasty/defaults"
 	"github.com/k-kinzal/aliases/pkg/aliases/validator"
@@ -148,9 +148,10 @@ func NewLedgerFromConfig(configpath string) (*Ledger, error) {
 		return nil, err
 	}
 
+	var hasher types.Hasher = types.SHA256
 	for index, schema := range schemas {
-		inherits := util.NewStack()
-		callstack := util.NewStack()
+		inherits := types.NewStack(hasher)
+		callstack := types.NewStack(hasher)
 		callstack.Push(&struct {
 			Path   string
 			Schema Schema
