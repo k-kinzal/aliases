@@ -47,7 +47,7 @@ func TestNewUnionFailed(t *testing.T) {
 	defer func() {
 		err := recover()
 		if err != "value is expected to be type `int` or `string`, but the actual is `bool`" {
-			t.Errorf("not expect message of \"%s\"", err)
+			t.Errorf("not expect message of \"%v\"", err)
 		}
 	}()
 	types.NewUnion(reflect.Int, reflect.String, true)
