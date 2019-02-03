@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/creasty/defaults"
+
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -22,12 +24,15 @@ func Unmarshal(buf []byte) (*ConfigSpec, error) {
 		}
 		return nil, err
 	}
+
 	v, err := NewValidator()
 	if err != nil {
 		return nil, err
 	}
-
 	if err := spec.Walk(func(path SpecPath, current *OptionSpec) (spec *OptionSpec, e error) {
+		if err := defaults.Set(current); err != nil {
+			return nil, err
+		}
 		if err := v.Struct(*current); err != nil {
 			return nil, fmt.Errorf("yaml error: %s in `%s`", err, path)
 		}

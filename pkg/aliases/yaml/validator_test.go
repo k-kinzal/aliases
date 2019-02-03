@@ -28,13 +28,19 @@ func ExampleNewValidator() {
 	// Output: <nil>
 }
 
-func TestValidate_StructSuccessHasEnvironmentVariable(t *testing.T) {
+func TestValidate_StructSuccessIsShell(t *testing.T) {
 	i := struct {
-		Data1 string `validate:"env"`
-		Data2 string `validate:"env"`
+		Data1 string `validate:"shell"`
+		Data2 string `validate:"shell"`
+		Data3 string `validate:"shell"`
+		Data4 string `validate:"shell"`
+		Data5 string `validate:"shell"`
 	}{
 		Data1: "Hello $FOO",
 		Data2: "Hello ${FOO}",
+		Data3: "Hello $(echo 'foo')",
+		Data4: "Hello `echo 'foo'`",
+		Data5: "$(echo \")\")",
 	}
 
 	validator, _ := yaml.NewValidator()
@@ -43,11 +49,21 @@ func TestValidate_StructSuccessHasEnvironmentVariable(t *testing.T) {
 	}
 }
 
-func TestValidate_StructFailedHasEnvironmentVariable(t *testing.T) {
+func TestValidate_StructFailedIsShell(t *testing.T) {
 	i := struct {
-		Data string `validate:"env"`
+		Data1 string `validate:"shell"`
+		Data2 string `validate:"shell"`
+		Data3 string `validate:"shell"`
+		Data4 string `validate:"shell"`
+		Data5 string `validate:"shell"`
+		Data6 string `validate:"shell"`
 	}{
-		Data: "Hello World",
+		Data1: "Hello World",
+		Data2: "$",
+		Data3: "${}",
+		Data4: "$(",
+		Data5: "$()",
+		Data6: "$(echo (123)",
 	}
 
 	validator, _ := yaml.NewValidator()

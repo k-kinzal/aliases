@@ -3,12 +3,13 @@ package yaml
 import (
 	"fmt"
 	"math/big"
-	"os"
 	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/k-kinzal/aliases/pkg/posix"
 
 	"github.com/iancoleman/strcase"
 	validator "gopkg.in/go-playground/validator.v9"
@@ -19,11 +20,14 @@ func separator(fl validator.FieldLevel) bool {
 	return true
 }
 
-// hasEnvironmentVariable is check that `$parameter` or `${parameter}` is included.
-func hasEnvironmentVariable(fl validator.FieldLevel) bool {
+// IsShell is check that `$parameter` or `${parameter}` or `$(expression)` or `\`expression\`` is included.
+func IsShell(fl validator.FieldLevel) bool {
 	val := fl.Field().String()
-	dst := os.ExpandEnv(fl.Field().String())
-	return dst != val
+	dst, err := posix.Shell(fmt.Sprintf("echo %s", strconv.Quote(val))).Output()
+	if err != nil {
+		return false
+	}
+	return strings.Trim(string(dst), "\r\n") != val
 }
 
 // asMax is check that less than or equal the parameter.
@@ -219,8 +223,8 @@ func (v *Validate) Struct(s interface{}) error {
 	if errs, ok := err.(validator.ValidationErrors); ok {
 		for _, e := range errs {
 			tag := e.Tag()
-			tag = strings.Replace(tag, "|env", "", -1)
-			tag = strings.Replace(tag, "env|", "", -1)
+			tag = strings.Replace(tag, "|shell", "", -1)
+			tag = strings.Replace(tag, "shell|", "", -1)
 			tag = strings.Replace(tag, fmt.Sprintf("=%s", e.Param()), "", -1)
 			// tag = paramRegexp.ReplaceAllString(tag, "")
 			switch tag {
@@ -277,7 +281,7 @@ func NewValidator() (*Validate, error) {
 	if err := validate.RegisterValidation("_", separator); err != nil {
 		return nil, fmt.Errorf("logic error: %s", err)
 	}
-	if err := validate.RegisterValidation("env", hasEnvironmentVariable); err != nil {
+	if err := validate.RegisterValidation("shell", IsShell); err != nil {
 		return nil, fmt.Errorf("logic error: %s", err)
 	}
 	if err := validate.RegisterValidation("max", asMax); err != nil {
