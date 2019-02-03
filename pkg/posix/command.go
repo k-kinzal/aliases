@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"path"
 	"strings"
 	"syscall"
 
@@ -17,14 +18,14 @@ type Cmd struct {
 	*exec.Cmd
 }
 
-func (sh *Cmd) Run() error {
-	sh.Cmd.Env = os.Environ()
-	sh.Cmd.Stdin = os.Stdin
-	sh.Cmd.Stdout = os.Stdout
-	sh.Cmd.Stderr = os.Stderr
+func (cmd *Cmd) Run() error {
+	cmd.Cmd.Env = os.Environ()
+	cmd.Cmd.Stdin = os.Stdin
+	cmd.Cmd.Stdout = os.Stdout
+	cmd.Cmd.Stderr = os.Stderr
 
 	if oldState, err := terminal.MakeRaw(int(os.Stdin.Fd())); err == nil {
-		ptmx, err := pty.Start(sh.Cmd)
+		ptmx, err := pty.Start(cmd.Cmd)
 		if err != nil {
 			return err
 		}
@@ -56,11 +57,11 @@ func (sh *Cmd) Run() error {
 		return nil
 	}
 
-	return sh.Cmd.Run()
+	return cmd.Cmd.Run()
 }
 
-func (sh *Cmd) String() string {
-	return strings.Join(sh.Cmd.Args, " ")
+func (cmd *Cmd) String() string {
+	return fmt.Sprintf("%s %s", path.Base(cmd.Cmd.Args[0]), strings.Join(cmd.Cmd.Args[1:], " "))
 }
 
 func Command(name string, arg ...string) *Cmd {
