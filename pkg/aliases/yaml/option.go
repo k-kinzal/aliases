@@ -49,7 +49,7 @@ type OptionSpec struct {
 	DisableContentTrust *string           `yaml:"disableContentTrust" validate:"omitempty,bool|shell"`
 	Domainname          *string           `yaml:"domainname"`
 	Entrypoint          *string           `yaml:"entrypoint"`
-	Env                 map[string]string `yaml:"shell"`
+	Env                 map[string]string `yaml:"env"`
 	EnvFile             []string          `yaml:"shellFile"`
 	Expose              []string          `yaml:"expose"`
 	GroupAdd            []string          `yaml:"groupAdd"`

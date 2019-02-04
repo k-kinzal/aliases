@@ -29,18 +29,25 @@ func Unmarshal(buf []byte) (*ConfigSpec, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := spec.Walk(func(path SpecPath, current *OptionSpec) (spec *OptionSpec, e error) {
-		if err := defaults.Set(current); err != nil {
+	if err := spec.DepthWalk(func(path SpecPath, current OptionSpec) (*OptionSpec, error) {
+		if err := defaults.Set(&current); err != nil {
 			return nil, err
 		}
-		if err := v.Struct(*current); err != nil {
+		if err := v.Struct(current); err != nil {
 			return nil, fmt.Errorf("yaml error: %s in `%s`", err, path)
 		}
-		return current, nil
+		for i, d := range current.Dependencies {
+			if d.IsConfig() {
+				continue
+			}
+			_, ok := spec[d.String()]
+			if !ok {
+				return nil, fmt.Errorf("yaml error: invalid parameter `%s` for `dependencies[%d]` is an undefined dependency in `%s`", d.String(), i, path)
+			}
+		}
+		return &current, nil
 	}); err != nil {
-		message := err.Error()
-		message = strings.Replace(message, "spec error", "yaml error", 1)
-		return nil, fmt.Errorf(message)
+		return nil, err
 	}
 
 	return &spec, nil
