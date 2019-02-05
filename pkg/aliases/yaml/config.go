@@ -37,7 +37,7 @@ func (spec *ConfigSpec) BreadthWalk(fn func(path SpecPath, current OptionSpec) (
 			(*spec)[v.path.String()] = *current
 		} else {
 			conf := v.parent.Dependencies[v.path.Index()].Config()
-			conf[v.path.Base()] = *current
+			conf[v.path.Name()] = *current
 			v.parent.Dependencies[v.path.Index()] = *NewDependencySpec(conf)
 		}
 
@@ -90,7 +90,7 @@ func (spec *ConfigSpec) DepthWalk(fn func(path SpecPath, current OptionSpec) (*O
 				(*spec)[v.path.String()] = *current
 			} else {
 				conf := v.parent.Dependencies[v.path.Index()].Config()
-				conf[v.path.Base()] = *current
+				conf[v.path.Name()] = *current
 				v.parent.Dependencies[v.path.Index()] = *NewDependencySpec(conf)
 			}
 		}

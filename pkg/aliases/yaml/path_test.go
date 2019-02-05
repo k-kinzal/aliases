@@ -7,25 +7,30 @@ import (
 	"github.com/k-kinzal/aliases/pkg/aliases/yaml"
 )
 
-func ExampleSpecPath_Base() {
+func ExampleSpecPath_Name() {
 	var path yaml.SpecPath = "/path/to/command1.dependencies[0]./path/to/command2"
-	fmt.Println(path.Base())
+	fmt.Println(path.Name())
 	// Output: /path/to/command2
 }
 
-func ExampleSpecPath_Base2() { // is path of root OptionSpec
+func ExampleSpecPath_Name2() { // is path of root OptionSpec
 	var path yaml.SpecPath = "/path/to/command1"
-	fmt.Println(path.Base())
+	fmt.Println(path.Name())
 	// Output: /path/to/command1
 }
 
-func TestSpecPath_BaseInvalidPath(t *testing.T) {
+func TestSpecPath_NameInvalidPath(t *testing.T) {
 	var path yaml.SpecPath = "."
-	if base := path.Base(); base != "" {
-		t.Errorf("expect `\"\"`, but actual `%#v`", base)
+	if name := path.Name(); name != "" {
+		t.Errorf("expect `\"\"`, but actual `%#v`", name)
 	}
 }
 
+func ExampleSpecPath_Base() {
+	var path yaml.SpecPath = "/path/to/command1.dependencies[0]./path/to/command2"
+	fmt.Println(path.Base())
+	// Output: command2
+}
 func ExampleSpecPath_Dependencies() {
 	var path yaml.SpecPath = "/path/to/command1"
 	fmt.Println(path.Dependencies(0, "/path/to/command2"))

@@ -2,6 +2,7 @@ package yaml
 
 import (
 	"fmt"
+	"path"
 	"regexp"
 	"strconv"
 	"strings"
@@ -17,40 +18,45 @@ var (
 type SpecPath string
 
 // Parent returns the path that points to the location of the parent OptionSpec.
-func (path *SpecPath) Parent() *SpecPath {
-	matches := pathRegexp.FindStringSubmatch(path.String())
+func (p *SpecPath) Parent() *SpecPath {
+	matches := pathRegexp.FindStringSubmatch(p.String())
 	if len(matches) <= 1 {
 		return nil
 	}
 	if matches[len(matches)-1] == "" {
 		return nil
 	}
-	p := (SpecPath)(strings.TrimSuffix(path.String(), matches[len(matches)-1]))
-	return &p
+	val := (SpecPath)(strings.TrimSuffix(p.String(), matches[len(matches)-1]))
+	return &val
 }
 
 // Dependencies returns the path point to the location of dependency OptionSpec.
-func (path *SpecPath) Dependencies(i int, index string) *SpecPath {
-	matches := pathRegexp.FindStringSubmatch(path.String())
+func (p *SpecPath) Dependencies(i int, index string) *SpecPath {
+	matches := pathRegexp.FindStringSubmatch(p.String())
 	if len(matches) == 0 {
 		return nil
 	}
-	p := SpecPath(fmt.Sprintf("%s.dependencies[%d].%s", path.String(), i, index))
-	return &p
+	val := SpecPath(fmt.Sprintf("%s.dependencies[%d].%s", p.String(), i, index))
+	return &val
 }
 
-// Base returns name of OptionSpec.
-func (path *SpecPath) Base() string {
-	matches := baseRegexp.FindStringSubmatch(path.String())
+// Name returns name of OptionSpec.
+func (p *SpecPath) Name() string {
+	matches := baseRegexp.FindStringSubmatch(p.String())
 	if len(matches) == 0 {
 		return ""
 	}
 	return matches[2]
 }
 
+// Base returns filename of OptionSpec.
+func (p *SpecPath) Base() string {
+	return path.Base(p.Name())
+}
+
 // Index returns index of parent dependencies.
-func (path *SpecPath) Index() int {
-	matches := dependencyRegexp.FindStringSubmatch(*(*string)(path))
+func (p *SpecPath) Index() int {
+	matches := dependencyRegexp.FindStringSubmatch(*(*string)(p))
 	if len(matches) == 0 {
 		return -1
 	}
@@ -63,6 +69,6 @@ func (path *SpecPath) Index() int {
 }
 
 // String converts string from SpecPath
-func (path *SpecPath) String() string {
-	return *(*string)(path)
+func (p *SpecPath) String() string {
+	return *(*string)(p)
 }
