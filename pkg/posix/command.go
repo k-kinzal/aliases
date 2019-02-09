@@ -19,45 +19,40 @@ type Cmd struct {
 }
 
 func (cmd *Cmd) Run() error {
-	cmd.Cmd.Env = os.Environ()
-	cmd.Cmd.Stdin = os.Stdin
-	cmd.Cmd.Stdout = os.Stdout
-	cmd.Cmd.Stderr = os.Stderr
-
-	if oldState, err := terminal.MakeRaw(int(os.Stdin.Fd())); err == nil {
-		ptmx, err := pty.Start(cmd.Cmd)
-		if err != nil {
-			return err
-		}
-		defer func() { _ = ptmx.Close() }()
-
-		ch := make(chan os.Signal, 1)
-		signal.Notify(ch, syscall.SIGWINCH)
-		go func() {
-			for range ch {
-				if err := pty.InheritSize(os.Stdin, ptmx); err != nil {
-					panic(fmt.Sprintf("error resizing pty: %s", err))
-				}
-			}
-		}()
-		ch <- syscall.SIGWINCH
-
-		if err != nil {
-			return err
-		}
-		defer func() {
-			_ = terminal.Restore(int(os.Stdin.Fd()), oldState)
-		}()
-
-		go func() {
-			_, _ = io.Copy(ptmx, os.Stdin)
-		}()
-		_, _ = io.Copy(os.Stdout, ptmx)
-
-		return nil
+	oldState, err := terminal.MakeRaw(int(os.Stdin.Fd()))
+	if err != nil {
+		return cmd.Cmd.Run()
 	}
+	ptmx, err := pty.Start(cmd.Cmd)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = ptmx.Close() }()
 
-	return cmd.Cmd.Run()
+	ch := make(chan os.Signal, 1)
+	signal.Notify(ch, syscall.SIGWINCH)
+	go func() {
+		for range ch {
+			if err := pty.InheritSize(os.Stdin, ptmx); err != nil {
+				panic(fmt.Sprintf("error resizing pty: %s", err))
+			}
+		}
+	}()
+	ch <- syscall.SIGWINCH
+
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = terminal.Restore(int(os.Stdin.Fd()), oldState)
+	}()
+
+	go func() {
+		_, _ = io.Copy(ptmx, os.Stdin)
+	}()
+	_, _ = io.Copy(os.Stdout, ptmx)
+
+	return nil
 }
 
 func (cmd *Cmd) String() string {

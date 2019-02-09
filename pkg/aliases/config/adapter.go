@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/k-kinzal/aliases/pkg/types"
+
 	"github.com/k-kinzal/aliases/pkg/aliases/yaml"
 )
 
@@ -14,7 +16,7 @@ type Path yaml.SpecPath
 func (path *Path) namespace() string {
 	bases := make([]string, 0)
 	for p := (*yaml.SpecPath)(path).Parent(); p != nil; p = p.Parent() {
-		bases = append(bases, p.Base())
+		bases = append(bases, types.MD5(p.Base()))
 	}
 	return fmt.Sprintf("/%s", strings.Join(bases, "/"))
 }
@@ -64,7 +66,7 @@ func transform(resolve func(key string) (*Option, error), path yaml.SpecPath, cu
 
 	option := &Option{OptionSpec: &current}
 	option.Namespace = (*Path)(&path).namespace()
-	option.Path = path.String()
+	option.Path = path.Name()
 	option.FileName = path.Base()
 	option.Dependencies = relatives
 

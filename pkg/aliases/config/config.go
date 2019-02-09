@@ -64,12 +64,12 @@ func Unmarshal(buf []byte) (*Config, error) {
 			continue
 		}
 
-		opt, err := transform(resolve, yaml.SpecPath(key), opt)
+		o, err := transform(resolve, yaml.SpecPath(key), opt)
 		if err != nil {
 			return nil, err
 		}
 
-		config.add(path, *opt)
+		config.add(path, *o)
 	}
 
 	return config, nil

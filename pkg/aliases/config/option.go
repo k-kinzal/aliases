@@ -15,17 +15,25 @@ type Option struct {
 }
 
 // merge Option and Option
-func (opt *Option) merge(src Option) *Option {
-	dst := *opt
-	src.OptionSpec.Dependencies = nil
-	src.OptionSpec.Image = ""
-	src.OptionSpec.Args = nil
-	src.OptionSpec.Tag = ""
-	src.OptionSpec.Command = nil
-	if err := mergo.Map(dst.OptionSpec, src.OptionSpec, mergo.WithAppendSlice); err != nil {
+func (opt *Option) merge(source Option) *Option {
+	dst := *opt.OptionSpec
+	src := *source.OptionSpec
+	src.Dependencies = nil
+	src.Image = ""
+	src.Args = nil
+	src.Tag = ""
+	src.Command = nil
+	if err := mergo.Map(&dst, src, mergo.WithAppendSlice); err != nil {
 		panic(err)
 	}
-	return &dst
+
+	return &Option{
+		OptionSpec:   &dst,
+		Namespace:    opt.Namespace,
+		Path:         opt.Path,
+		FileName:     opt.FileName,
+		Dependencies: opt.Dependencies,
+	}
 }
 
 // inherit dependencies.

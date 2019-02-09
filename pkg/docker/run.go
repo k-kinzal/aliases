@@ -434,7 +434,9 @@ func (client *Client) Run(image string, args []string, option RunOption) *posix.
 		cmd.Args = append(cmd.Args, "--volumes-from", strconv.Quote(v))
 	}
 	cmd.Args = append(cmd.Args, image)
-	cmd.Args = append(cmd.Args, args...)
+	for _, v := range args {
+		cmd.Args = append(cmd.Args, strconv.Quote(v))
+	}
 
 	return cmd
 }
