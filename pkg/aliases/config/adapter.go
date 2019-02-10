@@ -35,11 +35,7 @@ func (path *Path) index() string {
 // resolver resolves reference string to Option.
 func resolver(spec *yaml.ConfigSpec) func(key string) (*Option, error) {
 	return func(key string) (*Option, error) {
-		opt, ok := (*spec)[key]
-		if !ok {
-			return nil, fmt.Errorf("")
-		}
-		o, err := transform(resolver(spec), yaml.SpecPath(key), opt)
+		o, err := transform(resolver(spec), yaml.SpecPath(key), (*spec)[key])
 		if err != nil {
 			return nil, err
 		}
@@ -55,7 +51,7 @@ func transform(resolve func(key string) (*Option, error), path yaml.SpecPath, cu
 			for k, o := range dependency.Config() {
 				opt, err := transform(resolve, *path.Dependencies(i, k), o)
 				if err != nil {
-					panic(err)
+					return nil, err
 				}
 				relatives = append(relatives, opt)
 			}
@@ -82,7 +78,7 @@ func transform(resolve func(key string) (*Option, error), path yaml.SpecPath, cu
 	}
 
 	if err := defaults.Set(&dst); err != nil {
-		return nil, err
+		panic(err)
 	}
 
 	option := &Option{OptionSpec: &dst}

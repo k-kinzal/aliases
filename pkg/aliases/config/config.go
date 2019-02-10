@@ -52,6 +52,7 @@ func (c *Config) Slice() []Option {
 	return options
 }
 
+// Binaries returns slice of docker binary info.
 func (c *Config) Binaries(binaryDir string) []DockerBinary {
 	set := types.NewSet(nil)
 	for _, opt := range c.options {

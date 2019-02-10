@@ -18,6 +18,7 @@ type Option struct {
 	Dependencies []*Option
 }
 
+// Binary returns docker binary info.
 func (opt Option) Binary(binaryDir string) *DockerBinary {
 	filename := fmt.Sprintf("%s:%s", opt.Docker.Image, opt.Docker.Tag)
 	filename = strings.Replace(filename, "/", "-", -1)
@@ -32,6 +33,7 @@ func (opt Option) Binary(binaryDir string) *DockerBinary {
 	}
 }
 
+// Binaries returns slice of docker binery info.
 func (opt *Option) Binaries(binaryDir string) []DockerBinary {
 	set := types.NewSet(nil)
 	for _, dep := range opt.Dependencies {
