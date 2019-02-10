@@ -1,10 +1,12 @@
 package types
 
+// Set of data structure.
 type Set struct {
 	hash Hasher
 	data map[string]interface{}
 }
 
+// Add values to set.
 func (set *Set) Add(i interface{}) {
 	index := set.hash(i)
 	if _, ok := set.data[index]; ok {
@@ -13,6 +15,7 @@ func (set *Set) Add(i interface{}) {
 	set.data[index] = i
 }
 
+// Slice converts from set.
 func (set *Set) Slice() []interface{} {
 	i := 0
 	slice := make([]interface{}, len(set.data))

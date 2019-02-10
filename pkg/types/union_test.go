@@ -9,9 +9,13 @@ import (
 )
 
 func ExampleNewUnion() {
-	union := types.NewUnion(reflect.Int, reflect.String, "abc")
-	fmt.Printf("%s", union)
-	// Output: string("abc")
+	union1 := types.NewUnion(reflect.Int, reflect.String, 1)
+	union2 := types.NewUnion(reflect.Int, reflect.String, "abc")
+	fmt.Println(union1)
+	fmt.Println(union2)
+	// Output:
+	// int(1)
+	// string("abc")
 }
 
 func ExampleUnion_Type() {

@@ -3,8 +3,7 @@ package types
 import "fmt"
 
 func ExampleNewStack() {
-	var hasher Hasher = MD5
-	stack := NewStack(hasher)
+	stack := NewStack(nil)
 
 	stack.Push(1)
 	fmt.Println(stack.Pop())
@@ -35,18 +34,6 @@ func ExampleStack_Pop() {
 	fmt.Println(stack.Pop(), stack.Pop(), stack.Pop(), stack.Pop())
 	// Output: 2
 	// 4 3 1 <nil>
-}
-
-func ExampleStack_Has() {
-	var hasher Hasher = MD5
-	stack := NewStack(hasher)
-
-	fmt.Println(stack.Has(1))
-
-	stack.Push(1)
-	fmt.Println(stack.Has(1))
-	// Output: false
-	// true
 }
 
 func ExampleStack_Slice() {
