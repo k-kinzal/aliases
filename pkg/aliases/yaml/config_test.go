@@ -2,120 +2,124 @@ package yaml_test
 
 import (
 	"fmt"
-	"testing"
 
 	"github.com/k-kinzal/aliases/pkg/aliases/yaml"
 )
 
+func ptr(s string) *string {
+	return &s
+}
+
+func hierarchy(path yaml.SpecPath) int {
+	p := path.Parent()
+	i := 1
+	for p != nil {
+		p = p.Parent()
+		i++
+	}
+	return i
+}
+
 func ExampleConfigSpec_BreadthWalk() {
-	content := `
-/path/to/command1:
-  image: alpine
-  tag: latest
-  name: alpine1
-/path/to/command2:
-  image: alpine
-  tag: latest
-  name: alpine2
-  dependencies:
-  - /path/to/command1
-  - /path/to/command2
-  - /path/to/command3:
-      image: alpine
-      tag: latest
-      name: alpine3
-      dependencies:
-      - /path/to/command1
-      - /path/to/command2
-      - /path/to/command5:
-          image: alpine
-          tag: latest
-          name: alpine5
-  - /path/to/command4:
-      image: alpine
-      tag: latest
-      name: alpine4
-`
-	config, err := yaml.Unmarshal([]byte(content))
-	if err != nil {
-		panic(err)
+	config := yaml.ConfigSpec{
+		"/path/to/command1": yaml.OptionSpec{
+			Image: "alpine",
+			Tag:   "latest",
+			Name:  ptr("alpine1"),
+		},
+		"/path/to/command2": yaml.OptionSpec{
+			Image: "alpine",
+			Tag:   "latest",
+			Name:  ptr("alpine2"),
+			Dependencies: []yaml.DependencySpec{
+				*yaml.NewDependencySpec("/path/to/command1"),
+				*yaml.NewDependencySpec("/path/to/command2"),
+				*yaml.NewDependencySpec(yaml.ConfigSpec{
+					"/path/to/command3": yaml.OptionSpec{
+						Image: "alpine",
+						Tag:   "latest",
+						Name:  ptr("alpine3"),
+						Dependencies: []yaml.DependencySpec{
+							*yaml.NewDependencySpec("/path/to/command1"),
+							*yaml.NewDependencySpec("/path/to/command2"),
+							*yaml.NewDependencySpec(yaml.ConfigSpec{
+								"/path/to/command5": yaml.OptionSpec{
+									Image: "alpine",
+									Tag:   "latest",
+									Name:  ptr("alpine5"),
+								},
+							}),
+						},
+					},
+				}),
+				*yaml.NewDependencySpec(yaml.ConfigSpec{
+					"/path/to/command4": yaml.OptionSpec{
+						Image: "alpine",
+						Tag:   "latest",
+						Name:  ptr("alpine4"),
+					},
+				}),
+			},
+		},
 	}
 	if err := config.BreadthWalk(func(path yaml.SpecPath, current yaml.OptionSpec) (spec *yaml.OptionSpec, e error) {
-		fmt.Println(path, *current.Name)
+		fmt.Println(hierarchy(path)) // get number of hierarchy
 		return &current, nil
 	}); err != nil {
 		panic(err)
 	}
 	// Output:
-	// /path/to/command1 alpine1
-	// /path/to/command2 alpine2
-	// /path/to/command2.dependencies[2]./path/to/command3 alpine3
-	// /path/to/command2.dependencies[3]./path/to/command4 alpine4
-	// /path/to/command2.dependencies[2]./path/to/command3.dependencies[2]./path/to/command5 alpine5
+	// 1
+	// 1
+	// 2
+	// 2
+	// 3
 }
 
-func ExampleConfigSpec_Walk() {
-	content := `
-/path/to/command1:
-  image: alpine
-  tag: latest
-  name: alpine1
-/path/to/command2:
-  image: alpine
-  tag: latest
-  name: alpine2
-  dependencies:
-  - /path/to/command1
-  - /path/to/command2
-  - /path/to/command3:
-      image: alpine
-      tag: latest
-      name: alpine3
-      dependencies:
-      - /path/to/command1
-      - /path/to/command2
-      - /path/to/command5:
-          image: alpine
-          tag: latest
-          name: alpine5
-  - /path/to/command4:
-      image: alpine
-      tag: latest
-      name: alpine4
-`
-	config, err := yaml.Unmarshal([]byte(content))
-	if err != nil {
-		panic(err)
+func ExampleConfigSpec_DepthWalk() {
+	config := yaml.ConfigSpec{
+		"/path/to/command1": yaml.OptionSpec{
+			Image: "alpine",
+			Tag:   "latest",
+			Name:  ptr("alpine2"),
+			Dependencies: []yaml.DependencySpec{
+				*yaml.NewDependencySpec("/path/to/command1"),
+				*yaml.NewDependencySpec(yaml.ConfigSpec{
+					"/path/to/command3": yaml.OptionSpec{
+						Image: "alpine",
+						Tag:   "latest",
+						Name:  ptr("alpine3"),
+						Dependencies: []yaml.DependencySpec{
+							*yaml.NewDependencySpec("/path/to/command1"),
+							*yaml.NewDependencySpec(yaml.ConfigSpec{
+								"/path/to/command5": yaml.OptionSpec{
+									Image: "alpine",
+									Tag:   "latest",
+									Name:  ptr("alpine5"),
+								},
+							}),
+						},
+					},
+				}),
+				*yaml.NewDependencySpec(yaml.ConfigSpec{
+					"/path/to/command4": yaml.OptionSpec{
+						Image: "alpine",
+						Tag:   "latest",
+						Name:  ptr("alpine4"),
+					},
+				}),
+			},
+		},
 	}
 	if err := config.DepthWalk(func(path yaml.SpecPath, current yaml.OptionSpec) (spec *yaml.OptionSpec, e error) {
-		fmt.Println(path, *current.Name)
+		fmt.Println(hierarchy(path)) // get number of hierarchy
 		return &current, nil
 	}); err != nil {
 		panic(err)
 	}
 	// Output:
-	// /path/to/command1 alpine1
-	// /path/to/command2.dependencies[2]./path/to/command3.dependencies[2]./path/to/command5 alpine5
-	// /path/to/command2.dependencies[2]./path/to/command3 alpine3
-	// /path/to/command2.dependencies[3]./path/to/command4 alpine4
-	// /path/to/command2 alpine2
-}
-
-func TestConfigSpec_WalkUndefinedDependencyReference(t *testing.T) {
-	content := `
-/path/to/command1:
-  image: alpine
-  tag: latest
-  name: alpine1
-/path/to/command2:
-  image: alpine
-  tag: latest
-  name: alpine2
-  dependencies:
-  - /path/to/command3
-`
-	_, err := yaml.Unmarshal([]byte(content))
-	if err == nil || err.Error() != "yaml error: invalid parameter `/path/to/command3` for `dependencies[0]` is an undefined dependency in `/path/to/command2`" {
-		t.Errorf("not expect message of \"%v\"", err)
-	}
+	// 3
+	// 2
+	// 2
+	// 1
 }

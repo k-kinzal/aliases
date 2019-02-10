@@ -276,48 +276,21 @@ func (v *Validate) Struct(s interface{}) error {
 }
 
 // NewValidator creates a new Validator.
-func NewValidator() (*Validate, error) {
+func NewValidator() *Validate {
 	validate := validator.New()
-	if err := validate.RegisterValidation("_", separator); err != nil {
-		return nil, fmt.Errorf("logic error: %s", err)
-	}
-	if err := validate.RegisterValidation("shell", IsShell); err != nil {
-		return nil, fmt.Errorf("logic error: %s", err)
-	}
-	if err := validate.RegisterValidation("max", asMax); err != nil {
-		return nil, fmt.Errorf("logic error: %s", err)
-	}
-	if err := validate.RegisterValidation("min", asMin); err != nil {
-		return nil, fmt.Errorf("logic error: %s", err)
-	}
-	if err := validate.RegisterValidation("bool", isBoolean); err != nil {
-		return nil, fmt.Errorf("logic error: %s", err)
-	}
-	if err := validate.RegisterValidation("int", isInteger); err != nil {
-		return nil, fmt.Errorf("logic error: %s", err)
-	}
-	if err := validate.RegisterValidation("int64", isInteger64); err != nil {
-		return nil, fmt.Errorf("logic error: %s", err)
-	}
-	if err := validate.RegisterValidation("uint16", isUnsignedInteger16); err != nil {
-		return nil, fmt.Errorf("logic error: %s", err)
-	}
-	if err := validate.RegisterValidation("uint64", isUnsignedInteger64); err != nil {
-		return nil, fmt.Errorf("logic error: %s", err)
-	}
-	if err := validate.RegisterValidation("duration", isDuration); err != nil {
-		return nil, fmt.Errorf("logic error: %s", err)
-	}
-	if err := validate.RegisterValidation("nanocpus", isNanoCPUs); err != nil {
-		return nil, fmt.Errorf("logic error: %s", err)
-	}
-	if err := validate.RegisterValidation("membytes", isMemoryBytes); err != nil {
-		return nil, fmt.Errorf("logic error: %s", err)
-	}
-	if err := validate.RegisterValidation("memswapbytes", isMemorySwapBytes); err != nil {
-		return nil, fmt.Errorf("logic error: %s", err)
-	}
+	_ = validate.RegisterValidation("_", separator)
+	_ = validate.RegisterValidation("shell", IsShell)
+	_ = validate.RegisterValidation("max", asMax)
+	_ = validate.RegisterValidation("min", asMin)
+	_ = validate.RegisterValidation("bool", isBoolean)
+	_ = validate.RegisterValidation("int", isInteger)
+	_ = validate.RegisterValidation("int64", isInteger64)
+	_ = validate.RegisterValidation("uint16", isUnsignedInteger16)
+	_ = validate.RegisterValidation("uint64", isUnsignedInteger64)
+	_ = validate.RegisterValidation("duration", isDuration)
+	_ = validate.RegisterValidation("nanocpus", isNanoCPUs)
+	_ = validate.RegisterValidation("membytes", isMemoryBytes)
+	_ = validate.RegisterValidation("memswapbytes", isMemorySwapBytes)
 
-	v := Validate{validate}
-	return &v, nil
+	return &Validate{validate}
 }

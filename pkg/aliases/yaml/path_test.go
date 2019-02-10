@@ -7,16 +7,16 @@ import (
 	"github.com/k-kinzal/aliases/pkg/aliases/yaml"
 )
 
-func ExampleSpecPath_Name() {
-	var path yaml.SpecPath = "/path/to/command1.dependencies[0]./path/to/command2"
-	fmt.Println(path.Name())
-	// Output: /path/to/command2
-}
-
-func ExampleSpecPath_Name2() { // is path of root OptionSpec
+func ExampleSpecPath_Name() { // is path of root OptionSpec
 	var path yaml.SpecPath = "/path/to/command1"
 	fmt.Println(path.Name())
 	// Output: /path/to/command1
+}
+
+func ExampleSpecPath_Name2() {
+	var path yaml.SpecPath = "/path/to/command1.dependencies[0]./path/to/command2"
+	fmt.Println(path.Name())
+	// Output: /path/to/command2
 }
 
 func TestSpecPath_NameInvalidPath(t *testing.T) {
@@ -45,9 +45,9 @@ func TestSpecPath_DependenciesInvalidPath(t *testing.T) {
 }
 
 func ExampleSpecPath_Index() {
-	var path yaml.SpecPath = "/path/to/command1.dependencies[0]./path/to/command2"
+	var path yaml.SpecPath = "/path/to/command1.dependencies[0]./path/to/command2.dependencies[1]./path/to/command3"
 	fmt.Println(path.Index())
-	// Output: 0
+	// Output: 1
 }
 
 func TestSpecPath_IndexInvalidPath(t *testing.T) {

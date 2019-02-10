@@ -29,6 +29,25 @@ func ExampleUnmarshal() {
 	// alpine2
 }
 
+func TestUnmarshal_UndefinedDependencyReference(t *testing.T) {
+	content := `
+/path/to/command1:
+  image: alpine
+  tag: latest
+  name: alpine1
+/path/to/command2:
+  image: alpine
+  tag: latest
+  name: alpine2
+  dependencies:
+  - /path/to/command3
+`
+	_, err := yaml.Unmarshal([]byte(content))
+	if err == nil || err.Error() != "yaml error: invalid parameter `/path/to/command3` for `dependencies[0]` is an undefined dependency in `/path/to/command2`" {
+		t.Errorf("not expect message of \"%v\"", err)
+	}
+}
+
 func TestUnmarshalFailedEmpty(t *testing.T) {
 	content := ``
 	_, err := yaml.Unmarshal([]byte(content))

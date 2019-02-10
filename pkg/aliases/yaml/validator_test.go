@@ -14,11 +14,7 @@ func ExampleNewValidator() {
 	}{
 		Data: "foo",
 	}
-	v, err := yaml.NewValidator()
-	if err != nil {
-		panic(err)
-	}
-
+	v := yaml.NewValidator()
 	if err := v.Struct(i); err != nil {
 		panic(err)
 	} else {
@@ -43,8 +39,8 @@ func TestValidate_StructSuccessIsShell(t *testing.T) {
 		Data5: "$(echo \")\")",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err != nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err != nil {
 		t.Errorf("expect `<nil>`, but actual `%s`", err)
 	}
 }
@@ -66,8 +62,8 @@ func TestValidate_StructFailedIsShell(t *testing.T) {
 		Data6: "$(echo (123)",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err == nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err == nil {
 		t.Error("expected that an error will occur, but actual not error occur")
 	}
 }
@@ -103,8 +99,8 @@ func TestValidate_StructSuccessAsMax(t *testing.T) {
 		//Data12: "-1",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err != nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err != nil {
 		t.Errorf("expect `<nil>`, but actual `%s`", err)
 	}
 }
@@ -128,8 +124,8 @@ func TestValidate_StructFailedAsMax(t *testing.T) {
 		Data6: "18446744073709551616",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err == nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err == nil {
 		t.Error("expected that an error will occur, but actual not error occur")
 	}
 }
@@ -165,8 +161,8 @@ func TestValidate_StructSuccessAsMin(t *testing.T) {
 		//Data12: "18446744073709551616",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err != nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err != nil {
 		t.Errorf("expect `<nil>`, but actual `%s`", err)
 	}
 }
@@ -190,8 +186,8 @@ func TestValidate_StructFailedAsMin(t *testing.T) {
 		Data6: "-1",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err == nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err == nil {
 		t.Error("expected that an error will occur, but actual not error occur")
 	}
 }
@@ -207,8 +203,8 @@ func TestValidate_StructSuccessIsNanoCPUs(t *testing.T) {
 		Data3: ".5",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err != nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err != nil {
 		t.Errorf("expect `<nil>`, but actual `%s`", err)
 	}
 }
@@ -222,8 +218,8 @@ func TestValidate_StructFailedIsNanoCPUs(t *testing.T) {
 		Data2: fmt.Sprintf("%d", runtime.NumCPU()+1),
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err == nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err == nil {
 		t.Error("expected that an error will occur, but actual not error occur")
 	}
 }
@@ -255,8 +251,8 @@ func TestValidate_StructSuccessIsMemoryBytes(t *testing.T) {
 		Data11: "1.2",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err != nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err != nil {
 		t.Errorf("expect `<nil>`, but actual `%s`", err)
 	}
 }
@@ -270,8 +266,8 @@ func TestValidate_StructFailedIsMemoryBytes(t *testing.T) {
 		Data2: "foo",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err == nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err == nil {
 		t.Error("expected that an error will occur, but actual not error occur")
 	}
 }
@@ -303,8 +299,8 @@ func TestValidate_StructSuccessIsMemorySwapBytes(t *testing.T) {
 		Data11: "-1",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err != nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err != nil {
 		t.Errorf("expect `<nil>`, but actual `%s`", err)
 	}
 }
@@ -316,8 +312,8 @@ func TestValidate_StructFailedIsMemorySwapBytes(t *testing.T) {
 		Data1: "foo",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err == nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err == nil {
 		t.Error("expected that an error will occur, but actual not error occur")
 	}
 }
@@ -331,8 +327,8 @@ func TestValidate_StructSuccessIsBoolean(t *testing.T) {
 		Data2: "false",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err != nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err != nil {
 		t.Errorf("expect `<nil>`, but actual `%s`", err)
 	}
 }
@@ -344,8 +340,8 @@ func TestValidate_StructFailedIsBoolean(t *testing.T) {
 		Data1: "foo",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err == nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err == nil {
 		t.Error("expected that an error will occur, but actual not error occur")
 	}
 }
@@ -363,8 +359,8 @@ func TestValidate_StructSuccessIsInteger(t *testing.T) {
 		Data4: "2147483647",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err != nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err != nil {
 		t.Errorf("expect `<nil>`, but actual `%s`", err)
 	}
 }
@@ -378,8 +374,8 @@ func TestValidate_StructFailedIsInteger(t *testing.T) {
 		Data2: "2147483648",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err == nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err == nil {
 		t.Error("expected that an error will occur, but actual not error occur")
 	}
 }
@@ -397,8 +393,8 @@ func TestValidate_StructSuccessIsInteger64(t *testing.T) {
 		Data4: "9223372036854775807",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err != nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err != nil {
 		t.Errorf("expect `<nil>`, but actual `%s`", err)
 	}
 }
@@ -412,8 +408,8 @@ func TestValidate_StructFailedIsInteger64(t *testing.T) {
 		Data2: "9223372036854775808",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err == nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err == nil {
 		t.Error("expected that an error will occur, but actual not error occur")
 	}
 }
@@ -429,8 +425,8 @@ func TestValidate_StructSuccessIsUnsignedInteger16(t *testing.T) {
 		Data3: "65535",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err != nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err != nil {
 		t.Errorf("expect `<nil>`, but actual `%s`", err)
 	}
 }
@@ -444,8 +440,8 @@ func TestValidate_StructFailedIsUnsignedInteger16(t *testing.T) {
 		Data2: "65536",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err == nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err == nil {
 		t.Error("expected that an error will occur, but actual not error occur")
 	}
 }
@@ -461,8 +457,8 @@ func TestValidate_StructSuccessIsUnsignedInteger64(t *testing.T) {
 		Data3: "18446744073709551615",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err != nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err != nil {
 		t.Errorf("expect `<nil>`, but actual `%s`", err)
 	}
 }
@@ -476,8 +472,8 @@ func TestValidate_StructFailedIsUnsignedInteger64(t *testing.T) {
 		Data2: "18446744073709551616",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err == nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err == nil {
 		t.Error("expected that an error will occur, but actual not error occur")
 	}
 }
@@ -495,8 +491,8 @@ func TestValidate_StructSuccessIsDuration(t *testing.T) {
 		Data4: "1h",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err != nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err != nil {
 		t.Errorf("expect `<nil>`, but actual `%s`", err)
 	}
 }
@@ -510,8 +506,8 @@ func TestValidate_StructFailedIsDuration(t *testing.T) {
 		Data2: "foo",
 	}
 
-	validator, _ := yaml.NewValidator()
-	if err := validator.Struct(i); err == nil {
+	v := yaml.NewValidator()
+	if err := v.Struct(i); err == nil {
 		t.Error("expected that an error will occur, but actual not error occur")
 	}
 }

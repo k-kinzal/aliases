@@ -7,6 +7,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+// Unmarshal parses YAML-encoded data and returns config specification.
 func Unmarshal(buf []byte) (*ConfigSpec, error) {
 	spec := ConfigSpec{}
 	if err := yaml.UnmarshalStrict(buf, &spec); err != nil {
@@ -23,10 +24,7 @@ func Unmarshal(buf []byte) (*ConfigSpec, error) {
 		return nil, err
 	}
 
-	v, err := NewValidator()
-	if err != nil {
-		return nil, err
-	}
+	v := NewValidator()
 	if err := spec.DepthWalk(func(path SpecPath, current OptionSpec) (*OptionSpec, error) {
 		if err := v.Struct(current); err != nil {
 			return nil, fmt.Errorf("yaml error: %s in `%s`", err, path)
