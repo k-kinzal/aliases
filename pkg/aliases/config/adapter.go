@@ -69,8 +69,8 @@ func transform(resolve func(key string) (*Option, error), path yaml.SpecPath, cu
 	}
 
 	dst := current
-	for _, dependency := range relatives {
-		src := *dependency.OptionSpec
+	for i := len(relatives) - 1; i >= 0; i-- { // merge what is defined later
+		src := *relatives[i].OptionSpec
 		src.Dependencies = nil
 		src.Image = ""
 		src.Args = nil
