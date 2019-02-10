@@ -1,4 +1,4 @@
-package util
+package script
 
 import (
 	"os"
@@ -22,7 +22,7 @@ func expandEnv(str string) string {
 	return str
 }
 
-func ExpandColonDelimitedStringWithEnv(s string) string {
+func expandColonDelimitedStringWithEnv(s string) string {
 	arr := strings.Split(s, ":")
 	if len(arr) > 0 {
 		arr[0] = expandEnv(arr[0])
@@ -30,16 +30,16 @@ func ExpandColonDelimitedStringWithEnv(s string) string {
 	return strings.Join(arr, ":")
 }
 
-func ExpandColonDelimitedStringListWithEnv(arr []string) []string {
+func expandColonDelimitedStringListWithEnv(arr []string) []string {
 	rets := make([]string, 0)
 	for _, v := range arr {
-		rets = append(rets, ExpandColonDelimitedStringWithEnv(v))
+		rets = append(rets, expandColonDelimitedStringWithEnv(v))
 	}
 
 	return rets
 }
 
-func ExpandStringKeyMapWithEnv(m map[string]string) map[string]string {
+func expandStringKeyMapWithEnv(m map[string]string) map[string]string {
 	rets := make(map[string]string, len(m))
 	for k, v := range m {
 		rets[expandEnv(k)] = v

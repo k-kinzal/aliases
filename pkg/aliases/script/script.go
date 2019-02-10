@@ -7,8 +7,6 @@ import (
 
 	"github.com/k-kinzal/aliases/pkg/aliases"
 
-	"github.com/k-kinzal/aliases/pkg/util"
-
 	"github.com/imdario/mergo"
 
 	"github.com/k-kinzal/aliases/pkg/posix"
@@ -76,10 +74,10 @@ func NewScript(ctx aliases.Context, client *docker.Client, opt config.Option) *S
 	args = append(args, opt.Args...)
 	// options
 	o := docker.RunOption{}
-	o.AddHost = util.ExpandColonDelimitedStringListWithEnv(opt.AddHost)
+	o.AddHost = expandColonDelimitedStringListWithEnv(opt.AddHost)
 	o.Attach = opt.Attach
 	o.BlkioWeight = opt.BlkioWeight
-	o.BlkioWeightDevice = util.ExpandColonDelimitedStringListWithEnv(opt.BlkioWeightDevice)
+	o.BlkioWeightDevice = expandColonDelimitedStringListWithEnv(opt.BlkioWeightDevice)
 	o.CIDFile = opt.CIDFile
 	o.CPUPeriod = opt.CPUPeriod
 	o.CPUQuota = opt.CPUQuota
@@ -97,16 +95,16 @@ func NewScript(ctx aliases.Context, client *docker.Client, opt config.Option) *S
 	o.DNSSearch = opt.DNSSearch
 	o.Detach = opt.Detach
 	o.DetachKeys = opt.DetachKeys
-	o.Device = util.ExpandColonDelimitedStringListWithEnv(opt.Device)
+	o.Device = expandColonDelimitedStringListWithEnv(opt.Device)
 	o.DeviceCgroupRule = opt.DeviceCgroupRule
-	o.DeviceReadBPS = util.ExpandColonDelimitedStringListWithEnv(opt.DeviceReadBPS)
-	o.DeviceReadIOPS = util.ExpandColonDelimitedStringListWithEnv(opt.DeviceReadIOPS)
-	o.DeviceWriteBPS = util.ExpandColonDelimitedStringListWithEnv(opt.DeviceWriteBPS)
-	o.DeviceWriteIOPS = util.ExpandColonDelimitedStringListWithEnv(opt.DeviceWriteIOPS)
+	o.DeviceReadBPS = expandColonDelimitedStringListWithEnv(opt.DeviceReadBPS)
+	o.DeviceReadIOPS = expandColonDelimitedStringListWithEnv(opt.DeviceReadIOPS)
+	o.DeviceWriteBPS = expandColonDelimitedStringListWithEnv(opt.DeviceWriteBPS)
+	o.DeviceWriteIOPS = expandColonDelimitedStringListWithEnv(opt.DeviceWriteIOPS)
 	o.DisableContentTrust = opt.DisableContentTrust
 	o.Domainname = opt.Domainname
 	o.Entrypoint = opt.Entrypoint
-	o.Env = util.ExpandStringKeyMapWithEnv(opt.Env)
+	o.Env = expandStringKeyMapWithEnv(opt.Env)
 	o.EnvFile = opt.EnvFile
 	o.Expose = opt.Expose
 	o.GroupAdd = opt.GroupAdd
@@ -123,18 +121,18 @@ func NewScript(ctx aliases.Context, client *docker.Client, opt config.Option) *S
 	o.Interactive = opt.Interactive
 	o.Isolation = opt.Isolation
 	o.KernelMemory = opt.KernelMemory
-	o.Label = util.ExpandStringKeyMapWithEnv(opt.Label)
+	o.Label = expandStringKeyMapWithEnv(opt.Label)
 	o.LabelFile = opt.LabelFile
-	o.Link = util.ExpandColonDelimitedStringListWithEnv(opt.Link)
+	o.Link = expandColonDelimitedStringListWithEnv(opt.Link)
 	o.LinkLocalIP = opt.LinkLocalIP
 	o.LogDriver = opt.LogDriver
-	o.LogOpt = util.ExpandStringKeyMapWithEnv(opt.LogOpt)
+	o.LogOpt = expandStringKeyMapWithEnv(opt.LogOpt)
 	o.MacAddress = opt.MacAddress
 	o.Memory = opt.Memory
 	o.MemoryReservation = opt.MemoryReservation
 	o.MemorySwap = opt.MemorySwap
 	o.MemorySwappiness = opt.MemorySwappiness
-	o.Mount = util.ExpandStringKeyMapWithEnv(opt.Mount)
+	o.Mount = expandStringKeyMapWithEnv(opt.Mount)
 	o.Name = opt.Name
 	o.Network = opt.Network
 	o.NetworkAlias = opt.NetworkAlias
@@ -151,23 +149,23 @@ func NewScript(ctx aliases.Context, client *docker.Client, opt config.Option) *S
 	o.Restart = opt.Restart
 	o.Rm = opt.Rm
 	o.Runtime = opt.Runtime
-	o.SecurityOpt = util.ExpandStringKeyMapWithEnv(opt.SecurityOpt)
+	o.SecurityOpt = expandStringKeyMapWithEnv(opt.SecurityOpt)
 	o.ShmSize = opt.ShmSize
 	o.SigProxy = opt.SigProxy
 	o.StopSignal = opt.StopSignal
 	o.StopTimeout = opt.StopTimeout
-	o.StorageOpt = util.ExpandStringKeyMapWithEnv(opt.StorageOpt)
-	o.Sysctl = util.ExpandStringKeyMapWithEnv(opt.Sysctl)
+	o.StorageOpt = expandStringKeyMapWithEnv(opt.StorageOpt)
+	o.Sysctl = expandStringKeyMapWithEnv(opt.Sysctl)
 	o.TTY = opt.TTY
 	o.Tmpfs = opt.Tmpfs
 	o.UTS = opt.UTS
-	o.Ulimit = util.ExpandStringKeyMapWithEnv(opt.Ulimit)
+	o.Ulimit = expandStringKeyMapWithEnv(opt.Ulimit)
 	if opt.User != nil {
-		user := util.ExpandColonDelimitedStringWithEnv(*opt.User)
+		user := expandColonDelimitedStringWithEnv(*opt.User)
 		o.User = &user
 	}
 	o.Userns = opt.Userns
-	o.Volume = util.ExpandColonDelimitedStringListWithEnv(opt.Volume)
+	o.Volume = expandColonDelimitedStringListWithEnv(opt.Volume)
 	o.VolumeDriver = opt.VolumeDriver
 	o.VolumesFrom = opt.VolumesFrom
 	o.Workdir = opt.Workdir

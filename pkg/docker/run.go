@@ -6,8 +6,6 @@ import (
 	"strings"
 
 	"github.com/k-kinzal/aliases/pkg/posix"
-
-	"github.com/k-kinzal/aliases/pkg/util"
 )
 
 // RunOption is an option for executing docker run.
@@ -411,7 +409,7 @@ func (client *Client) Run(image string, args []string, option RunOption) *posix.
 		cmd.Args = append(cmd.Args, "--ulimit", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
 	}
 	if v := option.User; v != nil {
-		cmd.Args = append(cmd.Args, "--user", strconv.Quote(util.ExpandColonDelimitedStringWithEnv(*v)))
+		cmd.Args = append(cmd.Args, "--user", strconv.Quote(*v))
 	}
 	if v := option.Userns; v != nil {
 		cmd.Args = append(cmd.Args, "--userns", strconv.Quote(*v))
