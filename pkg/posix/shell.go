@@ -19,7 +19,7 @@ func (shell *ShellScript) Run() error {
 		val := strings.Join(a[1:], "=")
 		env = append(env, fmt.Sprintf("%s=%s", name, strconv.Quote(val)))
 	}
-	shell.Args[2] = fmt.Sprintf("#!/bin/sh\n%s; %s", strings.Join(env, ";\n"), shell.Args[2])
+	shell.Args[2] = fmt.Sprintf("#!/bin/sh\n%s;\n%s", strings.Join(env, ";\n"), shell.Args[2])
 	return shell.Cmd.Run()
 }
 

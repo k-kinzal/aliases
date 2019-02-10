@@ -3,6 +3,7 @@ package script_test
 import (
 	"fmt"
 	"io/ioutil"
+	"sort"
 
 	"github.com/k-kinzal/aliases/pkg/aliases"
 
@@ -10,6 +11,21 @@ import (
 	"github.com/k-kinzal/aliases/pkg/aliases/script"
 	"github.com/k-kinzal/aliases/pkg/docker"
 )
+
+func readDir(path string) []string {
+	files := make([]string, 0)
+	fileInfo, _ := ioutil.ReadDir(path)
+	for _, file := range fileInfo {
+		if file.IsDir() {
+			continue
+		}
+		files = append(files, file.Name())
+	}
+
+	sort.Strings(files)
+
+	return files
+}
 
 func ExampleScript_Write() {
 	content := `
@@ -19,9 +35,10 @@ func ExampleScript_Write() {
 /path/to/command2:
   image: alpine
   tag: latest
-/path/to/command3:
-  image: alpine
-  tag: latest
+  dependencies:
+  - /path/to/command3:
+      image: alpine
+      tag: latest
 `
 	conf, err := config.Unmarshal([]byte(content))
 	if err != nil {
@@ -48,13 +65,11 @@ func ExampleScript_Write() {
 		}
 	}
 
-	files, _ := ioutil.ReadDir(ctx.ExportPath())
-	for _, file := range files {
-		fmt.Println(file.Name())
+	for _, file := range readDir(ctx.ExportPath()) {
+		fmt.Println(file)
 	}
 
 	// Output:
 	// command1
 	// command2
-	// command3
 }

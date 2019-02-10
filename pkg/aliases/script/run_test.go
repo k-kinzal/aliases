@@ -12,6 +12,16 @@ func ExampleScript_Run() {
 /path/to/command1:
   image: alpine
   tag: latest
+  entrypoint: sh
+  env:
+    FOO: 1
+  dependencies:
+  - /path/to/command2:
+      image: alpine
+      tag: latest
+      entrypoint: sh
+      env:
+        FOO: 1
 `
 	conf, err := config.Unmarshal([]byte(content))
 	if err != nil {
@@ -27,6 +37,9 @@ func ExampleScript_Run() {
 	if err != nil {
 		panic(err)
 	}
+	if err := ctx.MakeExportDir(); err != nil {
+		panic(err)
+	}
 
 	client, err := docker.NewClient()
 	if err != nil {
@@ -34,7 +47,7 @@ func ExampleScript_Run() {
 	}
 
 	cmd := script.NewScript(ctx, client, *opt)
-	if err := cmd.Run(ctx, []string{"sh", "-c", "echo 1"}, docker.RunOption{}); err != nil {
+	if err := cmd.Run(ctx, []string{"-c", "'/path/to/command2 -c '\"'\"'echo $FOO'\"'\"''"}, docker.RunOption{}); err != nil {
 		panic(err)
 	}
 	// Output:

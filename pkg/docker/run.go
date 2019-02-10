@@ -434,7 +434,9 @@ func (client *Client) Run(image string, args []string, option RunOption) *posix.
 	}
 	cmd.Args = append(cmd.Args, image)
 	for _, v := range args {
-		if strings.Contains(v, " ") {
+		if strings.HasPrefix(v, "'") && strings.HasSuffix(v, "'") {
+			cmd.Args = append(cmd.Args, v)
+		} else if strings.Contains(v, " ") {
 			cmd.Args = append(cmd.Args, strconv.Quote(v))
 		} else {
 			cmd.Args = append(cmd.Args, v)
