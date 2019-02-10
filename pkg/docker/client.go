@@ -13,7 +13,6 @@ import (
 
 // Clients provide operations on Docker commands.
 type Client struct {
-	*ClientVersion
 	path string
 	host string
 	sock *string
@@ -60,31 +59,6 @@ func NewClient() (*Client, error) {
 			return
 		}
 		c.path = path
-		// docker version
-		out, _ := c.Version(VersionOption{}).Output()
-		stdout := string(out)
-		if stdout == "" {
-			err = fmt.Errorf("runtime error: docker is not installed. see https://docs.docker.com/install/")
-			return
-		}
-		clientVersion, e := parseClientVersion(stdout)
-		if e != nil {
-			err = e
-			return
-		}
-		serverVersion, e := parseServerVersion(stdout)
-		if e != nil {
-			err = e
-			return
-		}
-		if serverVersion == nil {
-			logger.Warn("could not connect to docker daemon")
-		} else {
-			if clientVersion.Version != serverVersion.Version {
-				logger.Warnf("dcker client version `%s` and server version `%s` are different", clientVersion.Version, serverVersion.Version)
-			}
-		}
-		c.ClientVersion = clientVersion
 		// docker host
 		c.host = os.Getenv("DOCKER_HOST")
 		if c.host == "" {
@@ -100,6 +74,20 @@ func NewClient() (*Client, error) {
 				return
 			}
 			c.sock = &sock
+		}
+		// docker version
+		clientVersion, e := c.ClientVersion()
+		if e != nil {
+			err = fmt.Errorf("runtime error: docker is not installed. see https://docs.docker.com/install/")
+			return
+		}
+		serverVersion, _ := c.ServerVersion()
+		if serverVersion == nil {
+			logger.Warnf("cannot connect to the Docker daemon at %s. Is the docker daemon running?", c.host)
+		} else {
+			if clientVersion.Version != serverVersion.Version {
+				logger.Warnf("docker client version `%s` and server version `%s` are different", clientVersion.Version, serverVersion.Version)
+			}
 		}
 		client = c
 	})
