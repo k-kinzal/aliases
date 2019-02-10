@@ -105,7 +105,7 @@ func GenAction(c *cli.Context) error {
 				return err
 			}
 		}
-		fmt.Println(posix.PathExport(ctx.ExportPath(), false))
+		fmt.Println(posix.PathExport(ctx.ExportPath()))
 	} else {
 		aliases := make([]posix.Cmd, 0)
 		for _, opt := range conf.Slice() {

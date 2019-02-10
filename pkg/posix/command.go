@@ -14,10 +14,13 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
+// Cmd is the base of the POSIX commands.
 type Cmd struct {
 	*exec.Cmd
 }
 
+// Run command
+// If there is a terminal connected to the file descriptor, run it via PTS.
 func (cmd *Cmd) Run() error {
 	oldState, err := terminal.MakeRaw(int(os.Stdin.Fd()))
 	if err != nil {
@@ -55,13 +58,12 @@ func (cmd *Cmd) Run() error {
 	return nil
 }
 
+// String returns command string.
 func (cmd *Cmd) String() string {
 	return fmt.Sprintf("%s %s", path.Base(cmd.Cmd.Args[0]), strings.Join(cmd.Cmd.Args[1:], " "))
 }
 
+// Command creates a new posix.Cmd.
 func Command(name string, arg ...string) *Cmd {
-	cmd := new(Cmd)
-	cmd.Cmd = exec.Command(name, arg...)
-
-	return cmd
+	return &Cmd{exec.Command(name, arg...)}
 }
