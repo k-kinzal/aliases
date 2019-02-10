@@ -5,7 +5,6 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/k-kinzal/aliases/pkg/posix"
 )
@@ -44,7 +43,7 @@ type ClientVersion struct {
 	APIVersion   string
 	GOVersion    string
 	GitCommit    string
-	Build        time.Time
+	Build        string
 	OS           string
 	Arch         string
 	Experimental bool
@@ -77,11 +76,6 @@ func (client *Client) ClientVersion() (*ClientVersion, error) {
 	}
 	s := strings.Split(strings.Trim(string(out), "\"\n"), "\\n")
 
-	build, err := time.Parse("Mon Jan  2 15:04:05 2006", s[4])
-	if err != nil {
-		return nil, err
-	}
-
 	experimental, err := strconv.ParseBool(s[7])
 	if err != nil {
 		return nil, err
@@ -92,7 +86,7 @@ func (client *Client) ClientVersion() (*ClientVersion, error) {
 		APIVersion:   s[1],
 		GOVersion:    s[2],
 		GitCommit:    s[3],
-		Build:        build,
+		Build:        s[4],
 		OS:           s[5],
 		Arch:         s[6],
 		Experimental: experimental,
@@ -115,14 +109,14 @@ type ServerVersion struct {
 	APIVersion   string
 	GOVersion    string
 	GitCommit    string
-	Built        time.Time
+	Build        string
 	OS           string
 	Arch         string
 	Experimental bool
 }
 
 // ServerVersion returns server info.
-func (client *Client) ServerVersion() (*ClientVersion, error) {
+func (client *Client) ServerVersion() (*ServerVersion, error) {
 	format := strings.Trim(`
 {{ .Server.Version }}
 {{ .Server.APIVersion }}
@@ -148,22 +142,17 @@ func (client *Client) ServerVersion() (*ClientVersion, error) {
 	}
 	s := strings.Split(strings.Trim(string(out), "\"\n"), "\\n")
 
-	build, err := time.Parse("Mon Jan  2 15:04:05 2006", s[4])
-	if err != nil {
-		return nil, err
-	}
-
 	experimental, err := strconv.ParseBool(s[7])
 	if err != nil {
 		return nil, err
 	}
 
-	return &ClientVersion{
+	return &ServerVersion{
 		Version:      s[0],
 		APIVersion:   s[1],
 		GOVersion:    s[2],
 		GitCommit:    s[3],
-		Build:        build,
+		Build:        s[4],
 		OS:           s[5],
 		Arch:         s[6],
 		Experimental: experimental,
