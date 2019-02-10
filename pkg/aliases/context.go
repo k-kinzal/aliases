@@ -1,38 +1,30 @@
 package aliases
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"os"
-	"os/exec"
 	"os/user"
-	"strings"
+	"path"
 
-	"github.com/k-kinzal/aliases/pkg/logger"
+	"github.com/k-kinzal/aliases/pkg/types"
 )
 
 type Context interface {
 	HomePath() string
 	ConfPath() string
 	ExportPath() string
+	BinaryPath() string
 
 	MakeHomeDir() error
 	MakeExportDir() error
-
-	DockerBinaryPath() string
-	DockerHost() string
-	DockerSocketPath() *string
-	HasDockerSocket() bool
+	MakeBinaryDir() error
 }
 
 type GlobalContext struct {
-	homePath       string
-	confPath       string
-	exportPath     string
-	dockerBinPath  string
-	dockerHost     string
-	dockerSockPath *string
+	homePath   string
+	confPath   string
+	exportPath string
+	binaryPath string
 }
 
 func (ctx *GlobalContext) HomePath() string {
@@ -56,11 +48,16 @@ func (ctx *GlobalContext) ConfPath() string {
 
 func (ctx *GlobalContext) ExportPath() string {
 	if ctx.exportPath == "" {
-		hasher := md5.New()
-		_, _ = hasher.Write([]byte(ctx.ConfPath()))
-		ctx.exportPath = fmt.Sprintf("%s/%s", ctx.HomePath(), hex.EncodeToString(hasher.Sum(nil)))
+		ctx.exportPath = fmt.Sprintf("%s/%s", ctx.HomePath(), types.MD5(ctx.ConfPath()))
 	}
 	return ctx.exportPath
+}
+
+func (ctx *GlobalContext) BinaryPath() string {
+	if ctx.binaryPath == "" {
+		ctx.binaryPath = path.Join(ctx.HomePath(), "docker")
+	}
+	return ctx.binaryPath
 }
 
 func (ctx *GlobalContext) MakeHomeDir() error {
@@ -82,53 +79,19 @@ func (ctx *GlobalContext) MakeExportDir() error {
 	return nil
 }
 
-func (ctx *GlobalContext) DockerBinaryPath() string {
-	return ctx.dockerBinPath
-}
-
-func (ctx *GlobalContext) DockerHost() string {
-	return ctx.dockerHost
-}
-
-func (ctx *GlobalContext) DockerSocketPath() *string {
-	if !strings.HasPrefix(ctx.dockerHost, "unix://") {
-		return nil
+func (ctx *GlobalContext) MakeBinaryDir() error {
+	if _, err := os.Stat(ctx.BinaryPath()); os.IsNotExist(err) {
+		if err := os.Mkdir(ctx.BinaryPath(), 0755); err != nil {
+			return err
+		}
 	}
-	sock := strings.TrimPrefix(ctx.dockerHost, "unix://")
-	return &sock
-}
-
-func (ctx *GlobalContext) HasDockerSocket() bool {
-	sock := ctx.DockerSocketPath()
-	return sock != nil && *sock != ""
+	return nil
 }
 
 func NewContext(homePath string, confPath string) (Context, error) {
 	ctx := new(GlobalContext)
 	ctx.homePath = homePath
 	ctx.confPath = confPath
-
-	cmd := exec.Command("docker")
-	if cmd.Path == "docker" {
-		return nil, fmt.Errorf("runtime error: docker is not installed. see https://docs.docker.com/install/")
-	}
-	ctx.dockerBinPath = cmd.Path
-
-	ctx.dockerHost = os.Getenv("DOCKER_HOST")
-	if ctx.dockerHost == "" {
-		// https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-socket-option
-		ctx.dockerHost = "unix:///var/run/docker.sock"
-	}
-
-	if !strings.HasPrefix(ctx.dockerHost, "unix://") {
-		logger.Warnf("%s may not working possibility. Please same path that you use on the host and the host of `DOCKER_HOST`.", ctx.dockerHost)
-	} else {
-		sock := strings.TrimPrefix(ctx.dockerHost, "unix://")
-		if _, err := os.Stat(sock); err != nil {
-			return nil, fmt.Errorf("runtime error: %s: no such file. please set DOCKER_HOST", sock)
-		}
-		ctx.dockerSockPath = &sock
-	}
 
 	return ctx, nil
 }

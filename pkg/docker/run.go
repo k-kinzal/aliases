@@ -3,6 +3,7 @@ package docker
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/k-kinzal/aliases/pkg/posix"
 
@@ -435,7 +436,11 @@ func (client *Client) Run(image string, args []string, option RunOption) *posix.
 	}
 	cmd.Args = append(cmd.Args, image)
 	for _, v := range args {
-		cmd.Args = append(cmd.Args, strconv.Quote(v))
+		if strings.Contains(v, " ") {
+			cmd.Args = append(cmd.Args, strconv.Quote(v))
+		} else {
+			cmd.Args = append(cmd.Args, v)
+		}
 	}
 
 	return cmd

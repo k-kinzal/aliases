@@ -56,11 +56,11 @@ func (p *SpecPath) Base() string {
 
 // Index returns index of parent dependencies.
 func (p *SpecPath) Index() int {
-	matches := dependencyRegexp.FindStringSubmatch(*(*string)(p))
+	matches := dependencyRegexp.FindAllStringSubmatch(*(*string)(p), -1)
 	if len(matches) == 0 {
 		return -1
 	}
-	n, err := strconv.Atoi(matches[len(matches)-1])
+	n, err := strconv.Atoi(matches[len(matches)-1][1])
 	if err != nil {
 		return -1
 	}

@@ -1,11 +1,9 @@
 package script
 
 import (
-	"fmt"
-	"io/ioutil"
 	"os"
 
-	"github.com/k-kinzal/aliases/pkg/logger"
+	"github.com/k-kinzal/aliases/pkg/aliases"
 
 	"github.com/k-kinzal/aliases/pkg/docker"
 
@@ -13,14 +11,9 @@ import (
 )
 
 // Run aliases script.
-func (script *Script) Run(args []string, opt docker.RunOption) error {
-	path, err := ioutil.TempDir("/tmp", "")
-	if err != nil {
-		return err
-	}
-
+func (script *Script) Run(ctx aliases.Context, args []string, opt docker.RunOption) error {
 	for _, relative := range script.relative {
-		if err := relative.Write(path); err != nil {
+		if _, err := relative.Write(ctx); err != nil {
 			return err
 		}
 	}
@@ -30,10 +23,6 @@ func (script *Script) Run(args []string, opt docker.RunOption) error {
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-
-	cmd.Env = append(cmd.Env, fmt.Sprintf("ALIASES_EXPORT_PATH=%s", path))
-
-	logger.Debug(cmd.String())
 
 	if err := cmd.Run(); err != nil {
 		return err

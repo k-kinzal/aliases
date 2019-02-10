@@ -1,8 +1,12 @@
 package config
 
 import (
-	"github.com/imdario/mergo"
+	"fmt"
+	"path"
+	"strings"
+
 	"github.com/k-kinzal/aliases/pkg/aliases/yaml"
+	"github.com/k-kinzal/aliases/pkg/types"
 )
 
 // Option is configuration option.
@@ -14,33 +18,35 @@ type Option struct {
 	Dependencies []*Option
 }
 
-// merge Option and Option
-func (opt *Option) merge(source Option) *Option {
-	dst := *opt.OptionSpec
-	src := *source.OptionSpec
-	src.Dependencies = nil
-	src.Image = ""
-	src.Args = nil
-	src.Tag = ""
-	src.Command = nil
-	if err := mergo.Map(&dst, src, mergo.WithAppendSlice); err != nil {
-		panic(err)
-	}
+func (opt Option) Binary(binaryDir string) *DockerBinary {
+	filename := fmt.Sprintf("%s:%s", opt.Docker.Image, opt.Docker.Tag)
+	filename = strings.Replace(filename, "/", "-", -1)
+	filename = strings.Replace(filename, ":", "-", -1)
+	filename = strings.Replace(filename, ".", "-", -1)
+	filename = strings.Replace(filename, "_", "-", -1)
 
-	return &Option{
-		OptionSpec:   &dst,
-		Namespace:    opt.Namespace,
-		Path:         opt.Path,
-		FileName:     opt.FileName,
-		Dependencies: opt.Dependencies,
+	return &DockerBinary{
+		Image: opt.Docker.Image,
+		Tag:   opt.Docker.Tag,
+		Path:  path.Join(binaryDir, filename),
 	}
 }
 
-// inherit dependencies.
-func (opt *Option) inherit() *Option {
-	src := Option{OptionSpec: &yaml.OptionSpec{}}
-	for _, o := range opt.Dependencies {
-		src = *o.merge(src)
+func (opt *Option) Binaries(binaryDir string) []DockerBinary {
+	set := types.NewSet(nil)
+	for _, dep := range opt.Dependencies {
+		for _, binary := range dep.Binaries(binaryDir) {
+			set.Add(binary)
+		}
 	}
-	return opt.merge(src)
+
+	set.Add(*opt.Binary(binaryDir))
+
+	slice := set.Slice()
+	binaries := make([]DockerBinary, len(slice))
+	for i := 0; i < len(slice); i++ {
+		binaries[i] = slice[i].(DockerBinary)
+	}
+
+	return binaries
 }

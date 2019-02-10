@@ -4,6 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/creasty/defaults"
+
+	"github.com/imdario/mergo"
+
 	"github.com/k-kinzal/aliases/pkg/types"
 
 	"github.com/k-kinzal/aliases/pkg/aliases/yaml"
@@ -64,7 +68,24 @@ func transform(resolve func(key string) (*Option, error), path yaml.SpecPath, cu
 		}
 	}
 
-	option := &Option{OptionSpec: &current}
+	dst := current
+	for _, dependency := range relatives {
+		src := *dependency.OptionSpec
+		src.Dependencies = nil
+		src.Image = ""
+		src.Args = nil
+		src.Tag = ""
+		src.Command = nil
+		if err := mergo.Map(&dst, src, mergo.WithAppendSlice); err != nil {
+			panic(err)
+		}
+	}
+
+	if err := defaults.Set(&dst); err != nil {
+		return nil, err
+	}
+
+	option := &Option{OptionSpec: &dst}
 	option.Namespace = (*Path)(&path).namespace()
 	option.Path = path.Name()
 	option.FileName = path.Base()

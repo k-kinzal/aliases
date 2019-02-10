@@ -5,6 +5,10 @@ import (
 	"path"
 	"strings"
 
+	"github.com/k-kinzal/aliases/pkg/aliases"
+
+	"github.com/k-kinzal/aliases/pkg/util"
+
 	"github.com/imdario/mergo"
 
 	"github.com/k-kinzal/aliases/pkg/posix"
@@ -13,21 +17,13 @@ import (
 	"github.com/k-kinzal/aliases/pkg/docker"
 )
 
-type dockerBinary struct {
-	image string
-	tag   string
-}
-
-type dockerRun struct {
-	image  string
-	args   []string
-	option docker.RunOption
-}
-
 // Script is the actual of command alises.
 type Script struct {
-	path     string
-	binary   dockerBinary
+	path   string
+	binary struct {
+		image string
+		tag   string
+	}
 	docker   func(args []string, option docker.RunOption) *posix.Cmd
 	relative []*Script
 }
@@ -35,6 +31,16 @@ type Script struct {
 // Path returns export path.
 func (script *Script) Path(p string) string {
 	return path.Join(p, script.path)
+}
+
+// FileName returns script name.
+func (script *Script) FileName() string {
+	return path.Base(script.path)
+}
+
+// String returns docker run string
+func (script *Script) String() string {
+	return script.docker(nil, docker.RunOption{}).String()
 }
 
 // newDockerRunCommand creates a new docker run command.
@@ -52,7 +58,7 @@ func newDockerRunCommand(client *docker.Client, image string, args []string, opt
 }
 
 // NewScript creates a new Script.
-func NewScript(client *docker.Client, opt config.Option) *Script {
+func NewScript(ctx aliases.Context, client *docker.Client, opt config.Option) *Script {
 	script := &Script{}
 	// global
 	script.path = strings.Replace(fmt.Sprintf("%s/%s", opt.Namespace, opt.FileName), "//", "/", -1)
@@ -69,12 +75,11 @@ func NewScript(client *docker.Client, opt config.Option) *Script {
 	}
 	args = append(args, opt.Args...)
 	// options
-	// FIXME: expand env
 	o := docker.RunOption{}
-	o.AddHost = opt.AddHost
+	o.AddHost = util.ExpandColonDelimitedStringListWithEnv(opt.AddHost)
 	o.Attach = opt.Attach
 	o.BlkioWeight = opt.BlkioWeight
-	o.BlkioWeightDevice = opt.BlkioWeightDevice
+	o.BlkioWeightDevice = util.ExpandColonDelimitedStringListWithEnv(opt.BlkioWeightDevice)
 	o.CIDFile = opt.CIDFile
 	o.CPUPeriod = opt.CPUPeriod
 	o.CPUQuota = opt.CPUQuota
@@ -92,16 +97,16 @@ func NewScript(client *docker.Client, opt config.Option) *Script {
 	o.DNSSearch = opt.DNSSearch
 	o.Detach = opt.Detach
 	o.DetachKeys = opt.DetachKeys
-	o.Device = opt.Device
+	o.Device = util.ExpandColonDelimitedStringListWithEnv(opt.Device)
 	o.DeviceCgroupRule = opt.DeviceCgroupRule
-	o.DeviceReadBPS = opt.DeviceReadBPS
-	o.DeviceReadIOPS = opt.DeviceReadIOPS
-	o.DeviceWriteBPS = opt.DeviceWriteBPS
-	o.DeviceWriteIOPS = opt.DeviceWriteIOPS
+	o.DeviceReadBPS = util.ExpandColonDelimitedStringListWithEnv(opt.DeviceReadBPS)
+	o.DeviceReadIOPS = util.ExpandColonDelimitedStringListWithEnv(opt.DeviceReadIOPS)
+	o.DeviceWriteBPS = util.ExpandColonDelimitedStringListWithEnv(opt.DeviceWriteBPS)
+	o.DeviceWriteIOPS = util.ExpandColonDelimitedStringListWithEnv(opt.DeviceWriteIOPS)
 	o.DisableContentTrust = opt.DisableContentTrust
 	o.Domainname = opt.Domainname
 	o.Entrypoint = opt.Entrypoint
-	o.Env = opt.Env
+	o.Env = util.ExpandStringKeyMapWithEnv(opt.Env)
 	o.EnvFile = opt.EnvFile
 	o.Expose = opt.Expose
 	o.GroupAdd = opt.GroupAdd
@@ -118,18 +123,18 @@ func NewScript(client *docker.Client, opt config.Option) *Script {
 	o.Interactive = opt.Interactive
 	o.Isolation = opt.Isolation
 	o.KernelMemory = opt.KernelMemory
-	o.Label = opt.Label
+	o.Label = util.ExpandStringKeyMapWithEnv(opt.Label)
 	o.LabelFile = opt.LabelFile
-	o.Link = opt.Link
+	o.Link = util.ExpandColonDelimitedStringListWithEnv(opt.Link)
 	o.LinkLocalIP = opt.LinkLocalIP
 	o.LogDriver = opt.LogDriver
-	o.LogOpt = opt.LogOpt
+	o.LogOpt = util.ExpandStringKeyMapWithEnv(opt.LogOpt)
 	o.MacAddress = opt.MacAddress
 	o.Memory = opt.Memory
 	o.MemoryReservation = opt.MemoryReservation
 	o.MemorySwap = opt.MemorySwap
 	o.MemorySwappiness = opt.MemorySwappiness
-	o.Mount = opt.Mount
+	o.Mount = util.ExpandStringKeyMapWithEnv(opt.Mount)
 	o.Name = opt.Name
 	o.Network = opt.Network
 	o.NetworkAlias = opt.NetworkAlias
@@ -146,20 +151,23 @@ func NewScript(client *docker.Client, opt config.Option) *Script {
 	o.Restart = opt.Restart
 	o.Rm = opt.Rm
 	o.Runtime = opt.Runtime
-	o.SecurityOpt = opt.SecurityOpt
+	o.SecurityOpt = util.ExpandStringKeyMapWithEnv(opt.SecurityOpt)
 	o.ShmSize = opt.ShmSize
 	o.SigProxy = opt.SigProxy
 	o.StopSignal = opt.StopSignal
 	o.StopTimeout = opt.StopTimeout
-	o.StorageOpt = opt.StorageOpt
-	o.Sysctl = opt.Sysctl
+	o.StorageOpt = util.ExpandStringKeyMapWithEnv(opt.StorageOpt)
+	o.Sysctl = util.ExpandStringKeyMapWithEnv(opt.Sysctl)
 	o.TTY = opt.TTY
 	o.Tmpfs = opt.Tmpfs
 	o.UTS = opt.UTS
-	o.Ulimit = opt.Ulimit
-	o.User = opt.User
+	o.Ulimit = util.ExpandStringKeyMapWithEnv(opt.Ulimit)
+	if opt.User != nil {
+		user := util.ExpandColonDelimitedStringWithEnv(*opt.User)
+		o.User = &user
+	}
 	o.Userns = opt.Userns
-	o.Volume = opt.Volume
+	o.Volume = util.ExpandColonDelimitedStringListWithEnv(opt.Volume)
 	o.VolumeDriver = opt.VolumeDriver
 	o.VolumesFrom = opt.VolumesFrom
 	o.Workdir = opt.Workdir
@@ -172,28 +180,27 @@ func NewScript(client *docker.Client, opt config.Option) *Script {
 			o.Volume = make([]string, 0)
 		}
 		o.Env["ALIASES_PWD"] = "${ALIASES_PWD:-$PWD}"
-		o.Env["DOCKER_HOST"] = client.Host()
 		if sock := client.Sock(); sock != nil {
 			// unix socket
 			literal := "true"
 			o.Privileged = &literal
-			// FIXME;
-			o.Volume = append(o.Volume, fmt.Sprintf("%s:%s", client.Path(), client.Path()))
-			o.Volume = append(o.Volume, fmt.Sprintf("%s:%s", *sock, *sock))
+			o.Volume = append(o.Volume, fmt.Sprintf("%s:%s", opt.Binary(ctx.BinaryPath()).Path, client.Path()))
+			o.Volume = append(o.Volume, fmt.Sprintf("%s:/var/run/docker.sock", *sock))
 		} else {
 			// tcp, http...
 			literal := "host"
 			o.Network = &literal
+			o.Env["DOCKER_HOST"] = client.Host()
 		}
 		for _, dep := range opt.Dependencies {
-			o.Volume = append(o.Volume, fmt.Sprintf("$ALIASES_EXPORT_PATH%s/%s:%s", dep.Namespace, dep.FileName, dep.Path))
+			o.Volume = append(o.Volume, fmt.Sprintf("%s:%s", path.Join(ctx.ExportPath(), dep.Namespace, dep.FileName), dep.Path))
 		}
 	}
 	script.docker = newDockerRunCommand(client, image, args, o)
 	// relative
 	relative := make([]*Script, len(opt.Dependencies))
 	for i, dep := range opt.Dependencies {
-		relative[i] = NewScript(client, *dep)
+		relative[i] = NewScript(ctx, client, *dep)
 	}
 	script.relative = relative
 

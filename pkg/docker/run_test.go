@@ -26,5 +26,5 @@ func ExampleClient_Run() {
 	}
 	cmd := client.Run("alpine", []string{"sh", "-c", "echo 1"}, opt)
 	fmt.Println(cmd)
-	// Output: docker run --env FOO="bar" --interactive --rm --tty alpine sh -c echo 1
+	// Output: docker run --env FOO="bar" --interactive --rm --tty alpine sh -c "echo 1"
 }

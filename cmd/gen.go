@@ -2,12 +2,16 @@ package cmd
 
 import (
 	"fmt"
-	pathes "path"
+	"strings"
 
 	"github.com/k-kinzal/aliases/pkg/aliases"
+	"github.com/k-kinzal/aliases/pkg/docker"
+
+	"github.com/k-kinzal/aliases/pkg/aliases/config"
+	"github.com/k-kinzal/aliases/pkg/aliases/script"
+
 	"github.com/k-kinzal/aliases/pkg/posix"
 
-	"github.com/k-kinzal/aliases/pkg/export"
 	"github.com/urfave/cli"
 )
 
@@ -17,11 +21,11 @@ type genContext struct {
 }
 
 func (ctx *genContext) ExportPath() string {
-	path := ctx.cli.String("export-path")
-	if path == "" {
-		path = ctx.Context.ExportPath()
+	p := ctx.cli.String("export-path")
+	if p == "" {
+		p = ctx.Context.ExportPath()
 	}
-	return path
+	return p
 }
 
 func (ctx *genContext) isExport() bool {
@@ -70,57 +74,52 @@ func GenAction(c *cli.Context) error {
 		return err
 	}
 
-	ledger, err := aliases.NewLedgerFromConfig(ctx.ConfPath())
+	if err := ctx.MakeBinaryDir(); err != nil {
+		return err
+	}
+
+	client, err := docker.NewClient()
 	if err != nil {
 		return err
 	}
 
+	conf, err := config.LoadConfig(ctx.ConfPath())
+	if err != nil {
+		return err
+	}
+
+	for _, binary := range conf.Binaries(ctx.BinaryPath()) {
+		if err := docker.Download(binary.Path, binary.Image, binary.Tag); err != nil {
+			return err
+		}
+	}
+
 	if ctx.isExport() {
-		for _, schema := range ledger.Schemas() {
-			cmd, err := aliases.NewCommand(ctx, schema)
+		for _, opt := range conf.Slice() {
+			cmd := script.NewScript(ctx, client, opt)
 			if err != nil {
 				return err
 			}
-			if err := export.Script(pathes.Join(ctx.ExportPath(), schema.FileName), *cmd); err != nil {
+			_, err := cmd.Write(ctx)
+			if err != nil {
 				return err
 			}
 		}
-		exp := posix.PathExport(ctx.ExportPath(), false)
-		fmt.Println(exp.String())
+		fmt.Println(posix.PathExport(ctx.ExportPath(), false))
 	} else {
-		for _, schema := range ledger.Schemas() {
-			for _, dependency := range schema.Dependencies {
-				if dependency.IsSchema() {
-					for _, s := range dependency.Schemas() {
-						cmd, err := aliases.NewCommand(ctx, s)
-						if err != nil {
-							return err
-						}
-						if err := export.Script(pathes.Join(ctx.ExportPath(), schema.FileName), *cmd); err != nil {
-							return err
-						}
-					}
-				} else {
-					s, err := ledger.LookUp(dependency.String())
-					if err != nil {
-						return err
-					}
-					cmd, err := aliases.NewCommand(ctx, *s)
-					if err != nil {
-						return err
-					}
-					if err := export.Script(pathes.Join(ctx.ExportPath(), schema.FileName), *cmd); err != nil {
-						return err
-					}
-				}
-			}
-			cmd, err := aliases.NewCommand(ctx, schema)
+		aliases := make([]posix.Cmd, 0)
+		for _, opt := range conf.Slice() {
+			cmd := script.NewScript(ctx, client, opt)
 			if err != nil {
 				return err
 			}
-
-			alias := posix.Alias(schema.FileName, cmd.String())
-
+			_, err := cmd.Write(ctx)
+			if err != nil {
+				return err
+			}
+			aliases = append(aliases, *posix.Alias(cmd.FileName(), strings.Replace(cmd.String(), "$ALIASES_EXPORT_PATH", ctx.ExportPath(), -1)))
+		}
+		for _, alias := range aliases {
 			fmt.Println(alias.String())
 		}
 	}

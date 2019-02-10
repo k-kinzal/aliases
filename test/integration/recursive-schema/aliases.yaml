@@ -17,3 +17,5 @@
         - /usr/local/bin/alpine5:
             image: alpine
             tag: 3.8
+            env:
+              FOO: ${FOO}

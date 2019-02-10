@@ -3,13 +3,16 @@ package cmd
 import (
 	"fmt"
 	"io/ioutil"
-	"path"
 
-	"github.com/k-kinzal/aliases/pkg/posix"
+	"github.com/k-kinzal/aliases/pkg/logger"
 
 	"github.com/k-kinzal/aliases/pkg/aliases"
-	"github.com/k-kinzal/aliases/pkg/export"
-	"github.com/k-kinzal/aliases/pkg/logger"
+	"github.com/k-kinzal/aliases/pkg/docker"
+
+	"github.com/k-kinzal/aliases/pkg/aliases/script"
+
+	"github.com/k-kinzal/aliases/pkg/aliases/config"
+
 	"github.com/urfave/cli"
 )
 
@@ -23,128 +26,126 @@ func (ctx *runContext) ExportPath() string {
 	return ctx.exportPath
 }
 
-func (ctx *runContext) GetCommandShema() *aliases.Schema {
+func (ctx *runContext) GetIndex() *string {
 	flags := ctx.flags
 	arguments := flags.Args()
 
 	if len(arguments) == 0 {
 		return nil
 	}
-	index := arguments[0]
+	return &arguments[0]
+}
 
-	var command *string
-	if len(arguments) > 1 {
-		command = &arguments[1]
-	}
+func (ctx *runContext) GetArgs() []string {
+	flags := ctx.flags
+	arguments := flags.Args()
+
 	var args []string
-	if len(arguments) > 2 {
-		args = arguments[2:]
+	if len(arguments) > 1 {
+		args = arguments[1:]
 	}
+	return args
+}
 
-	schema := aliases.Schema{
-		index,
-		path.Base(index),
-		aliases.BinarySchema{"", ""},
-		nil,
-		flags.bool("detach", "d"),
-		flags.bool("sig-proxy"),
-		flags.string("name"),
-		flags.string("detach-keys"),
-		flags.string("platform"),
-		flags.bool("disable-content-trust"),
-		flags.stringSlice("attach", "a"),
-		flags.stringSlice("device-cgroup-rule"),
-		flags.stringSlice("device"),
-		flags.stringMap("env", "e"),
-		flags.stringSlice("env-file"),
-		flags.string("entrypoint"),
-		flags.stringSlice("group-add"),
-		flags.string("hostname"),
-		flags.string("domainname"),
-		flags.bool("interactive", "i"),
-		flags.stringMap("label", "l"),
-		flags.stringSlice("label-file"),
-		flags.bool("read-only"),
-		flags.string("restart"),
-		flags.string("stop-signal"),
-		flags.int("stop-timeout"),
-		flags.stringMap("sysctl"),
-		flags.bool("tty", "t"),
-		flags.stringMap("ulimit"),
-		flags.string("user", "u"),
-		flags.string("work-dir", "w"),
-		flags.bool("rm"),
-		flags.stringSlice("cap-add"),
-		flags.stringSlice("cap-drop"),
-		flags.string("privileged"),
-		flags.stringMap("security-opt"),
-		flags.string("userns"),
+func (ctx *runContext) GetInputOption() *docker.RunOption {
+	flags := ctx.flags
+
+	opt := docker.RunOption{
 		flags.stringSlice("add-host"),
-		flags.stringSlice("dns"),
-		flags.stringSlice("dns-option", "dns-opt"),
-		flags.stringSlice("dns-search"),
-		flags.stringSlice("expose"),
-		flags.string("ip"),
-		flags.string("ip6"),
-		flags.stringSlice("link"),
-		flags.stringSlice("link-local-ip"),
-		flags.string("mac-address"),
-		flags.stringSlice("publish", "p"),
-		flags.bool("publish-all", "P"),
-		flags.string("network", "net"),
-		flags.stringSlice("network-alias", "net-alias"),
-		flags.string("log-driver"),
-		flags.string("volume-driver"),
-		flags.stringMap("log-opt"),
-		flags.stringMap("storage-opt"),
-		flags.stringSlice("tmpfs"),
-		flags.stringSlice("volumes-from"),
-		flags.stringSlice("volume", "v"),
-		flags.stringMap("mount"),
-		flags.string("health-cmd"),
-		flags.string("health-interval"),
-		flags.int("health-retries"),
-		flags.string("health-timeout"),
-		flags.string("health-start-period"),
-		flags.bool("no-healthcheck"),
+		flags.stringSlice("attach", "a"),
 		flags.uint16("blkio-weight"),
 		flags.stringSlice("blkio-weight-device"),
 		flags.string("cidFile"),
-		flags.string("cpuset-cpus"),
-		flags.string("cpuset-mems"),
 		flags.string("cpu-period"),
 		flags.int64("cpu-quota"),
 		flags.int64("cpu-rt-period"),
 		flags.int64("cpu-rt-runtime"),
 		flags.int64("cpu-shares", "c"),
 		flags.string("cpus"),
+		flags.string("cpuset-cpus"),
+		flags.string("cpuset-mems"),
+		flags.stringSlice("cap-add"),
+		flags.stringSlice("cap-drop"),
+		flags.string("cgroup-parent"),
+		flags.stringSlice("dns"),
+		flags.stringSlice("dns-option", "dns-opt"),
+		flags.stringSlice("dns-search"),
+		flags.bool("detach", "d"),
+		flags.string("detach-keys"),
+		flags.stringSlice("device"),
+		flags.stringSlice("device-cgroup-rule"),
 		flags.stringSlice("device-read-bps"),
 		flags.stringSlice("device-read-iops"),
 		flags.stringSlice("device-write-bps"),
 		flags.stringSlice("device-write-iops"),
+		flags.bool("disable-content-trust"),
+		flags.string("domainname"),
+		flags.string("entrypoint"),
+		flags.stringMap("env", "e"),
+		flags.stringSlice("env-file"),
+		flags.stringSlice("expose"),
+		flags.stringSlice("group-add"),
+		flags.string("health-cmd"),
+		flags.string("health-interval"),
+		flags.int("health-retries"),
+		flags.string("health-start-period"),
+		flags.string("health-timeout"),
+		flags.string("hostname"),
+		flags.string("ip"),
+		flags.string("ip6"),
+		flags.string("ipc"),
+		flags.bool("init"),
+		flags.bool("interactive", "i"),
+		flags.string("isolation"),
 		flags.string("kernel-memory"),
+		flags.stringMap("label", "l"),
+		flags.stringSlice("label-file"),
+		flags.stringSlice("link"),
+		flags.stringSlice("link-local-ip"),
+		flags.string("log-driver"),
+		flags.stringMap("log-opt"),
+		flags.string("mac-address"),
 		flags.string("memory"),
 		flags.string("memory-reservation"),
 		flags.string("memory-swap"),
 		flags.int64("memory-swappiness"),
+		flags.stringMap("mount"),
+		flags.string("name"),
+		flags.string("network", "net"),
+		flags.stringSlice("network-alias", "net-alias"),
+		flags.bool("no-healthcheck"),
 		flags.bool("oom-kill-disable"),
 		flags.int("oom-score-adj"),
-		flags.int64("pids-limit"),
-		flags.string("cgroup-parent"),
-		flags.string("ipc"),
-		flags.string("isolation"),
 		flags.string("pid"),
-		flags.string("shm-size"),
-		flags.string("uts"),
+		flags.int64("pids-limit"),
+		flags.string("platform"),
+		flags.string("privileged"),
+		flags.stringSlice("publish", "p"),
+		flags.bool("publish-all", "P"),
+		flags.bool("read-only"),
+		flags.string("restart"),
+		flags.bool("rm"),
 		flags.string("runtime"),
-		flags.bool("init"),
-		"",
-		args,
-		"",
-		command,
+		flags.stringMap("security-opt"),
+		flags.string("shm-size"),
+		flags.bool("sig-proxy"),
+		flags.string("stop-signal"),
+		flags.int("stop-timeout"),
+		flags.stringMap("storage-opt"),
+		flags.stringMap("sysctl"),
+		flags.bool("tty", "t"),
+		flags.stringSlice("tmpfs"),
+		flags.string("uts"),
+		flags.stringMap("ulimit"),
+		flags.string("user", "u"),
+		flags.string("userns"),
+		flags.stringSlice("volume", "v"),
+		flags.string("volume-driver"),
+		flags.stringSlice("volumes-from"),
+		flags.string("work-dir", "w"),
 	}
 
-	return &schema
+	return &opt
 }
 
 func newRunContext(c *cli.Context) (*runContext, error) {
@@ -291,64 +292,34 @@ func RunAction(c *cli.Context) error {
 		return err
 	}
 
-	ledger, err := aliases.NewLedgerFromConfig(ctx.ConfPath())
+	if err := ctx.MakeBinaryDir(); err != nil {
+		return err
+	}
+
+	client, err := docker.NewClient()
 	if err != nil {
 		return err
 	}
 
-	index := c.Args()[0]
-
-	src, err := ledger.LookUp(index)
-	if err != nil {
-		return err
-	}
-	dst := ctx.GetCommandShema()
-	dst.Dependencies = src.Dependencies
-	dst.Image = src.Image
-	dst.Tag = src.Tag
-
-	if err := ledger.Merge(index, *dst); err != nil {
-		return err
+	index := ctx.GetIndex()
+	if index == nil {
+		return fmt.Errorf("")
 	}
 
-	schema, err := ledger.LookUp(index)
+	conf, err := config.LoadConfig(ctx.ConfPath())
 	if err != nil {
 		return err
 	}
 
-	for _, dependency := range schema.Dependencies {
-		if dependency.IsSchema() {
-			for _, s := range dependency.Schemas() {
-				cmd, err := aliases.NewCommand(ctx, s)
-				if err != nil {
-					return err
-				}
-				if err := export.Script(path.Join(ctx.ExportPath(), s.FileName), *cmd); err != nil {
-					return err
-				}
-			}
-		} else {
-			s, err := ledger.LookUp(dependency.String())
-			if err != nil {
-				return err
-			}
-			cmd, err := aliases.NewCommand(ctx, *s)
-			if err != nil {
-				return err
-			}
-			if err := export.Script(path.Join(ctx.ExportPath(), s.FileName), *cmd); err != nil {
-				return err
-			}
-		}
-	}
-	cmd, err := aliases.NewCommand(ctx, *schema)
+	opt, err := conf.Get(*index)
 	if err != nil {
 		return err
 	}
+	cmd := script.NewScript(ctx, client, *opt)
 
-	logger.Debug(cmd)
+	logger.Debug(cmd.String())
 
-	if err := posix.Shell(cmd.String()).Run(); err != nil {
+	if err := cmd.Run(ctx, ctx.GetArgs(), *ctx.GetInputOption()); err != nil {
 		return err
 	}
 
