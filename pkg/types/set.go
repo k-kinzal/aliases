@@ -1,5 +1,7 @@
 package types
 
+import "sort"
+
 // Set of data structure.
 type Set struct {
 	hash Hasher
@@ -18,10 +20,18 @@ func (set *Set) Add(i interface{}) {
 // Slice converts from set.
 func (set *Set) Slice() []interface{} {
 	i := 0
-	slice := make([]interface{}, len(set.data))
-	for _, val := range set.data {
-		slice[i] = val
+	keys := make([]string, len(set.data))
+	for key, _ := range set.data {
+		keys[i] = key
 		i++
+	}
+	sort.Strings(keys)
+
+	j := 0
+	slice := make([]interface{}, len(set.data))
+	for _, key := range keys {
+		slice[j] = set.data[key]
+		j++
 	}
 	return slice
 }
