@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"sort"
 
-	"github.com/k-kinzal/aliases/pkg/aliases"
+	"github.com/k-kinzal/aliases/pkg/aliases/context"
 
 	"github.com/k-kinzal/aliases/pkg/aliases/config"
 	"github.com/k-kinzal/aliases/pkg/aliases/script"
@@ -45,8 +45,11 @@ func ExampleScript_Write() {
 		panic(err)
 	}
 
-	ctx, err := aliases.NewContext("", "")
+	dir, err := ioutil.TempDir("/tmp", "")
 	if err != nil {
+		panic(err)
+	}
+	if err := context.ChangeExportPath(dir); err != nil {
 		panic(err)
 	}
 
@@ -56,16 +59,16 @@ func ExampleScript_Write() {
 	}
 
 	for _, opt := range conf.Slice() {
-		cmd := script.NewScript(ctx, client, opt)
-		if _, err := cmd.Write(ctx); err != nil {
+		cmd := script.NewScript(client, opt)
+		if _, err := cmd.Write(); err != nil {
 			panic(err)
 		}
-		if _, err := cmd.Write(ctx); err != nil {
+		if _, err := cmd.Write(); err != nil {
 			panic(err)
 		}
 	}
 
-	for _, file := range readDir(ctx.ExportPath()) {
+	for _, file := range readDir(context.ExportPath()) {
 		fmt.Println(file)
 	}
 

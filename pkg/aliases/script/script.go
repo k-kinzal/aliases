@@ -5,7 +5,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/k-kinzal/aliases/pkg/aliases"
+	"github.com/k-kinzal/aliases/pkg/aliases/context"
 
 	"github.com/imdario/mergo"
 
@@ -56,7 +56,7 @@ func newDockerRunCommand(client *docker.Client, image string, args []string, opt
 }
 
 // NewScript creates a new Script.
-func NewScript(ctx aliases.Context, client *docker.Client, opt config.Option) *Script {
+func NewScript(client *docker.Client, opt config.Option) *Script {
 	script := &Script{}
 	// global
 	script.path = strings.Replace(fmt.Sprintf("%s/%s", opt.Namespace, opt.FileName), "//", "/", -1)
@@ -182,7 +182,7 @@ func NewScript(ctx aliases.Context, client *docker.Client, opt config.Option) *S
 			// unix socket
 			literal := "true"
 			o.Privileged = &literal
-			o.Volume = append(o.Volume, fmt.Sprintf("%s:%s", opt.Binary(ctx.BinaryPath()).Path, client.Path()))
+			o.Volume = append(o.Volume, fmt.Sprintf("%s:%s", opt.Binary(context.BinaryPath()).Path, client.Path()))
 			o.Volume = append(o.Volume, fmt.Sprintf("%s:/var/run/docker.sock", *sock))
 		} else {
 			// tcp, http...
@@ -191,14 +191,14 @@ func NewScript(ctx aliases.Context, client *docker.Client, opt config.Option) *S
 			o.Env["DOCKER_HOST"] = client.Host()
 		}
 		for _, dep := range opt.Dependencies {
-			o.Volume = append(o.Volume, fmt.Sprintf("%s:%s", path.Join(ctx.ExportPath(), dep.Namespace, dep.FileName), dep.Path))
+			o.Volume = append(o.Volume, fmt.Sprintf("%s:%s", path.Join(context.ExportPath(), dep.Namespace, dep.FileName), dep.Path))
 		}
 	}
 	script.docker = newDockerRunCommand(client, image, args, o)
 	// relative
 	relative := make([]*Script, len(opt.Dependencies))
 	for i, dep := range opt.Dependencies {
-		relative[i] = NewScript(ctx, client, *dep)
+		relative[i] = NewScript(client, *dep)
 	}
 	script.relative = relative
 

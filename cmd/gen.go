@@ -2,9 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"strings"
+	"path"
 
-	"github.com/k-kinzal/aliases/pkg/aliases"
+	"github.com/k-kinzal/aliases/pkg/aliases/context"
+	"github.com/k-kinzal/aliases/pkg/types"
+
 	"github.com/k-kinzal/aliases/pkg/docker"
 
 	"github.com/k-kinzal/aliases/pkg/aliases/config"
@@ -15,35 +17,9 @@ import (
 	"github.com/urfave/cli"
 )
 
-type genContext struct {
-	aliases.Context
-	cli cli.Context
-}
-
-func (ctx *genContext) ExportPath() string {
-	p := ctx.cli.String("export-path")
-	if p == "" {
-		p = ctx.Context.ExportPath()
-	}
-	return p
-}
-
-func (ctx *genContext) isExport() bool {
-	return ctx.cli.Bool("export")
-}
-
-func newGenContext(c *cli.Context) (*genContext, error) {
-	ctx, err := aliases.NewContext(
-		c.GlobalString("home"),
-		c.GlobalString("config"),
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &genContext{ctx, *c}, nil
-}
-
+// GenCommand returns `aliases gen` command.
+//
+// `aliases gen` aliases the command defined in aliases.yaml, or export the path of the command.
 func GenCommand() cli.Command {
 	return cli.Command{
 		Name:  "gen",
@@ -64,17 +40,14 @@ func GenCommand() cli.Command {
 	}
 }
 
+// GenAction is the action of `aliases gen`.
 func GenAction(c *cli.Context) error {
-	ctx, err := newGenContext(c)
-	if err != nil {
-		return err
+	isExport := c.Bool("export")
+	exportPath := c.String("export-path")
+	if exportPath == "" {
+		exportPath = path.Join(context.HomePath(), types.MD5(context.ConfPath()))
 	}
-
-	if err := ctx.MakeExportDir(); err != nil {
-		return err
-	}
-
-	if err := ctx.MakeBinaryDir(); err != nil {
+	if err := context.ChangeExportPath(exportPath); err != nil {
 		return err
 	}
 
@@ -83,41 +56,41 @@ func GenAction(c *cli.Context) error {
 		return err
 	}
 
-	conf, err := config.LoadConfig(ctx.ConfPath())
+	conf, err := config.LoadConfig(context.ConfPath())
 	if err != nil {
 		return err
 	}
 
-	for _, binary := range conf.Binaries(ctx.BinaryPath()) {
+	for _, binary := range conf.Binaries(context.BinaryPath()) {
 		if err := docker.Download(binary.Path, binary.Image, binary.Tag); err != nil {
 			return err
 		}
 	}
 
-	if ctx.isExport() {
+	if isExport {
 		for _, opt := range conf.Slice() {
-			cmd := script.NewScript(ctx, client, opt)
+			cmd := script.NewScript(client, opt)
 			if err != nil {
 				return err
 			}
-			_, err := cmd.Write(ctx)
+			_, err := cmd.Write()
 			if err != nil {
 				return err
 			}
 		}
-		fmt.Println(posix.PathExport(ctx.ExportPath()))
+		fmt.Println(posix.PathExport(context.ExportPath()))
 	} else {
 		aliases := make([]posix.Cmd, 0)
 		for _, opt := range conf.Slice() {
-			cmd := script.NewScript(ctx, client, opt)
+			cmd := script.NewScript(client, opt)
 			if err != nil {
 				return err
 			}
-			_, err := cmd.Write(ctx)
+			_, err := cmd.Write()
 			if err != nil {
 				return err
 			}
-			aliases = append(aliases, *posix.Alias(cmd.FileName(), strings.Replace(cmd.String(), "$ALIASES_EXPORT_PATH", ctx.ExportPath(), -1)))
+			aliases = append(aliases, *posix.Alias(cmd.FileName(), cmd.String()))
 		}
 		for _, alias := range aliases {
 			fmt.Println(alias.String())

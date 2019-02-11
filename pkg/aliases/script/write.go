@@ -5,7 +5,7 @@ import (
 	"path"
 	"text/template"
 
-	"github.com/k-kinzal/aliases/pkg/aliases"
+	"github.com/k-kinzal/aliases/pkg/aliases/context"
 
 	"github.com/k-kinzal/aliases/pkg/docker"
 )
@@ -26,19 +26,19 @@ fi
 `
 
 // Write exports aliases script to a file.
-func (script *Script) Write(ctx aliases.Context) (string, error) {
-	return script.WriteWithOverride(ctx, nil, docker.RunOption{})
+func (script *Script) Write() (string, error) {
+	return script.WriteWithOverride(nil, docker.RunOption{})
 }
 
 // Write exports aliases script to a file with override docker option.
-func (script *Script) WriteWithOverride(ctx aliases.Context, args []string, option docker.RunOption) (string, error) {
+func (script *Script) WriteWithOverride(args []string, option docker.RunOption) (string, error) {
 	for _, cmd := range script.relative {
-		if _, err := cmd.Write(ctx); err != nil {
+		if _, err := cmd.Write(); err != nil {
 			return "", err
 		}
 	}
 
-	targetPath := script.Path(ctx.ExportPath())
+	targetPath := script.Path(context.ExportPath())
 
 	if err := os.MkdirAll(path.Dir(targetPath), 0755); err != nil {
 		return "", err

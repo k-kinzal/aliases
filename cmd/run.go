@@ -3,10 +3,10 @@ package cmd
 import (
 	"fmt"
 	"io/ioutil"
+	"strings"
 
-	"github.com/k-kinzal/aliases/pkg/logger"
+	"github.com/k-kinzal/aliases/pkg/aliases/context"
 
-	"github.com/k-kinzal/aliases/pkg/aliases"
 	"github.com/k-kinzal/aliases/pkg/docker"
 
 	"github.com/k-kinzal/aliases/pkg/aliases/script"
@@ -16,154 +16,64 @@ import (
 	"github.com/urfave/cli"
 )
 
-type runContext struct {
-	aliases.Context
-	flags      helper
-	exportPath string
-}
+// opt is docker run option for aliases run.
+var opt = docker.RunOption{}
 
-func (ctx *runContext) ExportPath() string {
-	return ctx.exportPath
-}
-
-func (ctx *runContext) GetIndex() *string {
-	flags := ctx.flags
-	arguments := flags.Args()
-
-	if len(arguments) == 0 {
-		return nil
+// boolFlag returns string from boolean flag.
+func boolFlag(c *cli.Context, name string) *string {
+	for _, n := range strings.Split(name, ",") {
+		n = strings.Trim(n, " \t")
+		if c.IsSet(n) {
+			val := fmt.Sprintf("%t", c.Bool(n))
+			return &val
+		}
 	}
-	return &arguments[0]
+	return nil
 }
 
-func (ctx *runContext) GetArgs() []string {
-	flags := ctx.flags
-	arguments := flags.Args()
-
-	var args []string
-	if len(arguments) > 1 {
-		args = arguments[1:]
+// stringFlag returns string from string flag.
+func stringFlag(c *cli.Context, name string) *string {
+	for _, n := range strings.Split(name, ",") {
+		n = strings.Trim(n, " \t")
+		if c.IsSet(n) {
+			val := c.String(n)
+			return &val
+		}
 	}
-	return args
+	return nil
 }
 
-func (ctx *runContext) GetInputOption() *docker.RunOption {
-	flags := ctx.flags
-
-	opt := docker.RunOption{
-		flags.stringSlice("add-host"),
-		flags.stringSlice("attach", "a"),
-		flags.uint16("blkio-weight"),
-		flags.stringSlice("blkio-weight-device"),
-		flags.string("cidFile"),
-		flags.string("cpu-period"),
-		flags.int64("cpu-quota"),
-		flags.int64("cpu-rt-period"),
-		flags.int64("cpu-rt-runtime"),
-		flags.int64("cpu-shares", "c"),
-		flags.string("cpus"),
-		flags.string("cpuset-cpus"),
-		flags.string("cpuset-mems"),
-		flags.stringSlice("cap-add"),
-		flags.stringSlice("cap-drop"),
-		flags.string("cgroup-parent"),
-		flags.stringSlice("dns"),
-		flags.stringSlice("dns-option", "dns-opt"),
-		flags.stringSlice("dns-search"),
-		flags.bool("detach", "d"),
-		flags.string("detach-keys"),
-		flags.stringSlice("device"),
-		flags.stringSlice("device-cgroup-rule"),
-		flags.stringSlice("device-read-bps"),
-		flags.stringSlice("device-read-iops"),
-		flags.stringSlice("device-write-bps"),
-		flags.stringSlice("device-write-iops"),
-		flags.bool("disable-content-trust"),
-		flags.string("domainname"),
-		flags.string("entrypoint"),
-		flags.stringMap("env", "e"),
-		flags.stringSlice("env-file"),
-		flags.stringSlice("expose"),
-		flags.stringSlice("group-add"),
-		flags.string("health-cmd"),
-		flags.string("health-interval"),
-		flags.int("health-retries"),
-		flags.string("health-start-period"),
-		flags.string("health-timeout"),
-		flags.string("hostname"),
-		flags.string("ip"),
-		flags.string("ip6"),
-		flags.string("ipc"),
-		flags.bool("init"),
-		flags.bool("interactive", "i"),
-		flags.string("isolation"),
-		flags.string("kernel-memory"),
-		flags.stringMap("label", "l"),
-		flags.stringSlice("label-file"),
-		flags.stringSlice("link"),
-		flags.stringSlice("link-local-ip"),
-		flags.string("log-driver"),
-		flags.stringMap("log-opt"),
-		flags.string("mac-address"),
-		flags.string("memory"),
-		flags.string("memory-reservation"),
-		flags.string("memory-swap"),
-		flags.int64("memory-swappiness"),
-		flags.stringMap("mount"),
-		flags.string("name"),
-		flags.string("network", "net"),
-		flags.stringSlice("network-alias", "net-alias"),
-		flags.bool("no-healthcheck"),
-		flags.bool("oom-kill-disable"),
-		flags.int("oom-score-adj"),
-		flags.string("pid"),
-		flags.int64("pids-limit"),
-		flags.string("platform"),
-		flags.string("privileged"),
-		flags.stringSlice("publish", "p"),
-		flags.bool("publish-all", "P"),
-		flags.bool("read-only"),
-		flags.string("restart"),
-		flags.bool("rm"),
-		flags.string("runtime"),
-		flags.stringMap("security-opt"),
-		flags.string("shm-size"),
-		flags.bool("sig-proxy"),
-		flags.string("stop-signal"),
-		flags.int("stop-timeout"),
-		flags.stringMap("storage-opt"),
-		flags.stringMap("sysctl"),
-		flags.bool("tty", "t"),
-		flags.stringSlice("tmpfs"),
-		flags.string("uts"),
-		flags.stringMap("ulimit"),
-		flags.string("user", "u"),
-		flags.string("userns"),
-		flags.stringSlice("volume", "v"),
-		flags.string("volume-driver"),
-		flags.stringSlice("volumes-from"),
-		flags.string("work-dir", "w"),
+// sliceFlag returns []string from string slice flag.
+func sliceFlag(c *cli.Context, name string) []string {
+	for _, n := range strings.Split(name, ",") {
+		n = strings.Trim(n, " \t")
+		if c.IsSet(n) {
+			return c.StringSlice(n)
+		}
 	}
-
-	return &opt
+	return nil
 }
 
-func newRunContext(c *cli.Context) (*runContext, error) {
-	ctx, err := aliases.NewContext(
-		c.GlobalString("home"),
-		c.GlobalString("config"),
-	)
-	if err != nil {
-		return nil, err
+// mapFlag returns map[string]string from string slice flag.
+func mapFlag(c *cli.Context, name string) map[string]string {
+	for _, n := range strings.Split(name, ",") {
+		n = strings.Trim(n, " \t")
+		if c.IsSet(n) {
+			val := map[string]string{}
+			for _, v := range c.StringSlice(n) {
+				s := strings.Split(v, "=")
+				val[s[0]] = strings.Join(s[1:], "=")
+			}
+			return val
+		}
 	}
-	dir, err := ioutil.TempDir("/tmp", "")
-	if err != nil {
-		return nil, fmt.Errorf("runtime error: %s", err)
-	}
-
-	return &runContext{ctx, helper{c}, dir}, nil
+	return nil
 }
 
+// RunCommand returns `aliases run` command.
+//
+// `aliases run` is a command for run the command defined in aliases.yaml.
+// By specifying the same option as `docker run`, overwrite the command defined in aliases.yaml and run it.
 func RunCommand() cli.Command {
 	return cli.Command{
 		Name:      "run",
@@ -233,22 +143,22 @@ func RunCommand() cli.Command {
 			cli.StringSliceFlag{Name: "mount", Usage: "attach a filesystem mount to the container"},
 			// Health-checking
 			cli.StringFlag{Name: "health-cmd", Usage: "command to run to check health"},
-			cli.DurationFlag{Name: "health-interval", Usage: "time between running the check (ms|s|m|h) (default 0s)"},
-			cli.IntFlag{Name: "health-retries", Usage: "consecutive failures needed to report unhealthy"},
-			cli.DurationFlag{Name: "health-timeout", Usage: "maximum time to allow one check to run (ms|s|m|h) (default 0s)"},
-			cli.DurationFlag{Name: "health-start-period", Usage: "start period for the container to initialize before starting health-retries countdown (ms|s|m|h) (default 0s)"},
+			cli.StringFlag{Name: "health-interval", Usage: "time between running the check (ms|s|m|h) (default 0s)"},
+			cli.StringFlag{Name: "health-retries", Usage: "consecutive failures needed to report unhealthy"},
+			cli.StringFlag{Name: "health-timeout", Usage: "maximum time to allow one check to run (ms|s|m|h) (default 0s)"},
+			cli.StringFlag{Name: "health-start-period", Usage: "start period for the container to initialize before starting health-retries countdown (ms|s|m|h) (default 0s)"},
 			cli.BoolFlag{Name: "no-healthcheck", Usage: "disable any container-specified HEALTHCHECK"},
 			// Resource management
-			cli.UintFlag{Name: "blkio-weight", Usage: "block IO (relative weight), between 10 and 1000, or 0 to disable (default 0)"},
+			cli.StringFlag{Name: "blkio-weight", Usage: "block IO (relative weight), between 10 and 1000, or 0 to disable (default 0)"},
 			cli.BoolFlag{Name: "blkio-weight-device", Usage: "block IO weight (relative device weight)"},
 			cli.StringFlag{Name: "cidfile", Usage: "write the container ID to the file"},
 			cli.StringFlag{Name: "cpuset-cpus", Usage: "CPUs in which to allow execution (0-3, 0,1)"},
 			cli.StringFlag{Name: "cpuset-mems", Usage: "MEMs in which to allow execution (0-3, 0,1)"},
 			cli.StringFlag{Name: "cpu-period", Usage: "limit CPU CFS (Completely Fair Scheduler) period"},
-			cli.Int64Flag{Name: "cpu-quota", Usage: "limit CPU CFS (Completely Fair Scheduler) quota"},
-			cli.Int64Flag{Name: "cpu-rt-period", Usage: "limit CPU real-time period in microseconds"},
-			cli.Int64Flag{Name: "cpu-rt-runtime", Usage: "limit CPU real-time runtime in microseconds"},
-			cli.Int64Flag{Name: "cpu-shares, c", Usage: "CPU shares (relative weight)"},
+			cli.StringFlag{Name: "cpu-quota", Usage: "limit CPU CFS (Completely Fair Scheduler) quota"},
+			cli.StringFlag{Name: "cpu-rt-period", Usage: "limit CPU real-time period in microseconds"},
+			cli.StringFlag{Name: "cpu-rt-runtime", Usage: "limit CPU real-time runtime in microseconds"},
+			cli.StringFlag{Name: "cpu-shares, c", Usage: "CPU shares (relative weight)"},
 			cli.StringFlag{Name: "cpus", Usage: "number of CPUs"},
 			cli.StringSliceFlag{Name: "device-read-bps", Usage: "limit read rate (bytes per second) from a device"},
 			cli.StringSliceFlag{Name: "device-read-iops", Usage: "limit read rate (IO per second) from a device"},
@@ -258,10 +168,10 @@ func RunCommand() cli.Command {
 			cli.StringFlag{Name: "memory", Usage: "memory limit"},
 			cli.StringFlag{Name: "memory-reservation", Usage: "memory soft limit"},
 			cli.StringFlag{Name: "memory-swap", Usage: "swap limit equal to memory plus swap: '-1' to enable unlimited swap"},
-			cli.Int64Flag{Name: "memory-swappiness", Usage: "tune container memory swappiness (0 to 100)"},
+			cli.StringFlag{Name: "memory-swappiness", Usage: "tune container memory swappiness (0 to 100)"},
 			cli.BoolFlag{Name: "oom-kill-disable", Usage: "disable OOM Killer"},
-			cli.IntFlag{Name: "oom-score-adj", Usage: "tune host's OOM preferences (-1000 to 1000)"},
-			cli.Int64Flag{Name: "pids-limit", Usage: "tune container pids limit (set -1 for unlimited)"},
+			cli.StringFlag{Name: "oom-score-adj", Usage: "tune host's OOM preferences (-1000 to 1000)"},
+			cli.StringFlag{Name: "pids-limit", Usage: "tune container pids limit (set -1 for unlimited)"},
 			// Low-level execution (cgroups, namespaces, ...)
 			cli.StringFlag{Name: "cgroup-parent", Usage: "optional parent cgroup for the container"},
 			cli.StringFlag{Name: "ipc", Usage: "IPC mode to use"},
@@ -272,27 +182,125 @@ func RunCommand() cli.Command {
 			cli.StringFlag{Name: "runtime", Usage: "runtime to use for this container"},
 			cli.BoolFlag{Name: "init", Usage: "run an init inside the container that forwards signals and reaps processes"},
 		},
+		Before: func(c *cli.Context) error {
+			// FIXME: ٩(ˊᗜˋ*)و.
+			// since the type missmatch and destination is not supported, mapping is done with cli.Command.Before.
+			opt.Detach = boolFlag(c, "detach, d")
+			opt.SigProxy = boolFlag(c, "sig-roxy")
+			opt.Name = stringFlag(c, "name")
+			opt.DetachKeys = stringFlag(c, "detach-keys")
+			opt.Platform = stringFlag(c, "platform")
+			opt.DisableContentTrust = boolFlag(c, "disable-content-trust")
+			opt.Attach = sliceFlag(c, "attach, a")
+			opt.DeviceCgroupRule = sliceFlag(c, "device-cgroup-rule")
+			opt.Device = sliceFlag(c, "device")
+			opt.Env = mapFlag(c, "env, e")
+			opt.EnvFile = sliceFlag(c, "env-file")
+			opt.Entrypoint = stringFlag(c, "entrypoint")
+			opt.GroupAdd = sliceFlag(c, "group-add")
+			opt.Hostname = stringFlag(c, "hostname, h")
+			opt.Domainname = stringFlag(c, "domainname")
+			opt.Interactive = boolFlag(c, "interactive, i")
+			opt.Label = mapFlag(c, "label, l")
+			opt.LabelFile = sliceFlag(c, "label-file")
+			opt.ReadOnly = boolFlag(c, "read-only")
+			opt.Restart = stringFlag(c, "restart")
+			opt.StopSignal = stringFlag(c, "stop-signal")
+			opt.StopTimeout = boolFlag(c, "stop-timeout")
+			opt.Sysctl = mapFlag(c, "sysctl")
+			opt.TTY = boolFlag(c, "tty, t")
+			opt.Ulimit = mapFlag(c, "ulimit")
+			opt.User = stringFlag(c, "user, u")
+			opt.Workdir = stringFlag(c, "workdir, w")
+			opt.Rm = boolFlag(c, "rm")
+			opt.CapAdd = sliceFlag(c, "cap-add")
+			opt.CapDrop = sliceFlag(c, "cap-drop")
+			opt.Privileged = boolFlag(c, "privileged")
+			opt.SecurityOpt = mapFlag(c, "security-opt")
+			opt.Userns = stringFlag(c, "userns")
+			opt.AddHost = sliceFlag(c, "add-host")
+			opt.DNS = sliceFlag(c, "dns")
+			opt.DNSOption = sliceFlag(c, "dns-option, dns-opt")
+			opt.DNSSearch = sliceFlag(c, "dns-search")
+			opt.Expose = sliceFlag(c, "expose")
+			opt.IP = stringFlag(c, "ip")
+			opt.IP6 = stringFlag(c, "ip6")
+			opt.Link = sliceFlag(c, "link")
+			opt.LinkLocalIP = sliceFlag(c, "link-local-ip")
+			opt.MacAddress = stringFlag(c, "mac-address")
+			opt.Publish = sliceFlag(c, "publish, p")
+			opt.PublishAll = boolFlag(c, "publish-all, P")
+			opt.Network = stringFlag(c, "network, net")
+			opt.NetworkAlias = sliceFlag(c, "network-alias, net-alias")
+			opt.LogDriver = stringFlag(c, "log-driver")
+			opt.VolumeDriver = stringFlag(c, "volume-driver")
+			opt.LogOpt = mapFlag(c, "log-opt")
+			opt.StorageOpt = mapFlag(c, "storage-opt")
+			opt.Tmpfs = sliceFlag(c, "tmpfs")
+			opt.VolumesFrom = sliceFlag(c, "volumes-from")
+			opt.Volume = sliceFlag(c, "volume, v")
+			opt.Mount = mapFlag(c, "mount")
+			opt.HealthCmd = stringFlag(c, "health-cmd")
+			opt.HealthInterval = stringFlag(c, "health-interval")
+			opt.HealthRetries = stringFlag(c, "health-retries")
+			opt.HealthTimeout = stringFlag(c, "health-timeout")
+			opt.HealthStartPeriod = stringFlag(c, "health-start-period")
+			opt.NoHealthcheck = boolFlag(c, "no-healthcheck")
+			opt.BlkioWeight = stringFlag(c, "blkio-weight")
+			opt.BlkioWeight = boolFlag(c, "blkio-weight-device")
+			opt.CIDFile = stringFlag(c, "cidfile")
+			opt.CPUsetCPUs = stringFlag(c, "cpuset-cpus")
+			opt.CPUsetMems = stringFlag(c, "cpuset-mems")
+			opt.CPUPeriod = stringFlag(c, "cpu-period")
+			opt.CPUQuota = stringFlag(c, "cpu-quota")
+			opt.CPURtPeriod = stringFlag(c, "cpu-rt-period")
+			opt.CPURtRuntime = stringFlag(c, "cpu-rt-runtime")
+			opt.CPUShares = stringFlag(c, "cpu-shares, c")
+			opt.CPUs = stringFlag(c, "cpus")
+			opt.DeviceReadBPS = sliceFlag(c, "device-read-bps")
+			opt.DeviceReadIOPS = sliceFlag(c, "device-read-iops")
+			opt.DeviceWriteBPS = sliceFlag(c, "device-write-bps")
+			opt.DeviceWriteIOPS = sliceFlag(c, "device-write-iops")
+			opt.KernelMemory = stringFlag(c, "kernel-memory")
+			opt.Memory = stringFlag(c, "memory")
+			opt.MemoryReservation = stringFlag(c, "memory-reservation")
+			opt.MemorySwap = stringFlag(c, "memory-swap")
+			opt.MemorySwappiness = stringFlag(c, "memory-swappiness")
+			opt.OOMKillDisable = boolFlag(c, "oom-kill-disable")
+			opt.OOMScoreAdj = stringFlag(c, "oom-score-adj")
+			opt.PidsLimit = stringFlag(c, "pids-limit")
+			opt.CgroupParent = stringFlag(c, "cgroup-parent")
+			opt.IPC = stringFlag(c, "ipc")
+			opt.Isolation = stringFlag(c, "isolation")
+			opt.PID = stringFlag(c, "pid")
+			opt.ShmSize = stringFlag(c, "shm-size")
+			opt.UTS = stringFlag(c, "uts")
+			opt.Runtime = stringFlag(c, "runtime")
+			opt.Init = boolFlag(c, "init")
+			return nil
+		},
 		Action:                 RunAction,
 		SkipArgReorder:         true,
 		UseShortOptionHandling: true,
 	}
 }
 
+// RunAction is the action of `aliases run`.
 func RunAction(c *cli.Context) error {
-	if c.NArg() == 0 {
+	index := c.Args().Get(0)
+	if index == "" {
 		return cli.ShowCommandHelp(c, "run")
 	}
+	args := c.Args()
+	if c.NArg() > 1 {
+		args = args[1:]
+	}
 
-	ctx, err := newRunContext(c)
+	dir, err := ioutil.TempDir("/tmp", "")
 	if err != nil {
-		return err
+		return fmt.Errorf("runtime error: %s", err)
 	}
-
-	if err := ctx.MakeExportDir(); err != nil {
-		return err
-	}
-
-	if err := ctx.MakeBinaryDir(); err != nil {
+	if err := context.ChangeExportPath(dir); err != nil {
 		return err
 	}
 
@@ -301,25 +309,18 @@ func RunAction(c *cli.Context) error {
 		return err
 	}
 
-	index := ctx.GetIndex()
-	if index == nil {
-		return fmt.Errorf("")
-	}
-
-	conf, err := config.LoadConfig(ctx.ConfPath())
+	conf, err := config.LoadConfig(context.ConfPath())
 	if err != nil {
 		return err
 	}
 
-	opt, err := conf.Get(*index)
+	option, err := conf.Get(index)
 	if err != nil {
 		return err
 	}
-	cmd := script.NewScript(ctx, client, *opt)
 
-	logger.Debug(cmd.String())
-
-	if err := cmd.Run(ctx, ctx.GetArgs(), *ctx.GetInputOption()); err != nil {
+	cmd := script.NewScript(client, *option)
+	if err := cmd.Run(args, opt); err != nil {
 		return err
 	}
 

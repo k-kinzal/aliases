@@ -2,8 +2,10 @@ package script_test
 
 import (
 	"fmt"
+	"io/ioutil"
 
-	"github.com/k-kinzal/aliases/pkg/aliases"
+	"github.com/k-kinzal/aliases/pkg/aliases/context"
+
 	"github.com/k-kinzal/aliases/pkg/aliases/config"
 	"github.com/k-kinzal/aliases/pkg/aliases/script"
 	"github.com/k-kinzal/aliases/pkg/docker"
@@ -27,8 +29,11 @@ func ExampleNewScript() {
 		panic(err)
 	}
 
-	ctx, err := aliases.NewContext("", "")
+	dir, err := ioutil.TempDir("/tmp", "")
 	if err != nil {
+		panic(err)
+	}
+	if err := context.ChangeExportPath(dir); err != nil {
 		panic(err)
 	}
 
@@ -37,8 +42,8 @@ func ExampleNewScript() {
 		panic(err)
 	}
 
-	cmd := script.NewScript(ctx, client, *opt)
-	if err := cmd.Run(ctx, []string{"-c", "echo 1"}, docker.RunOption{}); err != nil {
+	cmd := script.NewScript(client, *opt)
+	if err := cmd.Run([]string{"-c", "echo 1"}, docker.RunOption{}); err != nil {
 		panic(err)
 	}
 	// Output:
@@ -63,8 +68,11 @@ func ExampleScript_Path() {
 		panic(err)
 	}
 
-	ctx, err := aliases.NewContext("", "")
+	dir, err := ioutil.TempDir("/tmp", "")
 	if err != nil {
+		panic(err)
+	}
+	if err := context.ChangeExportPath(dir); err != nil {
 		panic(err)
 	}
 
@@ -73,7 +81,7 @@ func ExampleScript_Path() {
 		panic(err)
 	}
 
-	cmd := script.NewScript(ctx, client, *opt)
+	cmd := script.NewScript(client, *opt)
 	fmt.Println(cmd.Path("/tmp"))
 	// Output: /tmp/command1
 }
@@ -96,8 +104,11 @@ func ExampleScript_FileName() {
 		panic(err)
 	}
 
-	ctx, err := aliases.NewContext("", "")
+	dir, err := ioutil.TempDir("/tmp", "")
 	if err != nil {
+		panic(err)
+	}
+	if err := context.ChangeExportPath(dir); err != nil {
 		panic(err)
 	}
 
@@ -106,7 +117,7 @@ func ExampleScript_FileName() {
 		panic(err)
 	}
 
-	cmd := script.NewScript(ctx, client, *opt)
+	cmd := script.NewScript(client, *opt)
 	fmt.Println(cmd.FileName())
 	// Output: command1
 }
@@ -129,8 +140,11 @@ func ExampleScript_String() {
 		panic(err)
 	}
 
-	ctx, err := aliases.NewContext("", "")
+	dir, err := ioutil.TempDir("/tmp", "")
 	if err != nil {
+		panic(err)
+	}
+	if err := context.ChangeExportPath(dir); err != nil {
 		panic(err)
 	}
 
@@ -139,7 +153,7 @@ func ExampleScript_String() {
 		panic(err)
 	}
 
-	cmd := script.NewScript(ctx, client, *opt)
+	cmd := script.NewScript(client, *opt)
 	fmt.Println(cmd.String())
 	// Output: docker run --entrypoint "sh" --interactive --network "host" --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") alpine:${COMMAND1_VERSION:-"latest"} -c
 }
