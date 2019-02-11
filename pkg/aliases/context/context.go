@@ -36,6 +36,9 @@ func replacetDir(path string) error {
 
 // HomePath returns home directory path for aliases.
 func HomePath() string {
+	if homePath == "" {
+		panic("logic error: home path must be set")
+	}
 	return homePath
 }
 
@@ -50,6 +53,9 @@ func ChangeHomePath(path string) error {
 
 // ConfPath returns path of configuration file.
 func ConfPath() string {
+	if confPath == "" {
+		panic("logic error: conf path must be set")
+	}
 	return confPath
 }
 
@@ -64,6 +70,9 @@ func ChangeConfPath(path string) error {
 
 // ConfPath returns path of export directory.
 func ExportPath() string {
+	if exportPath == "" {
+		panic("logic error: export path must be set")
+	}
 	return exportPath
 }
 
