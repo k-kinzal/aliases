@@ -51,6 +51,11 @@ func (script *Script) Run(args []string, opt docker.RunOption) error {
 				return util.FlagError(matches[1], matches[2], matches[3])
 			}
 		}
+		// remove docker prefix
+		if strings.HasPrefix(line, "docker: Error response from daemon: ") {
+			fmt.Fprintln(os.Stderr, "aliases: error response from daemon: "+strings.TrimPrefix(line, "docker: Error response from daemon: "))
+			continue
+		}
 		// suppress guidance to help
 		if line == "See 'docker run --help'." {
 			continue
