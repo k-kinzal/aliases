@@ -2,8 +2,12 @@ package main
 
 import (
 	"os"
+	"os/exec"
 	"os/user"
 	"path"
+	"syscall"
+
+	"github.com/k-kinzal/aliases/pkg/util"
 
 	"github.com/k-kinzal/aliases/pkg/aliases/yaml"
 
@@ -62,6 +66,9 @@ func main() {
 		}
 		// home directory setting
 		homePath := ctx.GlobalString("home")
+		if homePath != "" && !util.IsFilePath(homePath) {
+			return cmd.FlagError("home", homePath, "invalid path or path denied permission")
+		}
 		if homePath == "" {
 			usr, _ := user.Current()
 			homePath = path.Join(usr.HomeDir, ".aliases")
@@ -74,6 +81,9 @@ func main() {
 		}
 		// configuration file setting
 		confPath := ctx.GlobalString("config")
+		if confPath != "" && !util.IsFilePath(confPath) {
+			return cmd.FlagError("config, c", confPath, "invalid path or path denied permission")
+		}
 		if confPath == "" {
 			cwd, _ := os.Getwd()
 			confPath = path.Join(cwd, "aliases.yaml")
@@ -94,8 +104,15 @@ func main() {
 	err := app.Run(os.Args)
 	if err != nil {
 		switch e := err.(type) {
+		case *cmd.InvalidFlagError:
+			logger.Fatal(e)
 		case *yaml.YAMLError:
 			logger.Fatal(e)
+		case *exec.ExitError:
+			if status, ok := e.Sys().(syscall.WaitStatus); ok {
+				os.Exit(status.ExitStatus())
+			}
+			logger.Fatalf("runtime error: %s", e)
 		default:
 			logger.Fatalf("runtime error: %s", e)
 		}

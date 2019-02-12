@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"path"
 
+	"github.com/k-kinzal/aliases/pkg/util"
+
 	"github.com/k-kinzal/aliases/pkg/aliases/context"
 	"github.com/k-kinzal/aliases/pkg/types"
 
@@ -44,6 +46,9 @@ func GenCommand() cli.Command {
 func GenAction(c *cli.Context) error {
 	isExport := c.Bool("export")
 	exportPath := c.String("export-path")
+	if exportPath != "" && !util.IsFilePath(exportPath) {
+		return FlagError("export-path", exportPath, "invalid path or path denied permission")
+	}
 	if exportPath == "" {
 		exportPath = path.Join(context.HomePath(), types.MD5(context.ConfPath()))
 	}
