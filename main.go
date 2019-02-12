@@ -67,7 +67,7 @@ func main() {
 		// home directory setting
 		homePath := ctx.GlobalString("home")
 		if homePath != "" && !util.IsFilePath(homePath) {
-			return cmd.FlagError("home", homePath, "invalid path or path denied permission")
+			return util.FlagError("home", homePath, "invalid path or path denied permission")
 		}
 		if homePath == "" {
 			usr, _ := user.Current()
@@ -82,7 +82,7 @@ func main() {
 		// configuration file setting
 		confPath := ctx.GlobalString("config")
 		if confPath != "" && !util.IsFilePath(confPath) {
-			return cmd.FlagError("config, c", confPath, "invalid path or path denied permission")
+			return util.FlagError("config, c", confPath, "invalid path or path denied permission")
 		}
 		if confPath == "" {
 			cwd, _ := os.Getwd()
@@ -104,7 +104,7 @@ func main() {
 	err := app.Run(os.Args)
 	if err != nil {
 		switch e := err.(type) {
-		case *cmd.InvalidFlagError:
+		case *util.InvalidFlagError:
 			logger.Fatal(e)
 		case *yaml.YAMLError:
 			logger.Fatal(e)
@@ -112,7 +112,6 @@ func main() {
 			if status, ok := e.Sys().(syscall.WaitStatus); ok {
 				os.Exit(status.ExitStatus())
 			}
-			logger.Fatalf("runtime error: %s", e)
 		default:
 			logger.Fatalf("runtime error: %s", e)
 		}
