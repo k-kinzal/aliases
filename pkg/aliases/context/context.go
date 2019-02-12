@@ -17,7 +17,7 @@ var (
 func makeDir(path string) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		if err := os.Mkdir(path, 0755); err != nil {
-			return fmt.Errorf("runtime error: %s", err)
+			return err
 		}
 	}
 	return nil
@@ -26,10 +26,10 @@ func makeDir(path string) error {
 // replaceDir replace directory.
 func replacetDir(path string) error {
 	if err := os.RemoveAll(path); err != nil {
-		return fmt.Errorf("runtime error: %s", err)
+		return err
 	}
 	if err := os.Mkdir(path, 0755); err != nil {
-		return fmt.Errorf("runtime error: %s", err)
+		return err
 	}
 	return nil
 }
@@ -62,7 +62,7 @@ func ConfPath() string {
 // ChangeConfPath changes configuration file path for aliases.
 func ChangeConfPath(path string) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return fmt.Errorf("runtime error: %s: No such file or directory", path)
+		return fmt.Errorf("%s: no such file or directory", path)
 	}
 	confPath = path
 	return nil

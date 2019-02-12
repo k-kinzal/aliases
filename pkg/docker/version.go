@@ -137,7 +137,7 @@ func (client *Client) ServerVersion() (*ServerVersion, error) {
 			if !ok {
 				return nil, err
 			}
-			return nil, fmt.Errorf("runtime error: %s", string(e.Stderr))
+			return nil, fmt.Errorf("%s", strings.ToLower(string(e.Stderr)))
 		}
 	}
 	s := strings.Split(strings.Trim(string(out), "\"\n"), "\\n")

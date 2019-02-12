@@ -113,7 +113,7 @@ func main() {
 				os.Exit(status.ExitStatus())
 			}
 		default:
-			logger.Fatalf("runtime error: %s", e)
+			logger.Fatalf("aliases: %s", e)
 		}
 		os.Exit(1)
 	}

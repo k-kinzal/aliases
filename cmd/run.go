@@ -298,7 +298,7 @@ func RunAction(c *cli.Context) error {
 
 	dir, err := ioutil.TempDir("/tmp", "")
 	if err != nil {
-		return fmt.Errorf("runtime error: %s", err)
+		return err
 	}
 	if err := context.ChangeExportPath(dir); err != nil {
 		return err

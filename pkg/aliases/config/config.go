@@ -36,7 +36,7 @@ func (c *Config) has(path Path) bool {
 func (c *Config) Get(index string) (*Option, error) {
 	opt, ok := c.options[index]
 	if !ok {
-		return nil, fmt.Errorf("runtime error: %s: not found option", index)
+		return nil, fmt.Errorf("%s: index that does not exist in the config", index)
 	}
 	return &opt, nil
 }
@@ -104,12 +104,12 @@ func Unmarshal(buf []byte) (*Config, error) {
 // LoadConfig load the configuration from the conifiguration file.
 func LoadConfig(path string) (*Config, error) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return nil, fmt.Errorf("runtime error: %s", err)
+		return nil, fmt.Errorf("%s: no such file or directory", path)
 	}
 
 	buf, err := ioutil.ReadFile(path)
 	if err != nil {
-		return nil, fmt.Errorf("runtime error: %s", err)
+		return nil, err
 	}
 
 	config, err := Unmarshal(buf)

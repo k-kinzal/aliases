@@ -55,7 +55,7 @@ func NewClient() (*Client, error) {
 		// docker binary path
 		path := exec.Command("docker").Path
 		if path == "docker" {
-			err = fmt.Errorf("runtime error: docker is not installed. see https://docs.docker.com/install/")
+			err = fmt.Errorf("docker is not installed. see https://docs.docker.com/install/")
 			return
 		}
 		c.path = path
@@ -70,7 +70,7 @@ func NewClient() (*Client, error) {
 		} else {
 			sock := strings.TrimPrefix(c.host, "unix://")
 			if _, err := os.Stat(sock); err != nil {
-				err = fmt.Errorf("runtime error: %s: no such file. please set DOCKER_HOST", sock)
+				err = fmt.Errorf("%s: no such file. please set DOCKER_HOST", sock)
 				return
 			}
 			c.sock = &sock
@@ -78,7 +78,7 @@ func NewClient() (*Client, error) {
 		// docker version
 		clientVersion, e := c.ClientVersion()
 		if e != nil {
-			err = fmt.Errorf("runtime error: docker is not installed. see https://docs.docker.com/install/")
+			err = fmt.Errorf("docker is not installed. see https://docs.docker.com/install/")
 			return
 		}
 		serverVersion, _ := c.ServerVersion()

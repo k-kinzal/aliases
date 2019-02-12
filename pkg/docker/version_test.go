@@ -39,7 +39,7 @@ func TestClient_ServerVersion(t *testing.T) {
 	}
 
 	_, err = client.ServerVersion()
-	if err != nil && !strings.HasPrefix(err.Error(), "runtime error: Cannot connect to the Docker daemon") {
+	if err != nil && !strings.HasPrefix(err.Error(), "cannot connect to the docker daemon") {
 		t.Fatal(err)
 	}
 }
