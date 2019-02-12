@@ -5,6 +5,8 @@ import (
 	"os/user"
 	"path"
 
+	"github.com/k-kinzal/aliases/pkg/aliases/yaml"
+
 	"github.com/k-kinzal/aliases/pkg/aliases/context"
 
 	"github.com/k-kinzal/aliases/pkg/logger"
@@ -91,7 +93,12 @@ func main() {
 
 	err := app.Run(os.Args)
 	if err != nil {
-		logger.Fatal(err)
+		switch e := err.(type) {
+		case *yaml.YAMLError:
+			logger.Fatal(e)
+		default:
+			logger.Fatalf("runtime error: %s", e)
+		}
 		os.Exit(1)
 	}
 }

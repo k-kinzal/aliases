@@ -59,7 +59,7 @@ func (spec *DependencySpec) UnmarshalYAML(unmarshal func(interface{}) error) err
 		}
 		*spec = *NewDependencySpec(v)
 	default:
-		return fmt.Errorf("yaml error: cannot unmarshal !!%T `%v` into string or map", v, v)
+		return fmt.Errorf("cannot unmarshal !!%T `%v` into string or map", v, v)
 	}
 
 	return nil
