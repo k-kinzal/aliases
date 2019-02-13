@@ -53,12 +53,7 @@ func NewClient() (*Client, error) {
 	once.Do(func() {
 		c := &Client{}
 		// docker binary path
-		path := exec.Command("docker").Path
-		if path == "docker" {
-			err = fmt.Errorf("docker is not installed. see https://docs.docker.com/install/")
-			return
-		}
-		c.path = path
+		c.path = exec.Command("docker").Path
 		// docker host
 		c.host = os.Getenv("DOCKER_HOST")
 		if c.host == "" {
