@@ -15,15 +15,6 @@ func ExampleScript_Run() {
   image: alpine
   tag: latest
   entrypoint: sh
-  env:
-    FOO: 1
-  dependencies:
-  - /path/to/command2:
-      image: alpine
-      tag: latest
-      entrypoint: sh
-      env:
-        FOO: 1
 `
 	conf, err := config.Unmarshal([]byte(content))
 	if err != nil {
@@ -57,7 +48,7 @@ func ExampleScript_Run() {
 	}
 
 	cmd := script.NewScript(client, *opt)
-	if err := cmd.Run([]string{"-c", "'/path/to/command2 -c '\"'\"'echo $FOO'\"'\"''"}, docker.RunOption{}); err != nil {
+	if err := cmd.Run([]string{"-c", "echo 1"}, docker.RunOption{}); err != nil {
 		panic(err)
 	}
 	// Output:
