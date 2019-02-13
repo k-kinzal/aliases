@@ -6,6 +6,8 @@
     GOPATH: /go
   volume:
   - $PWD:/go/src/github.com/k-kinzal/aliases
+  - $(which docker):/usr/local/bin/docker
+  - /var/run/docker.sock:/var/run/docker.sock
   workdir: /go/src/github.com/k-kinzal/aliases
 
 /usr/local/bin/dep:
