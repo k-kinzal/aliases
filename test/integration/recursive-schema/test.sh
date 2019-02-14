@@ -14,5 +14,5 @@ ${ALIASES} gen --export --export-path "${TEMP_DIR}" | ${MASK} | ${DIFF} ${TEST_D
 cat ${TEMP_DIR}/alpine1 | ${MASK} | ${DIFF} ${TEST_DIR}/alpine1 -
 cat ${TEMP_DIR}/alpine2 | ${MASK} | ${DIFF} ${TEST_DIR}/alpine2 -
 
-${TEMP_DIR}/alpine2 /bin/sh -c "alpine3 /bin/sh -c \"alpine5 /bin/sh -c \\\"echo 1\\\"\"" | ${MASK} | ${DIFF} ${TEST_DIR}/stdout -
-${ALIASES} run /usr/local/bin/alpine2 /bin/sh -c "alpine3 /bin/sh -c \"alpine5 /bin/sh -c \\\"echo 1\\\"\"" | ${MASK} | ${DIFF} ${TEST_DIR}/stdout -
+FOO=1 ${TEMP_DIR}/alpine2 /bin/sh -c 'alpine3 /bin/sh -c \\'alpine5 /bin/sh -c \\\\'echo $FOO\\\\'\\'' | ${MASK} | ${DIFF} ${TEST_DIR}/stdout -
+FOO=1 ${ALIASES} run /usr/local/bin/alpine2 /bin/sh -c 'alpine3 /bin/sh -c \\'alpine5 /bin/sh -c \\\\'echo $FOO\\\\'\\'' | ${MASK} | ${DIFF} ${TEST_DIR}/stdout -

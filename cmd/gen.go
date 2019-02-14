@@ -2,44 +2,26 @@ package cmd
 
 import (
 	"fmt"
-	pathes "path"
+	"path"
 
-	"github.com/k-kinzal/aliases/pkg/aliases"
+	"github.com/k-kinzal/aliases/pkg/util"
+
+	"github.com/k-kinzal/aliases/pkg/aliases/context"
+	"github.com/k-kinzal/aliases/pkg/types"
+
+	"github.com/k-kinzal/aliases/pkg/docker"
+
+	"github.com/k-kinzal/aliases/pkg/aliases/config"
+	"github.com/k-kinzal/aliases/pkg/aliases/script"
+
 	"github.com/k-kinzal/aliases/pkg/posix"
 
-	"github.com/k-kinzal/aliases/pkg/export"
 	"github.com/urfave/cli"
 )
 
-type genContext struct {
-	aliases.Context
-	cli cli.Context
-}
-
-func (ctx *genContext) ExportPath() string {
-	path := ctx.cli.String("export-path")
-	if path == "" {
-		path = ctx.Context.ExportPath()
-	}
-	return path
-}
-
-func (ctx *genContext) isExport() bool {
-	return ctx.cli.Bool("export")
-}
-
-func newGenContext(c *cli.Context) (*genContext, error) {
-	ctx, err := aliases.NewContext(
-		c.GlobalString("home"),
-		c.GlobalString("config"),
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &genContext{ctx, *c}, nil
-}
-
+// GenCommand returns `aliases gen` command.
+//
+// `aliases gen` aliases the command defined in aliases.yaml, or export the path of the command.
 func GenCommand() cli.Command {
 	return cli.Command{
 		Name:  "gen",
@@ -60,67 +42,62 @@ func GenCommand() cli.Command {
 	}
 }
 
+// GenAction is the action of `aliases gen`.
 func GenAction(c *cli.Context) error {
-	ctx, err := newGenContext(c)
+	isExport := c.Bool("export")
+	exportPath := c.String("export-path")
+	if exportPath != "" && !util.IsFilePath(exportPath) {
+		return util.FlagError("export-path", exportPath, "invalid path or path denied permission")
+	}
+	if exportPath == "" {
+		exportPath = path.Join(context.HomePath(), types.MD5(context.ConfPath()))
+	}
+	if err := context.ChangeExportPath(exportPath); err != nil {
+		return err
+	}
+
+	client, err := docker.NewClient()
 	if err != nil {
 		return err
 	}
 
-	if err := ctx.MakeExportDir(); err != nil {
-		return err
-	}
-
-	ledger, err := aliases.NewLedgerFromConfig(ctx.ConfPath())
+	conf, err := config.LoadConfig(context.ConfPath())
 	if err != nil {
 		return err
 	}
 
-	if ctx.isExport() {
-		for _, schema := range ledger.Schemas() {
-			cmd, err := aliases.NewCommand(ctx, schema)
+	for _, binary := range conf.Binaries(context.BinaryPath()) {
+		if err := docker.Download(binary.Path, binary.Image, binary.Tag); err != nil {
+			return err
+		}
+	}
+
+	if isExport {
+		for _, opt := range conf.Slice() {
+			cmd := script.NewScript(client, opt)
 			if err != nil {
 				return err
 			}
-			if err := export.Script(pathes.Join(ctx.ExportPath(), schema.FileName), *cmd); err != nil {
+			_, err := cmd.Write()
+			if err != nil {
 				return err
 			}
 		}
-		exp := posix.PathExport(ctx.ExportPath(), false)
-		fmt.Println(exp.String())
+		fmt.Println(posix.PathExport(context.ExportPath()))
 	} else {
-		for _, schema := range ledger.Schemas() {
-			for _, dependency := range schema.Dependencies {
-				if dependency.IsSchema() {
-					for _, s := range dependency.Schemas() {
-						cmd, err := aliases.NewCommand(ctx, s)
-						if err != nil {
-							return err
-						}
-						if err := export.Script(pathes.Join(ctx.ExportPath(), schema.FileName), *cmd); err != nil {
-							return err
-						}
-					}
-				} else {
-					s, err := ledger.LookUp(dependency.String())
-					if err != nil {
-						return err
-					}
-					cmd, err := aliases.NewCommand(ctx, *s)
-					if err != nil {
-						return err
-					}
-					if err := export.Script(pathes.Join(ctx.ExportPath(), schema.FileName), *cmd); err != nil {
-						return err
-					}
-				}
-			}
-			cmd, err := aliases.NewCommand(ctx, schema)
+		aliases := make([]posix.Cmd, 0)
+		for _, opt := range conf.Slice() {
+			cmd := script.NewScript(client, opt)
 			if err != nil {
 				return err
 			}
-
-			alias := posix.Alias(schema.FileName, cmd.String())
-
+			_, err := cmd.Write()
+			if err != nil {
+				return err
+			}
+			aliases = append(aliases, *posix.Alias(cmd.FileName(), cmd.String()))
+		}
+		for _, alias := range aliases {
 			fmt.Println(alias.String())
 		}
 	}

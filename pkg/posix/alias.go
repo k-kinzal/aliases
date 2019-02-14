@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+// Alias is the alias wrapper for the POSIX command.
+//
 // see: http://pubs.opengroup.org/onlinepubs/9699919799/utilities/alias.html
 func Alias(name string, str string) *Cmd {
 	cmd := Command("alias")

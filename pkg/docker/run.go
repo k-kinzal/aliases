@@ -1,402 +1,447 @@
-package aliases
+package docker
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
-	"path"
 	"strconv"
 	"strings"
 
-	"github.com/k-kinzal/aliases/pkg/export"
-	yaml "gopkg.in/yaml.v2"
-
 	"github.com/k-kinzal/aliases/pkg/posix"
-	"github.com/k-kinzal/aliases/pkg/util"
 )
 
-func NewCommand(ctx Context, schema Schema) (*posix.Cmd, error) {
-	cmd := posix.Command("docker", "run")
+// RunOption is an option for executing docker run.
+type RunOption struct {
+	AddHost             []string
+	Attach              []string
+	BlkioWeight         *string
+	BlkioWeightDevice   []string
+	CIDFile             *string
+	CPUPeriod           *string
+	CPUQuota            *string
+	CPURtPeriod         *string
+	CPURtRuntime        *string
+	CPUShares           *string
+	CPUs                *string
+	CPUsetCPUs          *string
+	CPUsetMems          *string
+	CapAdd              []string
+	CapDrop             []string
+	CgroupParent        *string
+	DNS                 []string
+	DNSOption           []string
+	DNSSearch           []string
+	Detach              *string
+	DetachKeys          *string
+	Device              []string
+	DeviceCgroupRule    []string
+	DeviceReadBPS       []string
+	DeviceReadIOPS      []string
+	DeviceWriteBPS      []string
+	DeviceWriteIOPS     []string
+	DisableContentTrust *string
+	Domainname          *string
+	Entrypoint          *string
+	Env                 map[string]string
+	EnvFile             []string
+	Expose              []string
+	GroupAdd            []string
+	HealthCmd           *string
+	HealthInterval      *string
+	HealthRetries       *string
+	HealthStartPeriod   *string
+	HealthTimeout       *string
+	Hostname            *string
+	IP                  *string
+	IP6                 *string
+	IPC                 *string
+	Init                *string
+	Interactive         *string
+	Isolation           *string
+	KernelMemory        *string
+	Label               map[string]string
+	LabelFile           []string
+	Link                []string
+	LinkLocalIP         []string
+	LogDriver           *string
+	LogOpt              map[string]string
+	MacAddress          *string
+	Memory              *string
+	MemoryReservation   *string
+	MemorySwap          *string
+	MemorySwappiness    *string
+	Mount               map[string]string
+	Name                *string
+	Network             *string
+	NetworkAlias        []string
+	NoHealthcheck       *string
+	OOMKillDisable      *string
+	OOMScoreAdj         *string
+	PID                 *string
+	PidsLimit           *string
+	Platform            *string
+	Privileged          *string
+	Publish             []string
+	PublishAll          *string
+	ReadOnly            *string
+	Restart             *string
+	Rm                  *string
+	Runtime             *string
+	SecurityOpt         map[string]string
+	ShmSize             *string
+	SigProxy            *string
+	StopSignal          *string
+	StopTimeout         *string
+	StorageOpt          map[string]string
+	Sysctl              map[string]string
+	TTY                 *string
+	Tmpfs               []string
+	UTS                 *string
+	Ulimit              map[string]string
+	User                *string
+	Userns              *string
+	Volume              []string
+	VolumeDriver        *string
+	VolumesFrom         []string
+	Workdir             *string
+}
 
-	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.AddHost) {
+// Run returns a command that can execute docker run.
+func (client *Client) Run(image string, args []string, option RunOption) *posix.Cmd {
+	cmd := posix.Command(client.path, "run")
+
+	for _, v := range option.AddHost {
 		cmd.Args = append(cmd.Args, "--add-host", strconv.Quote(v))
 	}
-	for _, v := range schema.Attach {
+	for _, v := range option.Attach {
 		cmd.Args = append(cmd.Args, "--attach", strconv.Quote(v))
 	}
-	if v := schema.BlkioWeight; v != nil {
+	if v := option.BlkioWeight; v != nil {
 		cmd.Args = append(cmd.Args, "--blkio-weight", strconv.Quote(*v))
 	}
-	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.BlkioWeightDevice) {
+	for _, v := range option.BlkioWeightDevice {
 		cmd.Args = append(cmd.Args, "--blkio-weight-device", strconv.Quote(v))
 	}
-	for _, v := range schema.CapAdd {
+	for _, v := range option.CapAdd {
 		cmd.Args = append(cmd.Args, fmt.Sprintf("--cap-add=%s", strconv.Quote(v)))
 	}
-	for _, v := range schema.CapDrop {
+	for _, v := range option.CapDrop {
 		cmd.Args = append(cmd.Args, fmt.Sprintf("--cap-drop=%s", strconv.Quote(v)))
 	}
-	if v := schema.CgroupParent; v != nil {
+	if v := option.CgroupParent; v != nil {
 		cmd.Args = append(cmd.Args, fmt.Sprintf("--cgroup-parent==%s", strconv.Quote(*v)))
 	}
-	if v := schema.CIDFile; v != nil {
+	if v := option.CIDFile; v != nil {
 		cmd.Args = append(cmd.Args, "--cidfile", strconv.Quote(*v))
 	}
-	if v := schema.CPUPeriod; v != nil {
+	if v := option.CPUPeriod; v != nil {
 		cmd.Args = append(cmd.Args, "--cpu-period", strconv.Quote(*v))
 	}
-	if v := schema.CPUQuota; v != nil {
+	if v := option.CPUQuota; v != nil {
 		cmd.Args = append(cmd.Args, "--cpu-quota", strconv.Quote(*v))
 	}
-	if v := schema.CPURtPeriod; v != nil {
+	if v := option.CPURtPeriod; v != nil {
 		cmd.Args = append(cmd.Args, "--cpu-rt-period", strconv.Quote(*v))
 	}
-	if v := schema.CPURtRuntime; v != nil {
+	if v := option.CPURtRuntime; v != nil {
 		cmd.Args = append(cmd.Args, "--cpu-rt-runtime", strconv.Quote(*v))
 	}
-	if v := schema.CPUShares; v != nil {
+	if v := option.CPUShares; v != nil {
 		cmd.Args = append(cmd.Args, "--cpu-shares", strconv.Quote(*v))
 	}
-	if v := schema.CPUs; v != nil {
+	if v := option.CPUs; v != nil {
 		cmd.Args = append(cmd.Args, "--cpus", strconv.Quote(*v))
 	}
-	if v := schema.CPUsetCPUs; v != nil {
+	if v := option.CPUsetCPUs; v != nil {
 		cmd.Args = append(cmd.Args, "--cpuset-cpus", strconv.Quote(*v))
 	}
-	if v := schema.CPUsetMems; v != nil {
+	if v := option.CPUsetMems; v != nil {
 		cmd.Args = append(cmd.Args, "--cpuset-mems", strconv.Quote(*v))
 	}
-	if v := schema.Detach; v != nil && *v != "false" {
+	if v := option.Detach; v != nil && *v != "false" {
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--detach")
 		} else {
 			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--detach\")", strconv.Quote(*v)))
 		}
 	}
-	if v := schema.DetachKeys; v != nil {
+	if v := option.DetachKeys; v != nil {
 		cmd.Args = append(cmd.Args, "--detach-keys", strconv.Quote(*v))
 	}
-	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.Device) {
+	for _, v := range option.Device {
 		cmd.Args = append(cmd.Args, "--device", strconv.Quote(v))
 	}
-	for _, v := range schema.DeviceCgroupRule {
+	for _, v := range option.DeviceCgroupRule {
 		cmd.Args = append(cmd.Args, "--device-cgroup-rule", strconv.Quote(v))
 	}
-	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.DeviceReadBPS) {
+	for _, v := range option.DeviceReadBPS {
 		cmd.Args = append(cmd.Args, "--device-read-bps", strconv.Quote(v))
 	}
-	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.DeviceReadIOPS) {
+	for _, v := range option.DeviceReadIOPS {
 		cmd.Args = append(cmd.Args, "--device-read-iops", strconv.Quote(v))
 	}
-	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.DeviceWriteBPS) {
+	for _, v := range option.DeviceWriteBPS {
 		cmd.Args = append(cmd.Args, "--device-write-bps", strconv.Quote(v))
 	}
-	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.DeviceWriteIOPS) {
+	for _, v := range option.DeviceWriteIOPS {
 		cmd.Args = append(cmd.Args, "--device-write-iops", strconv.Quote(v))
 	}
-	if v := schema.DisableContentTrust; v != nil && *v != "false" {
+	if v := option.DisableContentTrust; v != nil && *v != "false" {
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--disable-content-trust")
 		} else {
 			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--disable-content-trust\")", strconv.Quote(*v)))
 		}
 	}
-	for _, v := range schema.DNS {
+	for _, v := range option.DNS {
 		cmd.Args = append(cmd.Args, "--dns", strconv.Quote(v))
 	}
-	for _, v := range schema.DNSOption {
+	for _, v := range option.DNSOption {
 		cmd.Args = append(cmd.Args, "--dns-option", strconv.Quote(v))
 	}
-	for _, v := range schema.DNSSearch {
+	for _, v := range option.DNSSearch {
 		cmd.Args = append(cmd.Args, "--dns-search", strconv.Quote(v))
 	}
-	if v := schema.Entrypoint; v != nil {
+	if v := option.Entrypoint; v != nil {
 		cmd.Args = append(cmd.Args, "--entrypoint", strconv.Quote(*v))
 	}
-	for k, v := range util.ExpandStringKeyMapWithEnv(schema.Env) {
+	for k, v := range option.Env {
 		cmd.Args = append(cmd.Args, "--env", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
 	}
-	if (len(schema.Dependencies) > 0) && !ctx.HasDockerSocket() {
-		cmd.Args = append(cmd.Args, "--env", fmt.Sprintf("DOCKER_HOST=%s", strconv.Quote(ctx.DockerHost())))
-	}
-	if len(schema.Dependencies) > 0 {
-		cmd.Args = append(cmd.Args, "--env", fmt.Sprintf("ALIASES_PWD=%s", strconv.Quote("${ALIASES_PWD:-$PWD}")))
-	}
-	for _, v := range schema.EnvFile {
+	for _, v := range option.EnvFile {
 		cmd.Args = append(cmd.Args, "--env-file", strconv.Quote(v))
 	}
-	for _, v := range schema.Expose {
+	for _, v := range option.Expose {
 		cmd.Args = append(cmd.Args, "--expose", strconv.Quote(v))
 	}
-	for _, v := range schema.GroupAdd {
+	for _, v := range option.GroupAdd {
 		cmd.Args = append(cmd.Args, "--group-add", strconv.Quote(v))
 	}
-	if v := schema.HealthCmd; v != nil {
+	if v := option.HealthCmd; v != nil {
 		cmd.Args = append(cmd.Args, "--health-cmd", strconv.Quote(*v))
 	}
-	if v := schema.HealthInterval; v != nil {
+	if v := option.HealthInterval; v != nil {
 		cmd.Args = append(cmd.Args, "--health-interval", strconv.Quote(*v))
 	}
-	if v := schema.HealthRetries; v != nil {
+	if v := option.HealthRetries; v != nil {
 		cmd.Args = append(cmd.Args, "--health-retries", strconv.Quote(*v))
 	}
-	if v := schema.HealthStartPeriod; v != nil {
+	if v := option.HealthStartPeriod; v != nil {
 		cmd.Args = append(cmd.Args, "--health-start-period", strconv.Quote(*v))
 	}
-	if v := schema.HealthTimeout; v != nil {
+	if v := option.HealthTimeout; v != nil {
 		cmd.Args = append(cmd.Args, "--health-timeout", strconv.Quote(*v))
 	}
-	if v := schema.Hostname; v != nil {
+	if v := option.Hostname; v != nil {
 		cmd.Args = append(cmd.Args, "--hostname", strconv.Quote(*v))
 	}
-	if v := schema.Init; v != nil && *v != "false" {
+	if v := option.Init; v != nil && *v != "false" {
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--init")
 		} else {
 			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--init\")", strconv.Quote(*v)))
 		}
 	}
-	if v := schema.Interactive; v != nil && *v != "false" {
+	if v := option.Interactive; v != nil && *v != "false" {
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--interactive")
 		} else {
 			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--interactive\")", strconv.Quote(*v)))
 		}
 	}
-	if v := schema.IP; v != nil {
+	if v := option.IP; v != nil {
 		cmd.Args = append(cmd.Args, "--ip", strconv.Quote(*v))
 	}
-	if v := schema.IP; v != nil {
+	if v := option.IP; v != nil {
 		cmd.Args = append(cmd.Args, "--ip6", strconv.Quote(*v))
 	}
-	if v := schema.IPC; v != nil {
+	if v := option.IPC; v != nil {
 		cmd.Args = append(cmd.Args, "--ipc", strconv.Quote(*v))
 	}
-	if v := schema.Isolation; v != nil {
+	if v := option.Isolation; v != nil {
 		cmd.Args = append(cmd.Args, "--isolation", strconv.Quote(*v))
 	}
-	if v := schema.KernelMemory; v != nil {
+	if v := option.KernelMemory; v != nil {
 		cmd.Args = append(cmd.Args, "--kernel-memory", strconv.Quote(*v))
 	}
-	for k, v := range util.ExpandStringKeyMapWithEnv(schema.Label) {
+	for k, v := range option.Label {
 		cmd.Args = append(cmd.Args, "--label", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
 	}
-	for _, v := range schema.LabelFile {
+	for _, v := range option.LabelFile {
 		cmd.Args = append(cmd.Args, "--label-file", strconv.Quote(v))
 	}
-	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.Link) {
+	for _, v := range option.Link {
 		cmd.Args = append(cmd.Args, "--link", strconv.Quote(v))
 	}
-	for _, v := range schema.LinkLocalIP {
+	for _, v := range option.LinkLocalIP {
 		cmd.Args = append(cmd.Args, "--link-loal-ip", strconv.Quote(v))
 	}
-	if v := schema.LogDriver; v != nil {
+	if v := option.LogDriver; v != nil {
 		cmd.Args = append(cmd.Args, "--log-driver", strconv.Quote(*v))
 	}
-	for k, v := range util.ExpandStringKeyMapWithEnv(schema.LogOpt) {
+	for k, v := range option.LogOpt {
 		cmd.Args = append(cmd.Args, "--log-opt", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
 	}
-	if v := schema.MacAddress; v != nil {
+	if v := option.MacAddress; v != nil {
 		cmd.Args = append(cmd.Args, "--mac-address", strconv.Quote(*v))
 	}
-	if v := schema.Memory; v != nil {
+	if v := option.Memory; v != nil {
 		cmd.Args = append(cmd.Args, "--memory", strconv.Quote(*v))
 	}
-	if v := schema.MemoryReservation; v != nil {
+	if v := option.MemoryReservation; v != nil {
 		cmd.Args = append(cmd.Args, "--memory-reservation", strconv.Quote(*v))
 	}
-	if v := schema.MemorySwap; v != nil {
+	if v := option.MemorySwap; v != nil {
 		cmd.Args = append(cmd.Args, "--memory-swap", strconv.Quote(*v))
 	}
-	if v := schema.MemorySwappiness; v != nil {
+	if v := option.MemorySwappiness; v != nil {
 		cmd.Args = append(cmd.Args, "--memory-swappiness", strconv.Quote(*v))
 	}
-	for k, v := range util.ExpandStringKeyMapWithEnv(schema.Mount) {
+	for k, v := range option.Mount {
 		cmd.Args = append(cmd.Args, "--mount", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
 	}
-	if v := schema.Name; v != nil {
+	if v := option.Name; v != nil {
 		cmd.Args = append(cmd.Args, "--name", strconv.Quote(*v))
 	}
-	if (len(schema.Dependencies) > 0) && !ctx.HasDockerSocket() {
-		cmd.Args = append(cmd.Args, "--network", strconv.Quote("host"))
-	} else if v := schema.Network; v != nil {
+	if v := option.Network; v != nil {
 		cmd.Args = append(cmd.Args, "--network", strconv.Quote(*v))
 	}
-	for _, v := range schema.NetworkAlias {
+	for _, v := range option.NetworkAlias {
 		cmd.Args = append(cmd.Args, "--network-alias", strconv.Quote(v))
 	}
-	if v := schema.NoHealthcheck; v != nil && *v != "false" {
+	if v := option.NoHealthcheck; v != nil && *v != "false" {
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--no-healthcheck")
 		} else {
 			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--no-healthcheck\")", strconv.Quote(*v)))
 		}
 	}
-	if v := schema.OOMKillDisable; v != nil && *v != "false" {
+	if v := option.OOMKillDisable; v != nil && *v != "false" {
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--oom-kill-disable")
 		} else {
 			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--oom-kill-disable\")", strconv.Quote(*v)))
 		}
 	}
-	if v := schema.OOMScoreAdj; v != nil {
+	if v := option.OOMScoreAdj; v != nil {
 		cmd.Args = append(cmd.Args, "--oom-secore-adj", strconv.Quote(*v))
 	}
-	if v := schema.PID; v != nil {
+	if v := option.PID; v != nil {
 		cmd.Args = append(cmd.Args, "--pid", strconv.Quote(*v))
 	}
-	if v := schema.PidsLimit; v != nil {
+	if v := option.PidsLimit; v != nil {
 		cmd.Args = append(cmd.Args, "--pids-limit", strconv.Quote(*v))
 	}
-	if v := schema.Platform; v != nil {
+	if v := option.Platform; v != nil {
 		cmd.Args = append(cmd.Args, "--platform", strconv.Quote(*v))
 	}
-	if (len(schema.Dependencies) > 0) && ctx.HasDockerSocket() {
-		cmd.Args = append(cmd.Args, "--privileged")
-	} else if v := schema.Privileged; v != nil && *v != "false" {
+	if v := option.Privileged; v != nil && *v != "false" {
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--privileged")
 		} else {
 			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--privileged\")", strconv.Quote(*v)))
 		}
 	}
-	for _, v := range schema.Publish {
+	for _, v := range option.Publish {
 		cmd.Args = append(cmd.Args, "--publish", strconv.Quote(v))
 	}
-	if v := schema.PublishAll; v != nil && *v != "false" {
+	if v := option.PublishAll; v != nil && *v != "false" {
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--publish-all")
 		} else {
 			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--publish-all\")", strconv.Quote(*v)))
 		}
 	}
-	if v := schema.ReadOnly; v != nil && *v != "false" {
+	if v := option.ReadOnly; v != nil && *v != "false" {
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--readonly")
 		} else {
 			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--readonly\")", strconv.Quote(*v)))
 		}
 	}
-	if v := schema.Restart; v != nil {
+	if v := option.Restart; v != nil {
 		cmd.Args = append(cmd.Args, "--restart", strconv.Quote(*v))
 	}
-	if v := schema.Rm; v != nil && *v != "false" {
+	if v := option.Rm; v != nil && *v != "false" {
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--rm")
 		} else {
 			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--rm\")", strconv.Quote(*v)))
 		}
 	}
-	if v := schema.Runtime; v != nil {
+	if v := option.Runtime; v != nil {
 		cmd.Args = append(cmd.Args, "--runtime", strconv.Quote(*v))
 	}
-	for k, v := range util.ExpandStringKeyMapWithEnv(schema.SecurityOpt) {
+	for k, v := range option.SecurityOpt {
 		cmd.Args = append(cmd.Args, "--security-opt", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
 	}
-	if v := schema.ShmSize; v != nil {
+	if v := option.ShmSize; v != nil {
 		cmd.Args = append(cmd.Args, "--shm-size", strconv.Quote(*v))
 	}
-	if v := schema.SigProxy; v != nil && *v != "false" {
+	if v := option.SigProxy; v != nil && *v != "false" {
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--sig-proxy")
 		} else {
 			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--sig-proxy\")", strconv.Quote(*v)))
 		}
 	}
-	if v := schema.StopSignal; v != nil {
+	if v := option.StopSignal; v != nil {
 		cmd.Args = append(cmd.Args, "--stop-signal", strconv.Quote(*v))
 	}
-	if v := schema.StopTimeout; v != nil {
+	if v := option.StopTimeout; v != nil {
 		cmd.Args = append(cmd.Args, "--stop-timeout", strconv.Quote(*v))
 	}
-	for k, v := range util.ExpandStringKeyMapWithEnv(schema.StorageOpt) {
+	for k, v := range option.StorageOpt {
 		cmd.Args = append(cmd.Args, "--storage-opt", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
 	}
-	for k, v := range util.ExpandStringKeyMapWithEnv(schema.Sysctl) {
+	for k, v := range option.Sysctl {
 		cmd.Args = append(cmd.Args, "--sysctl", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
 	}
-	for _, v := range schema.Tmpfs {
+	for _, v := range option.Tmpfs {
 		cmd.Args = append(cmd.Args, "--tmpfs", strconv.Quote(v))
 	}
-	if v := schema.TTY; v != nil && *v != "false" {
+	if v := option.TTY; v != nil && *v != "false" {
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--tty")
 		} else {
 			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--tty\")", strconv.Quote(*v)))
 		}
 	}
-	for k, v := range util.ExpandStringKeyMapWithEnv(schema.Ulimit) {
+	for k, v := range option.Ulimit {
 		cmd.Args = append(cmd.Args, "--ulimit", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
 	}
-	if v := schema.User; v != nil {
-		cmd.Args = append(cmd.Args, "--user", strconv.Quote(util.ExpandColonDelimitedStringWithEnv(*v)))
+	if v := option.User; v != nil {
+		cmd.Args = append(cmd.Args, "--user", strconv.Quote(*v))
 	}
-	if v := schema.Userns; v != nil {
+	if v := option.Userns; v != nil {
 		cmd.Args = append(cmd.Args, "--userns", strconv.Quote(*v))
 	}
-	if v := schema.UTS; v != nil {
+	if v := option.UTS; v != nil {
 		cmd.Args = append(cmd.Args, "--uts", strconv.Quote(*v))
 	}
-	for _, v := range util.ExpandColonDelimitedStringListWithEnv(schema.Volume) {
+	for _, v := range option.Volume {
 		cmd.Args = append(cmd.Args, "--volume", strconv.Quote(v))
 	}
-	if (len(schema.Dependencies) > 0) && ctx.HasDockerSocket() {
-		binary := BinaryManager{path.Join(ctx.HomePath(), "docker")}
-		binarypath, err := binary.Get(schema.Docker.Image, schema.Docker.Tag)
-		if err != nil {
-			return nil, err
-		}
-		cmd.Args = append(cmd.Args, "--volume", strconv.Quote(fmt.Sprintf("%s:/usr/local/bin/docker", *binarypath)))
-		if sock := ctx.DockerSocketPath(); sock != nil {
-			cmd.Args = append(cmd.Args, "--volume", strconv.Quote(fmt.Sprintf("%s:/var/run/docker.sock", *sock)))
-		}
-	}
-	for _, dep := range schema.Dependencies {
-		if dep.IsSchema() {
-			for i, d := range dep.Schemas() {
-				c, err := NewCommand(ctx, d)
-				if err != nil {
-					return nil, err
-				}
-				out, err := yaml.Marshal(d)
-				if err != nil {
-					return nil, err
-				}
-				hasher := md5.New()
-				_, _ = hasher.Write(out)
-				name := hex.EncodeToString(hasher.Sum(nil))
-				if err := export.Script(path.Join(ctx.ExportPath(), name), *c); err != nil {
-					return nil, err
-				}
-				cmd.Args = append(cmd.Args, "--volume", strconv.Quote(fmt.Sprintf("%s:%s", path.Join(ctx.ExportPath(), name), i)))
-			}
-		} else {
-			cmd.Args = append(cmd.Args, "--volume", strconv.Quote(fmt.Sprintf("%s/%s:%s", ctx.ExportPath(), path.Base(dep.String()), dep.String())))
-		}
-	}
-	if v := schema.VolumeDriver; v != nil {
+	if v := option.VolumeDriver; v != nil {
 		cmd.Args = append(cmd.Args, "--volume-driver", strconv.Quote(*v))
 	}
-	for _, v := range schema.VolumesFrom {
+	for _, v := range option.VolumesFrom {
 		cmd.Args = append(cmd.Args, "--volumes-from", strconv.Quote(v))
 	}
-	if v := schema.Workdir; v != nil {
+	if v := option.Workdir; v != nil {
 		cmd.Args = append(cmd.Args, "--workdir", strconv.Quote(*v))
 	}
-	for _, v := range schema.VolumesFrom {
+	for _, v := range option.VolumesFrom {
 		cmd.Args = append(cmd.Args, "--volumes-from", strconv.Quote(v))
 	}
-	cmd.Args = append(cmd.Args, fmt.Sprintf("%s:${%s_VERSION:-\"%s\"}", schema.Image, strings.ToUpper(schema.FileName), schema.Tag))
-	if schema.Command != nil {
-		cmd.Args = append(cmd.Args, *schema.Command)
-	}
-	for _, arg := range schema.Args {
-		if strings.Contains(arg, " ") {
-			cmd.Args = append(cmd.Args, strconv.Quote(arg))
+	cmd.Args = append(cmd.Args, image)
+	for _, v := range args {
+		if strings.HasPrefix(v, "'") && strings.HasSuffix(v, "'") {
+			cmd.Args = append(cmd.Args, v)
+		} else if strings.Contains(v, " ") {
+			cmd.Args = append(cmd.Args, strconv.Quote(v))
 		} else {
-			cmd.Args = append(cmd.Args, arg)
+			cmd.Args = append(cmd.Args, v)
 		}
 	}
 
-	return cmd, nil
+	return cmd
 }
