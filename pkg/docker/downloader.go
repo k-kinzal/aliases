@@ -22,6 +22,7 @@ func Download(binaryPath string, image string, tag string) error {
 		"-c",
 		fmt.Sprintf("cp $(which docker) /share/%s", path.Base(binaryPath)),
 	)
+	cmd.Stderr = os.Stderr
 
 	if err := cmd.Run(); err != nil {
 		return err

@@ -73,7 +73,7 @@ func NewClient() (*Client, error) {
 		// docker version
 		clientVersion, e := c.ClientVersion()
 		if e != nil {
-			err = fmt.Errorf("docker is not installed. see https://docs.docker.com/install/")
+			err = e
 			return
 		}
 		serverVersion, _ := c.ServerVersion()
