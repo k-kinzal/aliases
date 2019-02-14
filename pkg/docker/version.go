@@ -40,14 +40,13 @@ func (client *Client) Version(option VersionOption) *posix.Cmd {
 //  OS/Arch:           darwin/amd64
 //  Experimental:      false
 type ClientVersion struct {
-	Version      string
-	APIVersion   string
-	GOVersion    string
-	GitCommit    string
-	Build        string
-	OS           string
-	Arch         string
-	Experimental bool
+	Version    string
+	APIVersion string
+	GOVersion  string
+	GitCommit  string
+	Build      string
+	OS         string
+	Arch       string
 }
 
 // ClientVersion returns client info.
@@ -60,7 +59,6 @@ func (client *Client) ClientVersion() (*ClientVersion, error) {
 {{ .Client.BuildTime }}
 {{ .Client.Os }}
 {{ .Client.Arch }}
-{{ .Client.Experimental }}
 `, " \t\r\n")
 	opt := VersionOption{
 		Format: &format,
@@ -79,20 +77,14 @@ func (client *Client) ClientVersion() (*ClientVersion, error) {
 	}
 	s := strings.Split(strings.Trim(string(out), "\"\n"), "\\n")
 
-	experimental, err := strconv.ParseBool(s[7])
-	if err != nil {
-		return nil, err
-	}
-
 	return &ClientVersion{
-		Version:      s[0],
-		APIVersion:   s[1],
-		GOVersion:    s[2],
-		GitCommit:    s[3],
-		Build:        s[4],
-		OS:           s[5],
-		Arch:         s[6],
-		Experimental: experimental,
+		Version:    s[0],
+		APIVersion: s[1],
+		GOVersion:  s[2],
+		GitCommit:  s[3],
+		Build:      s[4],
+		OS:         s[5],
+		Arch:       s[6],
 	}, nil
 }
 
@@ -108,14 +100,13 @@ func (client *Client) ClientVersion() (*ClientVersion, error) {
 //   OS/Arch:          linux/amd64
 //   Experimental:     true
 type ServerVersion struct {
-	Version      string
-	APIVersion   string
-	GOVersion    string
-	GitCommit    string
-	Build        string
-	OS           string
-	Arch         string
-	Experimental bool
+	Version    string
+	APIVersion string
+	GOVersion  string
+	GitCommit  string
+	Build      string
+	OS         string
+	Arch       string
 }
 
 // ServerVersion returns server info.
@@ -128,7 +119,6 @@ func (client *Client) ServerVersion() (*ServerVersion, error) {
 {{ .Server.BuildTime }}
 {{ .Server.Os }}
 {{ .Server.Arch }}
-{{ .Server.Experimental }}
 `, " \t\r\n")
 	opt := VersionOption{
 		Format: &format,
@@ -145,19 +135,13 @@ func (client *Client) ServerVersion() (*ServerVersion, error) {
 	}
 	s := strings.Split(strings.Trim(string(out), "\"\n"), "\\n")
 
-	experimental, err := strconv.ParseBool(s[7])
-	if err != nil {
-		return nil, err
-	}
-
 	return &ServerVersion{
-		Version:      s[0],
-		APIVersion:   s[1],
-		GOVersion:    s[2],
-		GitCommit:    s[3],
-		Build:        s[4],
-		OS:           s[5],
-		Arch:         s[6],
-		Experimental: experimental,
+		Version:    s[0],
+		APIVersion: s[1],
+		GOVersion:  s[2],
+		GitCommit:  s[3],
+		Build:      s[4],
+		OS:         s[5],
+		Arch:       s[6],
 	}, nil
 }
