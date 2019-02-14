@@ -182,7 +182,7 @@ func NewScript(client *docker.Client, opt config.Option) *Script {
 			// unix socket
 			literal := "true"
 			o.Privileged = &literal
-			o.Volume = append(o.Volume, fmt.Sprintf("%s:%s", opt.Binary(context.BinaryPath()).Path, client.Path()))
+			o.Volume = append(o.Volume, fmt.Sprintf("%s:/usr/local/bin/docker", opt.Binary(context.BinaryPath()).Path))
 			o.Volume = append(o.Volume, fmt.Sprintf("%s:/var/run/docker.sock", *sock))
 		} else {
 			// tcp, http...
