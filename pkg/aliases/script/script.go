@@ -172,7 +172,7 @@ func NewScript(client *docker.Client, opt config.Option) *Script {
 	// dependencies
 	if len(opt.Dependencies) > 0 {
 		if opt.Env == nil {
-			o.Env = make(map[string]string, 0)
+			o.Env = make(map[string]string)
 		}
 		if opt.Volume == nil {
 			o.Volume = make([]string, 0)

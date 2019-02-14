@@ -18,11 +18,10 @@ func MD5(v interface{}) string {
 	case string:
 		bytes = []byte(raw)
 	default:
-		out, _ := json.Marshal(raw)
-		bytes = []byte(out)
+		bytes, _ = json.Marshal(raw)
 	}
 	hasher := md5.New()
-	hasher.Write(bytes)
+	_, _ = hasher.Write(bytes)
 	return hex.EncodeToString(hasher.Sum(nil))
 }
 
@@ -33,11 +32,10 @@ func SHA1(v interface{}) string {
 	case string:
 		bytes = []byte(raw)
 	default:
-		out, _ := json.Marshal(raw)
-		bytes = []byte(out)
+		bytes, _ = json.Marshal(raw)
 	}
 	hasher := sha1.New()
-	hasher.Write(bytes)
+	_, _ = hasher.Write(bytes)
 	return hex.EncodeToString(hasher.Sum(nil))
 }
 
@@ -48,10 +46,9 @@ func SHA256(v interface{}) string {
 	case string:
 		bytes = []byte(raw)
 	default:
-		out, _ := json.Marshal(raw)
-		bytes = []byte(out)
+		bytes, _ = json.Marshal(raw)
 	}
 	hasher := sha256.New()
-	hasher.Write(bytes)
+	_, _ = hasher.Write(bytes)
 	return hex.EncodeToString(hasher.Sum(nil))
 }

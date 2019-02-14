@@ -57,7 +57,7 @@ func ExampleOption_Binaries() {
 		Path:      "/path/to/command1",
 		FileName:  "command1",
 		Dependencies: []*config.Option{
-			&config.Option{
+			{
 				OptionSpec: &yaml.OptionSpec{
 					Docker: struct {
 						Image string `yaml:"image" default:"docker"`
@@ -74,7 +74,7 @@ func ExampleOption_Binaries() {
 				Path:      "/path/to/command2",
 				FileName:  "command2",
 			},
-			&config.Option{
+			{
 				OptionSpec: &yaml.OptionSpec{
 					Docker: struct {
 						Image string `yaml:"image" default:"docker"`
@@ -91,7 +91,7 @@ func ExampleOption_Binaries() {
 				Path:      "/path/to/command3",
 				FileName:  "command3",
 				Dependencies: []*config.Option{
-					&config.Option{
+					{
 						OptionSpec: &yaml.OptionSpec{
 							Docker: struct {
 								Image string `yaml:"image" default:"docker"`

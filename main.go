@@ -106,7 +106,7 @@ func main() {
 		switch e := err.(type) {
 		case *util.InvalidFlagError:
 			logger.Fatal(e)
-		case *yaml.YAMLError:
+		case *yaml.UnmarshalError:
 			logger.Fatal(e)
 		case *exec.ExitError:
 			if status, ok := e.Sys().(syscall.WaitStatus); ok {

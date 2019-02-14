@@ -25,7 +25,10 @@ func TestNewDependencySpecPassConfigMap(t *testing.T) {
 
 func TestNewDependencySpecPassInteger(t *testing.T) {
 	defer func() {
-		recover()
+		err := recover()
+		if err != "value is expected to be type `string` or `map`, but the actual is `int`" {
+			t.Errorf("not expect message of \"%v\"", err)
+		}
 	}()
 	yaml.NewDependencySpec(1)
 	t.Error("expected that `panic()` but did not occur")

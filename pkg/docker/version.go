@@ -64,10 +64,10 @@ func (client *Client) ClientVersion() (*ClientVersion, error) {
 		Format: &format,
 	}
 	cmd := client.Version(opt)
-	cmd.Stderr = os.Stderr
 	out, err := cmd.Output()
 	if err != nil {
 		e, ok := err.(*exec.ExitError)
+		fmt.Fprintln(os.Stderr, string(e.Stderr))
 		if !ok {
 			return nil, err
 		}

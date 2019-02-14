@@ -64,7 +64,7 @@ func NewClient() (*Client, error) {
 			logger.Warnf("%s may not working possibility. please same path that you use on the host and the host of `DOCKER_HOST`.", c.host)
 		} else {
 			sock := strings.TrimPrefix(c.host, "unix://")
-			if _, err := os.Stat(sock); err != nil {
+			if _, e := os.Stat(sock); e != nil {
 				err = fmt.Errorf("%s: no such file. please set DOCKER_HOST", sock)
 				return
 			}

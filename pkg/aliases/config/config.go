@@ -72,7 +72,7 @@ func (c *Config) Binaries(binaryDir string) []DockerBinary {
 
 // newConfig creates a new Config.
 func newConfig() *Config {
-	return &Config{options: make(map[string]Option, 0)}
+	return &Config{options: make(map[string]Option)}
 }
 
 // Unmarshal parses YAML-encoded data and returns configuration.

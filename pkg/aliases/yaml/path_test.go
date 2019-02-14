@@ -8,15 +8,14 @@ import (
 )
 
 func ExampleSpecPath_Name() { // is path of root OptionSpec
-	var path yaml.SpecPath = "/path/to/command1"
-	fmt.Println(path.Name())
-	// Output: /path/to/command1
-}
+	var path1 yaml.SpecPath = "/path/to/command1"
+	fmt.Println(path1.Name())
 
-func ExampleSpecPath_Name2() {
-	var path yaml.SpecPath = "/path/to/command1.dependencies[0]./path/to/command2"
-	fmt.Println(path.Name())
-	// Output: /path/to/command2
+	var path2 yaml.SpecPath = "/path/to/command1.dependencies[0]./path/to/command2"
+	fmt.Println(path2.Name())
+	// Output:
+	// /path/to/command1
+	// /path/to/command2
 }
 
 func TestSpecPath_NameInvalidPath(t *testing.T) {

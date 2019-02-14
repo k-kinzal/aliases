@@ -71,7 +71,7 @@ func asMax(fl validator.FieldLevel) bool {
 	return false
 }
 
-// asMax is check that greater than or equal the parameter.
+// asMin is check that greater than or equal the parameter.
 func asMin(fl validator.FieldLevel) bool {
 	param := fl.Param()
 	val := fl.Field().String()
@@ -127,11 +127,8 @@ func isNanoCPUs(fl validator.FieldLevel) bool {
 		return false
 	}
 	max := new(big.Rat).SetInt64((int64)(runtime.NumCPU()))
-	if nano.Cmp(max.Mul(max, big.NewRat(1e9, 1))) == 1 {
-		return false
-	}
 
-	return true
+	return nano.Cmp(max.Mul(max, big.NewRat(1e9, 1))) != 1
 }
 
 var (

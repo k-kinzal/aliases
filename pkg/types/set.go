@@ -21,7 +21,7 @@ func (set *Set) Add(i interface{}) {
 func (set *Set) Slice() []interface{} {
 	i := 0
 	keys := make([]string, len(set.data))
-	for key, _ := range set.data {
+	for key := range set.data {
 		keys[i] = key
 		i++
 	}
