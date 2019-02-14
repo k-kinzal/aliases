@@ -15,12 +15,10 @@ import (
 //  Therefore, we use timeouts at the expense of performance.
 var content = `#!/bin/sh
 if [ -p /dev/stdin ]; then
-  while read -t 1 line; do
-    echo $line
-  done | {{ .command }} "$@"
+  cat - | {{ .command }} "$@"
   exit $?
 else
-  {{ .command }} "$@"
+  echo "" | {{ .command }} "$@"
   exit $?
 fi
 `
