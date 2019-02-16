@@ -5,15 +5,16 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/k-kinzal/aliases/pkg/types"
-
 	"github.com/k-kinzal/aliases/pkg/aliases/yaml"
 )
 
-type DockerBinary struct {
-	Image string
-	Tag   string
-	Path  string
+// Option is configuration option.
+type Option struct {
+	*yaml.OptionSpec
+	Namespace    string
+	Path         string
+	FileName     string
+	Dependencies []*Option
 }
 
 // Config is aliases configuration.
@@ -50,24 +51,6 @@ func (c *Config) Slice() []Option {
 		i++
 	}
 	return options
-}
-
-// Binaries returns slice of docker binary info.
-func (c *Config) Binaries(binaryDir string) []DockerBinary {
-	set := types.NewSet(nil)
-	for _, opt := range c.options {
-		for _, binary := range opt.Binaries(binaryDir) {
-			set.Add(binary)
-		}
-	}
-
-	slice := set.Slice()
-	binaries := make([]DockerBinary, len(slice))
-	for i := 0; i < len(slice); i++ {
-		binaries[i] = slice[i].(DockerBinary)
-	}
-
-	return binaries
 }
 
 // newConfig creates a new Config.

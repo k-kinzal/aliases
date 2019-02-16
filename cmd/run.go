@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"github.com/k-kinzal/aliases/pkg/logger"
+
 	"github.com/k-kinzal/aliases/pkg/aliases/context"
 
 	"github.com/k-kinzal/aliases/pkg/docker"
@@ -320,6 +322,8 @@ func RunAction(c *cli.Context) error {
 	}
 
 	cmd := script.NewScript(client, *option)
+	logger.Debug(cmd.StringWithOverride(args, opt))
+
 	if err := cmd.Run(args, opt); err != nil {
 		return err
 	}

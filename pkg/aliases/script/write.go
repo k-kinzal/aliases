@@ -1,27 +1,13 @@
 package script
 
 import (
+	"fmt"
 	"os"
 	"path"
-	"text/template"
 
 	"github.com/k-kinzal/aliases/pkg/aliases/context"
-
 	"github.com/k-kinzal/aliases/pkg/docker"
 )
-
-// FIXME:
-//  `-p /dev/stdin` always becomes true in `docker run -i`.
-//  Therefore, we use timeouts at the expense of performance.
-var content = `#!/bin/sh
-if [ -p /dev/stdin ]; then
-  cat - | {{ .command }} "$@"
-  exit $?
-else
-  echo "" >/dev/null | {{ .command }} "$@"
-  exit $?
-fi
-`
 
 // Write exports aliases script to a file.
 func (script *Script) Write() (string, error) {
@@ -52,13 +38,12 @@ func (script *Script) WriteWithOverride(args []string, option docker.RunOption) 
 		return "", err
 	}
 
-	data := map[string]interface{}{
-		"command": script.docker(args, option).String(),
+	shell, err := script.Shell(args, option)
+	if err != nil {
+		return "", err
 	}
 
-	tmpl := template.Must(template.New(script.path).Parse(content))
-
-	if err := tmpl.Execute(file, data); err != nil {
+	if _, err := file.Write([]byte(fmt.Sprintf("#!/bin/sh\n%s", shell.String()))); err != nil {
 		return "", err
 	}
 

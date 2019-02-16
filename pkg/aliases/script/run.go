@@ -22,10 +22,10 @@ func (script *Script) Run(args []string, opt docker.RunOption) error {
 		}
 	}
 
-	dockerCmdString := script.docker(args, opt).String()
-	logger.Debug(dockerCmdString)
-
-	command := posix.Shell(dockerCmdString)
+	command, err := script.Shell(args, opt)
+	if err != nil {
+		return err
+	}
 	command.Env = os.Environ()
 
 	info, err := os.Stdin.Stat()

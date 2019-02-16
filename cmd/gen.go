@@ -66,12 +66,6 @@ func GenAction(c *cli.Context) error {
 		return err
 	}
 
-	for _, binary := range conf.Binaries(context.BinaryPath()) {
-		if err := docker.Download(binary.Path, binary.Image, binary.Tag); err != nil {
-			return err
-		}
-	}
-
 	if isExport {
 		for _, opt := range conf.Slice() {
 			cmd := script.NewScript(client, opt)
@@ -91,11 +85,11 @@ func GenAction(c *cli.Context) error {
 			if err != nil {
 				return err
 			}
-			_, err := cmd.Write()
+			p, err := cmd.Write()
 			if err != nil {
 				return err
 			}
-			aliases = append(aliases, *posix.Alias(cmd.FileName(), cmd.String()))
+			aliases = append(aliases, *posix.Alias(cmd.FileName(), p))
 		}
 		for _, alias := range aliases {
 			fmt.Println(alias.String())

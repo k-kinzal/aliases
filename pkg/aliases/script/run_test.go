@@ -33,14 +33,6 @@ func ExampleScript_Run() {
 	if err := context.ChangeHomePath(dir); err != nil {
 		panic(err)
 	}
-	if err := context.ChangeExportPath(dir); err != nil {
-		panic(err)
-	}
-	for _, binary := range conf.Binaries(context.BinaryPath()) {
-		if err := docker.Download(binary.Path, binary.Image, binary.Tag); err != nil {
-			panic(err)
-		}
-	}
 
 	client, err := docker.NewClient()
 	if err != nil {
