@@ -9,14 +9,14 @@ commands:
   go_cache_restore:
     steps:
     - restore_cache:
-        key: v1-gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
+        key: v1-gopkg-{{ checksum "Gopkg.lock" }}
         paths:
         - vendor
 
   go_cache_save:
     steps:
     - save_cache:
-        key: v1-gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
+        key: v1-gopkg-{{ checksum "Gopkg.lock" }}
         paths:
         - vendor
 
