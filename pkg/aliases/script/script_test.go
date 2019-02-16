@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/k-kinzal/aliases/pkg/aliases/context"
-
 	"github.com/k-kinzal/aliases/pkg/aliases/config"
+	"github.com/k-kinzal/aliases/pkg/aliases/context"
 	"github.com/k-kinzal/aliases/pkg/aliases/script"
 	"github.com/k-kinzal/aliases/pkg/docker"
 )
 
-func init() {
+func ExampleNewScript() {
 	dir, err := ioutil.TempDir("/tmp", "")
 	if err != nil {
 		panic(err)
@@ -22,9 +21,7 @@ func init() {
 	if err := context.ChangeExportPath(dir); err != nil {
 		panic(err)
 	}
-}
 
-func ExampleNewScript() {
 	content := `
 /path/to/command1:
   image: alpine
@@ -56,6 +53,17 @@ func ExampleNewScript() {
 }
 
 func ExampleScript_Path() {
+	dir, err := ioutil.TempDir("/tmp", "")
+	if err != nil {
+		panic(err)
+	}
+	if err := context.ChangeHomePath(dir); err != nil {
+		panic(err)
+	}
+	if err := context.ChangeExportPath(dir); err != nil {
+		panic(err)
+	}
+
 	content := `
 /path/to/command1:
   image: alpine
@@ -84,6 +92,17 @@ func ExampleScript_Path() {
 }
 
 func ExampleScript_FileName() {
+	dir, err := ioutil.TempDir("/tmp", "")
+	if err != nil {
+		panic(err)
+	}
+	if err := context.ChangeHomePath(dir); err != nil {
+		panic(err)
+	}
+	if err := context.ChangeExportPath(dir); err != nil {
+		panic(err)
+	}
+
 	content := `
 /path/to/command1:
   image: alpine
@@ -112,6 +131,17 @@ func ExampleScript_FileName() {
 }
 
 func ExampleScript_StringWithOverride() {
+	dir, err := ioutil.TempDir("/tmp", "")
+	if err != nil {
+		panic(err)
+	}
+	if err := context.ChangeHomePath(dir); err != nil {
+		panic(err)
+	}
+	if err := context.ChangeExportPath(dir); err != nil {
+		panic(err)
+	}
+
 	content := `
 /path/to/command1:
   image: alpine
@@ -140,6 +170,17 @@ func ExampleScript_StringWithOverride() {
 }
 
 func ExampleScript_String() {
+	dir, err := ioutil.TempDir("/tmp", "")
+	if err != nil {
+		panic(err)
+	}
+	if err := context.ChangeHomePath(dir); err != nil {
+		panic(err)
+	}
+	if err := context.ChangeExportPath(dir); err != nil {
+		panic(err)
+	}
+
 	content := `
 /path/to/command1:
   image: alpine
@@ -168,6 +209,17 @@ func ExampleScript_String() {
 }
 
 func ExampleScript_Shell() {
+	dir, err := ioutil.TempDir("/tmp", "")
+	if err != nil {
+		panic(err)
+	}
+	if err := context.ChangeHomePath(dir); err != nil {
+		panic(err)
+	}
+	if err := context.ChangeExportPath(dir); err != nil {
+		panic(err)
+	}
+
 	content := `
 /path/to/command1:
   image: alpine
