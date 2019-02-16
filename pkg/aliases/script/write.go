@@ -18,7 +18,7 @@ if [ -p /dev/stdin ]; then
   cat - | {{ .command }} "$@"
   exit $?
 else
-  echo "" | {{ .command }} "$@"
+  echo "" >/dev/null | {{ .command }} "$@"
   exit $?
 fi
 `

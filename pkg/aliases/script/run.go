@@ -7,12 +7,12 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/k-kinzal/aliases/pkg/posix"
+
 	"github.com/k-kinzal/aliases/pkg/logger"
 	"github.com/k-kinzal/aliases/pkg/util"
 
 	"github.com/k-kinzal/aliases/pkg/docker"
-
-	"github.com/k-kinzal/aliases/pkg/posix"
 )
 
 // Run aliases script.
@@ -26,9 +26,19 @@ func (script *Script) Run(args []string, opt docker.RunOption) error {
 	dockerCmdString := script.docker(args, opt).String()
 	logger.Debug(dockerCmdString)
 
-	command := posix.Shell(dockerCmdString)
+	command := posix.Shell(fmt.Sprintf("echo \"\" >/dev/null | %s", dockerCmdString))
 	command.Env = os.Environ()
-	command.Stdin = os.Stdin
+
+	info, err := os.Stdin.Stat()
+	if err != nil {
+		return err
+	}
+	if (info.Mode()&os.ModeNamedPipe) != 0 || info.Size() > 0 {
+		command.Stdin = os.Stdin
+	} else {
+		command.Stdin = nil
+	}
+
 	command.Stdout = os.Stdout
 
 	stderr, err := command.StderrPipe()
