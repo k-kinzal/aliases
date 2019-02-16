@@ -18,3 +18,13 @@ func (e *InvalidFlagError) Error() string {
 func FlagError(name string, value interface{}, reason string) error {
 	return &InvalidFlagError{name, value, reason}
 }
+
+// TimeoutError returns in util.Timeout when a timeout occurs.
+type TimeoutError struct {
+	msg string
+}
+
+// Error returns error message.
+func (err *TimeoutError) Error() string {
+	return err.msg
+}
