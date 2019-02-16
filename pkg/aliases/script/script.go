@@ -1,9 +1,11 @@
 package script
 
 import (
+	"bytes"
 	"fmt"
 	"path"
 	"strings"
+	"text/template"
 
 	"github.com/k-kinzal/aliases/pkg/aliases/context"
 
@@ -36,9 +38,61 @@ func (script *Script) FileName() string {
 	return path.Base(script.path)
 }
 
-// String returns docker run string
+// StringWithOverride returns docker run string with override args and option.
+func (script *Script) StringWithOverride(overrideArgs []string, overrideOption docker.RunOption) string {
+	return script.docker(overrideArgs, overrideOption).String()
+}
+
+// String returns docker run string.
 func (script *Script) String() string {
 	return script.docker(nil, docker.RunOption{}).String()
+}
+
+var content = `
+{{- if .dependencies }}
+DOCKER_BINARY_PATH="{{ .binaryPath }}/{{ .binary.filename }}"
+if [ ! -f "${DOCKER_BINARY_PATH}" ]; then
+  docker run --entrypoint '' -v {{ .binaryPath }}:/share {{ .binary.image }}:{{ .binary.tag }} sh -c 'cp -av $(which docker) /share/{{ .binary.filename }}' >/dev/null
+fi
+{{- end }}
+if [ -p /dev/stdin ]; then
+  cat - | {{ .command }} "$@"
+  exit $?
+else
+  echo "" >/dev/null | {{ .command }} "$@"
+  exit $?
+fi
+`
+
+// Shell returns shell script command.
+func (script *Script) Shell(args []string, option docker.RunOption) (*posix.ShellScript, error) {
+	data := map[string]interface{}{
+		"command":      script.docker(args, option).String(),
+		"dependencies": len(script.relative) > 0,
+		"binary": map[string]string{
+			"image": script.binary.image,
+			"tag":   script.binary.tag,
+			"filename": (func() string {
+				filename := fmt.Sprintf("%s:%s", script.binary.image, script.binary.tag)
+				filename = strings.Replace(filename, "/", "-", -1)
+				filename = strings.Replace(filename, ":", "-", -1)
+				filename = strings.Replace(filename, ".", "-", -1)
+				filename = strings.Replace(filename, "_", "-", -1)
+
+				return filename
+			})(),
+		},
+		"binaryPath": context.BinaryPath(),
+	}
+
+	tmpl := template.Must(template.New(script.path).Parse(content))
+
+	var tpl bytes.Buffer
+	if err := tmpl.Execute(&tpl, data); err != nil {
+		return nil, err
+	}
+
+	return posix.Shell(tpl.String()), nil
 }
 
 // newDockerRunCommand creates a new docker run command.
@@ -182,7 +236,8 @@ func NewScript(client *docker.Client, opt config.Option) *Script {
 			// unix socket
 			literal := "true"
 			o.Privileged = &literal
-			o.Volume = append(o.Volume, fmt.Sprintf("%s:/usr/local/bin/docker", opt.Binary(context.BinaryPath()).Path))
+			o.Volume = append(o.Volume, fmt.Sprintf("%s:%s", context.HomePath(), context.HomePath()))
+			o.Volume = append(o.Volume, "${DOCKER_BINARY_PATH}:/usr/local/bin/docker")
 			o.Volume = append(o.Volume, fmt.Sprintf("%s:/var/run/docker.sock", *sock))
 		} else {
 			// tcp, http...

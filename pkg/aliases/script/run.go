@@ -6,14 +6,12 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/k-kinzal/aliases/pkg/util"
 
-	"github.com/k-kinzal/aliases/pkg/posix"
-
 	"github.com/k-kinzal/aliases/pkg/docker"
-	"github.com/k-kinzal/aliases/pkg/logger"
 )
 
 // Run aliases script.
@@ -24,10 +22,10 @@ func (script *Script) Run(args []string, opt docker.RunOption) error {
 		}
 	}
 
-	dockerCmdString := script.docker(args, opt).String()
-	logger.Debug(dockerCmdString)
-
-	command := posix.Shell(dockerCmdString)
+	command, err := script.Shell(args, opt)
+	if err != nil {
+		return err
+	}
 	command.Env = os.Environ()
 
 	info, err := os.Stdin.Stat()
@@ -46,6 +44,8 @@ func (script *Script) Run(args []string, opt docker.RunOption) error {
 	if err != nil {
 		return nil
 	}
+
+	command.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
 	fn := func() error {
 		if err := command.Start(); err != nil {
@@ -82,7 +82,7 @@ func (script *Script) Run(args []string, opt docker.RunOption) error {
 		// FIXME: timeout get from command line arguments
 		if err := util.Timeout(3*time.Second, fn); err != nil {
 			if _, ok := err.(*util.TimeoutError); ok {
-				_ = command.Process.Kill()
+				_ = syscall.Kill(-command.Process.Pid, syscall.SIGKILL)
 				return nil
 			}
 			return err

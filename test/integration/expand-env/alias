@@ -1,1 +1,1 @@
-alias alpine='docker run --env ${ALIASES_PWD:-$PWD}="$PWD" --interactive --label [HOME]="$HOME" --network "host" --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") --ulimit $(echo nofile)="$(ulimit -n)" --user "root:$USER" --volume "${ALIASES_PWD:-$PWD}:$PWD" --volume "[HOME]:$HOME" --volume "$(echo $HOME):$(echo $HOME)" alpine:${ALPINE_VERSION:-"3.8"}'
+alias alpine='[TEMP_DIR]/alpine'

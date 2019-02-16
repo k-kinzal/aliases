@@ -4,14 +4,24 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/k-kinzal/aliases/pkg/aliases/context"
-
 	"github.com/k-kinzal/aliases/pkg/aliases/config"
+	"github.com/k-kinzal/aliases/pkg/aliases/context"
 	"github.com/k-kinzal/aliases/pkg/aliases/script"
 	"github.com/k-kinzal/aliases/pkg/docker"
 )
 
 func ExampleNewScript() {
+	dir, err := ioutil.TempDir("/tmp", "")
+	if err != nil {
+		panic(err)
+	}
+	if err := context.ChangeHomePath(dir); err != nil {
+		panic(err)
+	}
+	if err := context.ChangeExportPath(dir); err != nil {
+		panic(err)
+	}
+
 	content := `
 /path/to/command1:
   image: alpine
@@ -26,14 +36,6 @@ func ExampleNewScript() {
 
 	opt, err := conf.Get("/path/to/command1")
 	if err != nil {
-		panic(err)
-	}
-
-	dir, err := ioutil.TempDir("/tmp", "")
-	if err != nil {
-		panic(err)
-	}
-	if err := context.ChangeExportPath(dir); err != nil {
 		panic(err)
 	}
 
@@ -51,6 +53,17 @@ func ExampleNewScript() {
 }
 
 func ExampleScript_Path() {
+	dir, err := ioutil.TempDir("/tmp", "")
+	if err != nil {
+		panic(err)
+	}
+	if err := context.ChangeHomePath(dir); err != nil {
+		panic(err)
+	}
+	if err := context.ChangeExportPath(dir); err != nil {
+		panic(err)
+	}
+
 	content := `
 /path/to/command1:
   image: alpine
@@ -65,14 +78,6 @@ func ExampleScript_Path() {
 
 	opt, err := conf.Get("/path/to/command1")
 	if err != nil {
-		panic(err)
-	}
-
-	dir, err := ioutil.TempDir("/tmp", "")
-	if err != nil {
-		panic(err)
-	}
-	if err := context.ChangeExportPath(dir); err != nil {
 		panic(err)
 	}
 
@@ -87,6 +92,17 @@ func ExampleScript_Path() {
 }
 
 func ExampleScript_FileName() {
+	dir, err := ioutil.TempDir("/tmp", "")
+	if err != nil {
+		panic(err)
+	}
+	if err := context.ChangeHomePath(dir); err != nil {
+		panic(err)
+	}
+	if err := context.ChangeExportPath(dir); err != nil {
+		panic(err)
+	}
+
 	content := `
 /path/to/command1:
   image: alpine
@@ -101,14 +117,6 @@ func ExampleScript_FileName() {
 
 	opt, err := conf.Get("/path/to/command1")
 	if err != nil {
-		panic(err)
-	}
-
-	dir, err := ioutil.TempDir("/tmp", "")
-	if err != nil {
-		panic(err)
-	}
-	if err := context.ChangeExportPath(dir); err != nil {
 		panic(err)
 	}
 
@@ -122,7 +130,18 @@ func ExampleScript_FileName() {
 	// Output: command1
 }
 
-func ExampleScript_String() {
+func ExampleScript_StringWithOverride() {
+	dir, err := ioutil.TempDir("/tmp", "")
+	if err != nil {
+		panic(err)
+	}
+	if err := context.ChangeHomePath(dir); err != nil {
+		panic(err)
+	}
+	if err := context.ChangeExportPath(dir); err != nil {
+		panic(err)
+	}
+
 	content := `
 /path/to/command1:
   image: alpine
@@ -140,11 +159,42 @@ func ExampleScript_String() {
 		panic(err)
 	}
 
+	client, err := docker.NewClient()
+	if err != nil {
+		panic(err)
+	}
+
+	cmd := script.NewScript(client, *opt)
+	fmt.Println(cmd.StringWithOverride([]string{"-c", "echo 1"}, docker.RunOption{Env: map[string]string{"FOO": "1"}}))
+	// Output: docker run --entrypoint "sh" --env FOO="1" --interactive --network "host" --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") alpine:${COMMAND1_VERSION:-"latest"} -c "echo 1"
+}
+
+func ExampleScript_String() {
 	dir, err := ioutil.TempDir("/tmp", "")
 	if err != nil {
 		panic(err)
 	}
+	if err := context.ChangeHomePath(dir); err != nil {
+		panic(err)
+	}
 	if err := context.ChangeExportPath(dir); err != nil {
+		panic(err)
+	}
+
+	content := `
+/path/to/command1:
+  image: alpine
+  tag: latest
+  entrypoint: sh
+  args: [-c]
+`
+	conf, err := config.Unmarshal([]byte(content))
+	if err != nil {
+		panic(err)
+	}
+
+	opt, err := conf.Get("/path/to/command1")
+	if err != nil {
 		panic(err)
 	}
 
@@ -156,4 +206,54 @@ func ExampleScript_String() {
 	cmd := script.NewScript(client, *opt)
 	fmt.Println(cmd.String())
 	// Output: docker run --entrypoint "sh" --interactive --network "host" --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") alpine:${COMMAND1_VERSION:-"latest"} -c
+}
+
+func ExampleScript_Shell() {
+	dir, err := ioutil.TempDir("/tmp", "")
+	if err != nil {
+		panic(err)
+	}
+	if err := context.ChangeHomePath(dir); err != nil {
+		panic(err)
+	}
+	if err := context.ChangeExportPath(dir); err != nil {
+		panic(err)
+	}
+
+	content := `
+/path/to/command1:
+  image: alpine
+  tag: latest
+  entrypoint: sh
+  args: [-c]
+`
+	conf, err := config.Unmarshal([]byte(content))
+	if err != nil {
+		panic(err)
+	}
+
+	opt, err := conf.Get("/path/to/command1")
+	if err != nil {
+		panic(err)
+	}
+
+	client, err := docker.NewClient()
+	if err != nil {
+		panic(err)
+	}
+
+	cmd := script.NewScript(client, *opt)
+	shell, err := cmd.Shell([]string{}, docker.RunOption{})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(shell.String())
+	// Output:
+	// if [ -p /dev/stdin ]; then
+	//   cat - | docker run --entrypoint "sh" --interactive --network "host" --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") alpine:${COMMAND1_VERSION:-"latest"} -c "$@"
+	//   exit $?
+	// else
+	//   echo "" >/dev/null | docker run --entrypoint "sh" --interactive --network "host" --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") alpine:${COMMAND1_VERSION:-"latest"} -c "$@"
+	//   exit $?
+	// fi
 }

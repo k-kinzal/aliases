@@ -1,9 +1,13 @@
 #!/bin/sh
 
+DOCKER_BINARY_PATH="[HOME]/.aliases/docker/docker-18-09-0"
+if [ ! -f "${DOCKER_BINARY_PATH}" ]; then
+  docker run --entrypoint '' -v [HOME]/.aliases/docker:/share docker:18.09.0 sh -c 'cp -av $(which docker) /share/docker-18-09-0' >/dev/null
+fi
 if [ -p /dev/stdin ]; then
-  cat - | docker run --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --interactive --network "host" --privileged --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") --volume "[HOME]/.kube:/root/.kube" --volume "${ALIASES_PWD:-$PWD}:/kube" --volume "[HOME]/.aliases/docker/docker-18-09-0:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "[TEMP_DIR]/kubectl:/usr/local/bin/kubectl" --workdir "/kube" alpine:${ALPINE_VERSION:-"3.8"} "$@"
+  cat - | docker run --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --interactive --network "host" --privileged --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") --volume "[HOME]/.kube:/root/.kube" --volume "${ALIASES_PWD:-$PWD}:/kube" --volume "[HOME]/.aliases:[HOME]/.aliases" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "[TEMP_DIR]/kubectl:/usr/local/bin/kubectl" --workdir "/kube" alpine:${ALPINE_VERSION:-"3.8"} "$@"
   exit $?
 else
-  echo "" >/dev/null | docker run --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --interactive --network "host" --privileged --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") --volume "[HOME]/.kube:/root/.kube" --volume "${ALIASES_PWD:-$PWD}:/kube" --volume "[HOME]/.aliases/docker/docker-18-09-0:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "[TEMP_DIR]/kubectl:/usr/local/bin/kubectl" --workdir "/kube" alpine:${ALPINE_VERSION:-"3.8"} "$@"
+  echo "" >/dev/null | docker run --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --interactive --network "host" --privileged --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") --volume "[HOME]/.kube:/root/.kube" --volume "${ALIASES_PWD:-$PWD}:/kube" --volume "[HOME]/.aliases:[HOME]/.aliases" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "[TEMP_DIR]/kubectl:/usr/local/bin/kubectl" --workdir "/kube" alpine:${ALPINE_VERSION:-"3.8"} "$@"
   exit $?
 fi

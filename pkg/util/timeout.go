@@ -1,6 +1,8 @@
 package util
 
-import "time"
+import (
+	"time"
+)
 
 // Timeout stops the slow function at the specified time
 func Timeout(t time.Duration, fn func() error) error {
