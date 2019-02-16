@@ -9,41 +9,16 @@ commands:
   go_cache_restore:
     steps:
     - restore_cache:
-        key: v1-gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
+        key: v1-gopkg-{{ checksum "Gopkg.lock" }}
         paths:
         - vendor
 
   go_cache_save:
     steps:
     - save_cache:
-        key: v1-gopkg-{{ .Branch }}-{{ checksum "Gopkg.lock" }}
+        key: v1-gopkg-{{ checksum "Gopkg.lock" }}
         paths:
         - vendor
-
-  docker_cache_restore:
-    steps:
-    - restore_cache:
-        key: v1-docker-{{ .Branch }}-{{ checksum "aliases.yaml" }}
-        paths:
-          - ~/.cache/images.tar
-    - run:
-        name: Load Docker Cache
-        command: |
-          if [[ -f .cache/images.tar ]]; then
-            docker load -i ~/.cache/images.tar
-          fi
-
-  docker_cache_save:
-    steps:
-    - run:
-        name: Save Docker Cache
-        command: |
-          mkdir -p ~/.cache
-          docker save $(docker images | awk 'NR>=2 && ! /^<none>/{print $1}') -o ~/.cache/images.tar
-    - save_cache:
-        key: v1-docker-{{ .Branch }}-{{ checksum "aliases.yaml" }}
-        paths:
-          - ~/.cache/images.tar
 
 jobs:
   orb-validate:
@@ -77,12 +52,10 @@ jobs:
     - checkout
     - aliases/install
     - aliases/gen
-    - docker_cache_restore
     - go_cache_restore
     - run: make build
     - run: make test
     - go_cache_save
-    - docker_cache_save
 
   integration:
     machine: true
@@ -90,11 +63,9 @@ jobs:
     - checkout
     - aliases/install
     - aliases/gen
-    - docker_cache_restore
     - go_cache_restore
     - run: make integration
     - go_cache_save
-    - docker_cache_save
 
 workflows:
   version: 2
