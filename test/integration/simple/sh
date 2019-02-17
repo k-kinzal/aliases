@@ -1,0 +1,9 @@
+#!/bin/sh
+
+if [ -p /dev/stdin ]; then
+  cat - | docker run --entrypoint "sh" --interactive --network "host" --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") alpine:${SH_VERSION:-"3.8"} -c "$@"
+  exit $?
+else
+  echo "" >/dev/null | docker run --entrypoint "sh" --interactive --network "host" --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") alpine:${SH_VERSION:-"3.8"} -c "$@"
+  exit $?
+fi

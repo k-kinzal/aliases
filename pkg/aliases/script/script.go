@@ -121,11 +121,7 @@ func NewScript(client *docker.Client, opt config.Option) *Script {
 	// image
 	image := fmt.Sprintf("%s:${%s_VERSION:-\"%s\"}", opt.Image, strings.ToUpper(opt.FileName), opt.Tag)
 	// args
-	args := make([]string, 0)
-	if opt.Command != nil {
-		args = append(args, *opt.Command)
-	}
-	args = append(args, opt.Args...)
+	args := opt.Args
 	// options
 	o := docker.RunOption{}
 	o.AddHost = ExpandColonDelimitedStringListWithEnv(opt.AddHost)
@@ -157,7 +153,11 @@ func NewScript(client *docker.Client, opt config.Option) *Script {
 	o.DeviceWriteIOPS = ExpandColonDelimitedStringListWithEnv(opt.DeviceWriteIOPS)
 	o.DisableContentTrust = opt.DisableContentTrust
 	o.Domainname = opt.Domainname
-	o.Entrypoint = opt.Entrypoint
+	if opt.Command != nil {
+		o.Entrypoint = opt.Command
+	} else {
+		o.Entrypoint = opt.Entrypoint
+	}
 	o.Env = ExpandStringKeyMapWithEnv(opt.Env)
 	o.EnvFile = opt.EnvFile
 	o.Expose = opt.Expose

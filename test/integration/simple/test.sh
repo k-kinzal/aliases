@@ -11,7 +11,7 @@ MASK="sed -e s|${HOME}|[HOME]|g -e s|${TEMP_DIR}|[TEMP_DIR]|g"
 
 ${ALIASES} gen --export-path "${TEMP_DIR}" | ${MASK} | sort | ${DIFF} ${TEST_DIR}/alias -
 ${ALIASES} gen --export --export-path "${TEMP_DIR}" | ${MASK} | ${DIFF} ${TEST_DIR}/export -
-cat ${TEMP_DIR}/alpine | ${MASK} | ${DIFF} ${TEST_DIR}/alpine -
+cat ${TEMP_DIR}/sh | ${MASK} | ${DIFF} ${TEST_DIR}/sh -
 
-${TEMP_DIR}/alpine /bin/sh -c "echo foo" | ${DIFF} ${TEST_DIR}/stdout -
-${ALIASES} run /usr/local/bin/alpine /bin/sh -c "echo foo" | ${DIFF} ${TEST_DIR}/stdout -
+${TEMP_DIR}/sh "echo foo" | ${DIFF} ${TEST_DIR}/stdout -
+${ALIASES} run /usr/local/bin/sh -c "echo foo" | ${DIFF} ${TEST_DIR}/stdout -
