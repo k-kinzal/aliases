@@ -105,7 +105,7 @@ type OptionSpec struct {
 	StopTimeout         *string           `yaml:"stopTimeout" validate:"omitempty,int|shell"`
 	StorageOpt          map[string]string `yaml:"storageOpt"`
 	Sysctl              map[string]string `yaml:"sysctl"`
-	TTY                 *string           `yaml:"tty" validate:"omitempty,bool|shell" default:"$(if tty >/dev/null; then echo true; else echo false; fi)"`
+	TTY                 *string           `yaml:"tty" validate:"omitempty,bool|shell" default:"tty >/dev/null"`
 	Tmpfs               []string          `yaml:"tmpfs"`
 	UTS                 *string           `yaml:"uts"`
 	Ulimit              map[string]string `yaml:"ulimit"`

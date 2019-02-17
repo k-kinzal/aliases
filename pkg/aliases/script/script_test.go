@@ -166,7 +166,7 @@ func ExampleScript_StringWithOverride() {
 
 	cmd := script.NewScript(client, *opt)
 	fmt.Println(cmd.StringWithOverride([]string{"-c", "echo 1"}, docker.RunOption{Env: map[string]string{"FOO": "1"}}))
-	// Output: docker run --entrypoint "sh" --env FOO="1" --interactive --network "host" --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") alpine:${COMMAND1_VERSION:-"latest"} -c "echo 1"
+	// Output: docker run --entrypoint "sh" --env FOO="1" --interactive --network "host" --rm $(tty >/dev/null && echo "--tty") alpine:${COMMAND1_VERSION:-"latest"} -c "echo 1"
 }
 
 func ExampleScript_String() {
@@ -205,7 +205,7 @@ func ExampleScript_String() {
 
 	cmd := script.NewScript(client, *opt)
 	fmt.Println(cmd.String())
-	// Output: docker run --entrypoint "sh" --interactive --network "host" --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") alpine:${COMMAND1_VERSION:-"latest"} -c
+	// Output: docker run --entrypoint "sh" --interactive --network "host" --rm $(tty >/dev/null && echo "--tty") alpine:${COMMAND1_VERSION:-"latest"} -c
 }
 
 func ExampleScript_Shell() {
@@ -250,10 +250,10 @@ func ExampleScript_Shell() {
 	fmt.Println(shell.String())
 	// Output:
 	// if [ -p /dev/stdin ]; then
-	//   cat - | docker run --entrypoint "sh" --interactive --network "host" --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") alpine:${COMMAND1_VERSION:-"latest"} -c "$@"
+	//   cat - | docker run --entrypoint "sh" --interactive --network "host" --rm $(tty >/dev/null && echo "--tty") alpine:${COMMAND1_VERSION:-"latest"} -c "$@"
 	//   exit $?
 	// else
-	//   echo "" >/dev/null | docker run --entrypoint "sh" --interactive --network "host" --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") alpine:${COMMAND1_VERSION:-"latest"} -c "$@"
+	//   echo "" >/dev/null | docker run --entrypoint "sh" --interactive --network "host" --rm $(tty >/dev/null && echo "--tty") alpine:${COMMAND1_VERSION:-"latest"} -c "$@"
 	//   exit $?
 	// fi
 }
