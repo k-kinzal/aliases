@@ -160,7 +160,7 @@ func (client *Client) Run(image string, args []string, option RunOption) *posix.
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--detach")
 		} else {
-			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--detach\")", strconv.Quote(*v)))
+			cmd.Args = append(cmd.Args, fmt.Sprintf("$(%s && echo \"--detach\")", *v))
 		}
 	}
 	if v := option.DetachKeys; v != nil {
@@ -188,7 +188,7 @@ func (client *Client) Run(image string, args []string, option RunOption) *posix.
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--disable-content-trust")
 		} else {
-			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--disable-content-trust\")", strconv.Quote(*v)))
+			cmd.Args = append(cmd.Args, fmt.Sprintf("$(%s && echo \"--disable-content-trust\")", *v))
 		}
 	}
 	for _, v := range option.DNS {
@@ -237,14 +237,14 @@ func (client *Client) Run(image string, args []string, option RunOption) *posix.
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--init")
 		} else {
-			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--init\")", strconv.Quote(*v)))
+			cmd.Args = append(cmd.Args, fmt.Sprintf("$(%s && echo \"--init\")", *v))
 		}
 	}
 	if v := option.Interactive; v != nil && *v != "false" {
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--interactive")
 		} else {
-			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--interactive\")", strconv.Quote(*v)))
+			cmd.Args = append(cmd.Args, fmt.Sprintf("$(%s && echo \"--interactive\")", *v))
 		}
 	}
 	if v := option.IP; v != nil {
@@ -311,14 +311,14 @@ func (client *Client) Run(image string, args []string, option RunOption) *posix.
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--no-healthcheck")
 		} else {
-			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--no-healthcheck\")", strconv.Quote(*v)))
+			cmd.Args = append(cmd.Args, fmt.Sprintf("$(%s && echo \"--no-healthcheck\")", *v))
 		}
 	}
 	if v := option.OOMKillDisable; v != nil && *v != "false" {
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--oom-kill-disable")
 		} else {
-			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--oom-kill-disable\")", strconv.Quote(*v)))
+			cmd.Args = append(cmd.Args, fmt.Sprintf("$(%s && echo \"--oom-kill-disable\")", *v))
 		}
 	}
 	if v := option.OOMScoreAdj; v != nil {
@@ -337,7 +337,7 @@ func (client *Client) Run(image string, args []string, option RunOption) *posix.
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--privileged")
 		} else {
-			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--privileged\")", strconv.Quote(*v)))
+			cmd.Args = append(cmd.Args, fmt.Sprintf("$(%s && echo \"--privileged\")", *v))
 		}
 	}
 	for _, v := range option.Publish {
@@ -347,14 +347,14 @@ func (client *Client) Run(image string, args []string, option RunOption) *posix.
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--publish-all")
 		} else {
-			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--publish-all\")", strconv.Quote(*v)))
+			cmd.Args = append(cmd.Args, fmt.Sprintf("$(%s && echo \"--publish-all\")", *v))
 		}
 	}
 	if v := option.ReadOnly; v != nil && *v != "false" {
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--readonly")
 		} else {
-			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--readonly\")", strconv.Quote(*v)))
+			cmd.Args = append(cmd.Args, fmt.Sprintf("$(%s && echo \"--readonly\")", *v))
 		}
 	}
 	if v := option.Restart; v != nil {
@@ -364,7 +364,7 @@ func (client *Client) Run(image string, args []string, option RunOption) *posix.
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--rm")
 		} else {
-			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--rm\")", strconv.Quote(*v)))
+			cmd.Args = append(cmd.Args, fmt.Sprintf("$(%s && echo \"--rm\")", *v))
 		}
 	}
 	if v := option.Runtime; v != nil {
@@ -380,7 +380,7 @@ func (client *Client) Run(image string, args []string, option RunOption) *posix.
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--sig-proxy")
 		} else {
-			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--sig-proxy\")", strconv.Quote(*v)))
+			cmd.Args = append(cmd.Args, fmt.Sprintf("$(%s && echo \"--sig-proxy\")", *v))
 		}
 	}
 	if v := option.StopSignal; v != nil {
@@ -402,7 +402,7 @@ func (client *Client) Run(image string, args []string, option RunOption) *posix.
 		if *v == "true" {
 			cmd.Args = append(cmd.Args, "--tty")
 		} else {
-			cmd.Args = append(cmd.Args, fmt.Sprintf("$(test %s = \"true\" && echo \"--tty\")", strconv.Quote(*v)))
+			cmd.Args = append(cmd.Args, fmt.Sprintf("$(%s && echo \"--tty\")", *v))
 		}
 	}
 	for k, v := range option.Ulimit {
