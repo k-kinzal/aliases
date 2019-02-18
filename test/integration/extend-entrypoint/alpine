@@ -3,6 +3,9 @@
 if [ -p /dev/stdin ]; then
   cat - | docker run --entrypoint "/86e90c3dd209d67f8a0bdff9c91509d5" --interactive --network "host" --rm $(tty >/dev/null && echo "--tty") --volume "[TEMP_DIR]/entrypoint/86e90c3dd209d67f8a0bdff9c91509d5:/86e90c3dd209d67f8a0bdff9c91509d5" alpine:${ALPINE_VERSION:-"3.8"} "$@"
   exit $?
+elif [ -f /dev/stdin ]; then
+  docker run --entrypoint "/86e90c3dd209d67f8a0bdff9c91509d5" --interactive --network "host" --rm $(tty >/dev/null && echo "--tty") --volume "[TEMP_DIR]/entrypoint/86e90c3dd209d67f8a0bdff9c91509d5:/86e90c3dd209d67f8a0bdff9c91509d5" alpine:${ALPINE_VERSION:-"3.8"} "$@" </dev/stdin
+  exit $?
 else
   echo "" >/dev/null | docker run --entrypoint "/86e90c3dd209d67f8a0bdff9c91509d5" --interactive --network "host" --rm $(tty >/dev/null && echo "--tty") --volume "[TEMP_DIR]/entrypoint/86e90c3dd209d67f8a0bdff9c91509d5:/86e90c3dd209d67f8a0bdff9c91509d5" alpine:${ALPINE_VERSION:-"3.8"} "$@"
   exit $?

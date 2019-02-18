@@ -86,6 +86,9 @@ fi
 if [ -p /dev/stdin ]; then
   cat - | {{ .command }} "$@"
   exit $?
+elif [ -f /dev/stdin ]; then
+  {{ .command }} "$@" </dev/stdin
+  exit $?
 else
   echo "" >/dev/null | {{ .command }} "$@"
   exit $?

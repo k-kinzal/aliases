@@ -252,6 +252,9 @@ func ExampleScript_Shell() {
 	// if [ -p /dev/stdin ]; then
 	//   cat - | docker run --entrypoint "sh" --interactive --network "host" --rm $(tty >/dev/null && echo "--tty") alpine:${COMMAND1_VERSION:-"latest"} -c "$@"
 	//   exit $?
+	// elif [ -f /dev/stdin ]; then
+	//   docker run --entrypoint "sh" --interactive --network "host" --rm $(tty >/dev/null && echo "--tty") alpine:${COMMAND1_VERSION:-"latest"} -c "$@" </dev/stdin
+	//   exit $?
 	// else
 	//   echo "" >/dev/null | docker run --entrypoint "sh" --interactive --network "host" --rm $(tty >/dev/null && echo "--tty") alpine:${COMMAND1_VERSION:-"latest"} -c "$@"
 	//   exit $?
