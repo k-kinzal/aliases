@@ -22,6 +22,12 @@ func (script *Script) WriteWithOverride(args []string, option docker.RunOption) 
 		}
 	}
 
+	if script.entrypoint.body != "" {
+		if err := script.WriteExtendEntrypoint(); err != nil {
+			return "", err
+		}
+	}
+
 	targetPath := script.Path(context.ExportPath())
 
 	if err := os.MkdirAll(path.Dir(targetPath), 0755); err != nil {

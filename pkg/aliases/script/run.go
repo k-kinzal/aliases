@@ -22,6 +22,12 @@ func (script *Script) Run(args []string, opt docker.RunOption) error {
 		}
 	}
 
+	if script.entrypoint.body != "" {
+		if err := script.WriteExtendEntrypoint(); err != nil {
+			return err
+		}
+	}
+
 	command, err := script.Shell(args, opt)
 	if err != nil {
 		return err

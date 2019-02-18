@@ -3,9 +3,13 @@ package script
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"path"
 	"strings"
 	"text/template"
+
+	"github.com/k-kinzal/aliases/pkg/types"
 
 	"github.com/k-kinzal/aliases/pkg/aliases/context"
 
@@ -24,7 +28,12 @@ type Script struct {
 		image string
 		tag   string
 	}
-	docker   func(args []string, option docker.RunOption) *posix.Cmd
+	docker     func(args []string, option docker.RunOption) *posix.Cmd
+	entrypoint struct {
+		body      string
+		path      string
+		mountPath string
+	}
 	relative []*Script
 }
 
@@ -48,6 +57,25 @@ func (script *Script) String() string {
 	return script.docker(nil, docker.RunOption{}).String()
 }
 
+// WriteExtendEntrypoint exports exdend entrypoint script to a file.
+func (script *Script) WriteExtendEntrypoint() error {
+	if script.entrypoint.body == "" {
+		return fmt.Errorf("extend entrypoint is not defined")
+	}
+	dir := path.Dir(script.entrypoint.path)
+	if err := os.RemoveAll(dir); err != nil {
+		return err
+	}
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return err
+	}
+	if err := ioutil.WriteFile(script.entrypoint.path, []byte(script.entrypoint.body), 0755); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 var content = `
 {{- if .dependencies }}
 DOCKER_BINARY_PATH="{{ .binaryPath }}/{{ .binary.filename }}"
@@ -67,7 +95,7 @@ fi
 // Shell returns shell script command.
 func (script *Script) Shell(args []string, option docker.RunOption) (*posix.ShellScript, error) {
 	data := map[string]interface{}{
-		"command":      script.docker(args, option).String(),
+		"command":      script.StringWithOverride(args, option),
 		"dependencies": len(script.relative) > 0,
 		"binary": map[string]string{
 			"image": script.binary.image,
@@ -223,6 +251,19 @@ func NewScript(client *docker.Client, opt config.Option) *Script {
 	o.VolumeDriver = opt.VolumeDriver
 	o.VolumesFrom = opt.VolumesFrom
 	o.Workdir = opt.Workdir
+	// exdent entrypoint
+	if o.Entrypoint != nil && strings.HasPrefix(strings.Trim(*o.Entrypoint, " \t\r\n"), "#!") {
+		body := *o.Entrypoint
+		hash := types.MD5(body)
+		entrypoint := fmt.Sprintf("/%s", hash)
+
+		script.entrypoint.body = body
+		script.entrypoint.path = path.Join(context.ExportPath(), "entrypoint", hash)
+		script.entrypoint.mountPath = entrypoint
+
+		o.Entrypoint = &script.entrypoint.mountPath
+		o.Volume = append(o.Volume, fmt.Sprintf("%s:%s", script.entrypoint.path, script.entrypoint.mountPath))
+	}
 	// dependencies
 	if len(opt.Dependencies) > 0 {
 		if opt.Env == nil {
