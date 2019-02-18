@@ -293,9 +293,9 @@ func RunAction(c *cli.Context) error {
 	if index == "" {
 		return cli.ShowCommandHelp(c, "run")
 	}
-	args := c.Args()
+	args := []string{}
 	if c.NArg() > 1 {
-		args = args[1:]
+		args = c.Args()[1:]
 	}
 
 	dir, err := ioutil.TempDir("/tmp", "")
