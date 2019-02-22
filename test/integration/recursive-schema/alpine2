@@ -2,7 +2,7 @@
 
 DOCKER_BINARY_PATH="[HOME]/.aliases/docker/docker-18-09-0"
 if [ ! -f "${DOCKER_BINARY_PATH}" ]; then
-  docker run --entrypoint '' -v [HOME]/.aliases/docker:/share docker:18.09.0 sh -c 'cp -av $(which docker) /share/docker-18-09-0' >/dev/null
+  docker run --entrypoint "" --volume "[HOME]/.aliases/docker:/share" docker:18.09.0 sh -c "cp -av $(which docker) /share/docker-18-09-0" >/dev/null
 fi
 if [ -p /dev/stdin ]; then
   cat - | docker run --env FOO="${FOO}" --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --interactive --network "host" --privileged --rm $(tty >/dev/null && echo "--tty") --volume "[HOME]/.aliases:[HOME]/.aliases" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "[TEMP_DIR]/alpine1:/usr/local/bin/alpine1" --volume "[TEMP_DIR]/4d89908fa7d1581bb3aaa1558f57ce08/alpine3:/usr/local/bin/alpine3" alpine:${ALPINE2_VERSION:-"3.8"} "$@"

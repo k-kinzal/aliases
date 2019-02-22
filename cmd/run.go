@@ -5,15 +5,13 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/k-kinzal/aliases/pkg/logger"
+	"github.com/k-kinzal/aliases/pkg/aliases/yaml"
 
 	"github.com/k-kinzal/aliases/pkg/aliases/context"
 
 	"github.com/k-kinzal/aliases/pkg/docker"
 
 	"github.com/k-kinzal/aliases/pkg/aliases/script"
-
-	"github.com/k-kinzal/aliases/pkg/aliases/config"
 
 	"github.com/urfave/cli"
 )
@@ -293,7 +291,7 @@ func RunAction(c *cli.Context) error {
 	if index == "" {
 		return cli.ShowCommandHelp(c, "run")
 	}
-	args := []string{}
+	var args []string
 	if c.NArg() > 1 {
 		args = c.Args()[1:]
 	}
@@ -311,20 +309,20 @@ func RunAction(c *cli.Context) error {
 		return err
 	}
 
-	conf, err := config.LoadConfig(context.ConfPath())
+	conf, err := yaml.LoadFile(context.ConfPath())
 	if err != nil {
 		return err
 	}
 
-	option, err := conf.Get(index)
-	if err != nil {
-		return err
+	option, ok := (*conf)[index]
+	if !ok {
+		return fmt.Errorf("%s: index that does not exist in the config", index)
 	}
 
-	cmd := script.NewScript(client, *option)
-	logger.Debug(cmd.StringWithOverride(args, opt))
+	cmd := script.NewScript(*option)
+	//logger.Debug(cmd.StringWithOverride(args, opt))
 
-	if err := cmd.Run(args, opt); err != nil {
+	if err := cmd.Run(client, args, opt); err != nil {
 		return err
 	}
 

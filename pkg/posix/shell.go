@@ -6,9 +6,7 @@ import (
 	"strings"
 )
 
-type ShellScript struct {
-	*Cmd
-}
+type ShellScript Cmd
 
 // Run shell script.
 func (shell *ShellScript) Run() error {
@@ -33,5 +31,5 @@ func (shell *ShellScript) String() string {
 // http://pubs.opengroup.org/onlinepubs/009695399/utilities/sh.html
 // TODO: Implement other options if there is a use case
 func Shell(commandString string) *ShellScript {
-	return &ShellScript{Command("sh", "-c", commandString)}
+	return (*ShellScript)(Command("sh", "-c", commandString))
 }
