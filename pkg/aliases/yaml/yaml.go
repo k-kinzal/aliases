@@ -124,6 +124,7 @@ func Unmarshal(buf []byte) (*Config, error) {
 			src.Image = ""
 			src.Args = nil
 			src.Tag = ""
+			src.Entrypoint = nil
 			src.Command = nil
 			if err := mergo.Map(&dst, src, mergo.WithAppendSlice); err != nil {
 				panic(err)
@@ -155,6 +156,7 @@ func Unmarshal(buf []byte) (*Config, error) {
 			src.Image = ""
 			src.Args = nil
 			src.Tag = ""
+			src.Entrypoint = nil
 			src.Command = nil
 			if err := mergo.Map(&dst, src, mergo.WithAppendSlice); err != nil {
 				panic(err)

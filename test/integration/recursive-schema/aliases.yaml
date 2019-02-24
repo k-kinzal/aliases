@@ -14,6 +14,7 @@
         - /usr/local/bin/alpine4:
             image: alpine
             tag: 3.8
+            entrypoint: echo
         - /usr/local/bin/alpine5:
             image: alpine
             tag: 3.8
