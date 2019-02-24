@@ -1,7 +1,7 @@
 package util
 
 func UniqueStringSlice(data []string) []string {
-	var slice []string
+	slice := make([]string, 0)
 	u := map[string]int{}
 	for i, v := range data {
 		if _, ok := u[v]; ok {
