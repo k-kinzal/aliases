@@ -16,7 +16,7 @@ var (
 // makeDir make directory.
 func makeDir(path string) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		if err := os.Mkdir(path, 0755); err != nil {
+		if err := os.MkdirAll(path, 0755); err != nil {
 			return err
 		}
 	}
@@ -28,7 +28,7 @@ func replacetDir(path string) error {
 	if err := os.RemoveAll(path); err != nil {
 		return err
 	}
-	if err := os.Mkdir(path, 0755); err != nil {
+	if err := os.MkdirAll(path, 0755); err != nil {
 		return err
 	}
 	return nil
@@ -87,9 +87,9 @@ func ChangeExportPath(path string) error {
 
 // BinaryPath returns path of docker binary directory.
 func BinaryPath() string {
-	if binaryPath == "" {
-		binaryPath = path.Join(HomePath(), "docker")
+	p := path.Join(HomePath(), "docker")
+	if _, err := os.Stat(p); os.IsNotExist(err) {
 		_ = makeDir(binaryPath)
 	}
-	return binaryPath
+	return p
 }

@@ -1,0 +1,17 @@
+#!/bin/sh
+
+DOCKER_BINARY_PATH="[HOME]/.aliases/docker/docker-18-09-0"
+if [ ! -f "${DOCKER_BINARY_PATH}" ]; then
+  docker run --entrypoint "" --volume "[HOME]/.aliases/docker:/share" docker:18.09.0 sh -c "cp -av $(which docker) /share/docker-18-09-0" >/dev/null
+fi
+
+if [ -p /dev/stdin ]; then
+  cat - | docker run --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --interactive --network "host" --privileged --rm $(tty >/dev/null && echo "--tty") --volume "[HOME]/.aliases:[HOME]/.aliases" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "[TEMP_DIR]/464799acdf053a1198ec608ff72d0f5d/alpine2:/usr/local/bin/alpine2" alpine:${ALPINE1_VERSION:-"3.8"} "$@"
+  exit $?
+elif [ -f /dev/stdin ]; then
+  docker run --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --interactive --network "host" --privileged --rm $(tty >/dev/null && echo "--tty") --volume "[HOME]/.aliases:[HOME]/.aliases" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "[TEMP_DIR]/464799acdf053a1198ec608ff72d0f5d/alpine2:/usr/local/bin/alpine2" alpine:${ALPINE1_VERSION:-"3.8"} "$@" </dev/stdin
+  exit $?
+else
+  echo "" >/dev/null | docker run --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --interactive --network "host" --privileged --rm $(tty >/dev/null && echo "--tty") --volume "[HOME]/.aliases:[HOME]/.aliases" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "[TEMP_DIR]/464799acdf053a1198ec608ff72d0f5d/alpine2:/usr/local/bin/alpine2" alpine:${ALPINE1_VERSION:-"3.8"} "$@"
+  exit $?
+fi

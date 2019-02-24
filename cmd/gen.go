@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"path"
 
+	"github.com/k-kinzal/aliases/pkg/aliases/yaml"
+
 	"github.com/k-kinzal/aliases/pkg/util"
 
 	"github.com/k-kinzal/aliases/pkg/aliases/context"
@@ -11,7 +13,6 @@ import (
 
 	"github.com/k-kinzal/aliases/pkg/docker"
 
-	"github.com/k-kinzal/aliases/pkg/aliases/config"
 	"github.com/k-kinzal/aliases/pkg/aliases/script"
 
 	"github.com/k-kinzal/aliases/pkg/posix"
@@ -61,35 +62,26 @@ func GenAction(c *cli.Context) error {
 		return err
 	}
 
-	conf, err := config.LoadConfig(context.ConfPath())
+	conf, err := yaml.LoadFile(context.ConfPath())
 	if err != nil {
 		return err
 	}
 
 	if isExport {
-		for _, opt := range conf.Slice() {
-			cmd := script.NewScript(client, opt)
-			if err != nil {
-				return err
-			}
-			_, err := cmd.Write()
-			if err != nil {
+		for _, opt := range *conf {
+			if err := script.NewScript(*opt).Write(client); err != nil {
 				return err
 			}
 		}
 		fmt.Println(posix.PathExport(context.ExportPath()))
 	} else {
 		aliases := make([]posix.Cmd, 0)
-		for _, opt := range conf.Slice() {
-			cmd := script.NewScript(client, opt)
+		for _, opt := range *conf {
+			cmd, err := script.NewScript(*opt).Alias(client)
 			if err != nil {
 				return err
 			}
-			p, err := cmd.Write()
-			if err != nil {
-				return err
-			}
-			aliases = append(aliases, *posix.Alias(cmd.FileName(), p))
+			aliases = append(aliases, *cmd)
 		}
 		for _, alias := range aliases {
 			fmt.Println(alias.String())
