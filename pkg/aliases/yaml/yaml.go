@@ -177,6 +177,7 @@ func Unmarshal(buf []byte) (*Config, error) {
 		if err := defaults.Set(option.OptionSpec); err != nil {
 			panic(err)
 		}
+		conf.Set(path, *option)
 
 		return &current, nil
 	}); err != nil {

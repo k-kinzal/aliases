@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/k-kinzal/aliases/pkg/util"
+
 	"github.com/k-kinzal/aliases/pkg/posix"
 )
 
@@ -203,8 +205,8 @@ func (client *Client) Run(image string, args []string, option RunOption) *posix.
 	if v := option.Entrypoint; v != nil {
 		cmd.Args = append(cmd.Args, "--entrypoint", strconv.Quote(*v))
 	}
-	for k, v := range option.Env {
-		cmd.Args = append(cmd.Args, "--env", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
+	for _, k := range util.StringKeys(option.Env) {
+		cmd.Args = append(cmd.Args, "--env", fmt.Sprintf("%s=%s", k, strconv.Quote(option.Env[k])))
 	}
 	for _, v := range option.EnvFile {
 		cmd.Args = append(cmd.Args, "--env-file", strconv.Quote(v))
@@ -262,8 +264,8 @@ func (client *Client) Run(image string, args []string, option RunOption) *posix.
 	if v := option.KernelMemory; v != nil {
 		cmd.Args = append(cmd.Args, "--kernel-memory", strconv.Quote(*v))
 	}
-	for k, v := range option.Label {
-		cmd.Args = append(cmd.Args, "--label", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
+	for _, k := range util.StringKeys(option.Label) {
+		cmd.Args = append(cmd.Args, "--label", fmt.Sprintf("%s=%s", k, strconv.Quote(option.Label[k])))
 	}
 	for _, v := range option.LabelFile {
 		cmd.Args = append(cmd.Args, "--label-file", strconv.Quote(v))
@@ -277,8 +279,8 @@ func (client *Client) Run(image string, args []string, option RunOption) *posix.
 	if v := option.LogDriver; v != nil {
 		cmd.Args = append(cmd.Args, "--log-driver", strconv.Quote(*v))
 	}
-	for k, v := range option.LogOpt {
-		cmd.Args = append(cmd.Args, "--log-opt", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
+	for _, k := range util.StringKeys(option.LogOpt) {
+		cmd.Args = append(cmd.Args, "--log-opt", fmt.Sprintf("%s=%s", k, strconv.Quote(option.LogOpt[k])))
 	}
 	if v := option.MacAddress; v != nil {
 		cmd.Args = append(cmd.Args, "--mac-address", strconv.Quote(*v))
@@ -295,8 +297,8 @@ func (client *Client) Run(image string, args []string, option RunOption) *posix.
 	if v := option.MemorySwappiness; v != nil {
 		cmd.Args = append(cmd.Args, "--memory-swappiness", strconv.Quote(*v))
 	}
-	for k, v := range option.Mount {
-		cmd.Args = append(cmd.Args, "--mount", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
+	for _, k := range util.StringKeys(option.Mount) {
+		cmd.Args = append(cmd.Args, "--mount", fmt.Sprintf("%s=%s", k, strconv.Quote(option.Mount[k])))
 	}
 	if v := option.Name; v != nil {
 		cmd.Args = append(cmd.Args, "--name", strconv.Quote(*v))
@@ -370,8 +372,8 @@ func (client *Client) Run(image string, args []string, option RunOption) *posix.
 	if v := option.Runtime; v != nil {
 		cmd.Args = append(cmd.Args, "--runtime", strconv.Quote(*v))
 	}
-	for k, v := range option.SecurityOpt {
-		cmd.Args = append(cmd.Args, "--security-opt", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
+	for _, k := range util.StringKeys(option.SecurityOpt) {
+		cmd.Args = append(cmd.Args, "--security-opt", fmt.Sprintf("%s=%s", k, strconv.Quote(option.SecurityOpt[k])))
 	}
 	if v := option.ShmSize; v != nil {
 		cmd.Args = append(cmd.Args, "--shm-size", strconv.Quote(*v))
@@ -389,11 +391,11 @@ func (client *Client) Run(image string, args []string, option RunOption) *posix.
 	if v := option.StopTimeout; v != nil {
 		cmd.Args = append(cmd.Args, "--stop-timeout", strconv.Quote(*v))
 	}
-	for k, v := range option.StorageOpt {
-		cmd.Args = append(cmd.Args, "--storage-opt", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
+	for _, k := range util.StringKeys(option.StorageOpt) {
+		cmd.Args = append(cmd.Args, "--storage-opt", fmt.Sprintf("%s=%s", k, strconv.Quote(option.StorageOpt[k])))
 	}
-	for k, v := range option.Sysctl {
-		cmd.Args = append(cmd.Args, "--sysctl", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
+	for _, k := range util.StringKeys(option.Sysctl) {
+		cmd.Args = append(cmd.Args, "--sysctl", fmt.Sprintf("%s=%s", k, strconv.Quote(option.Sysctl[k])))
 	}
 	for _, v := range option.Tmpfs {
 		cmd.Args = append(cmd.Args, "--tmpfs", strconv.Quote(v))
@@ -405,8 +407,8 @@ func (client *Client) Run(image string, args []string, option RunOption) *posix.
 			cmd.Args = append(cmd.Args, fmt.Sprintf("$(%s && echo \"--tty\")", *v))
 		}
 	}
-	for k, v := range option.Ulimit {
-		cmd.Args = append(cmd.Args, "--ulimit", fmt.Sprintf("%s=%s", k, strconv.Quote(v)))
+	for _, k := range util.StringKeys(option.Ulimit) {
+		cmd.Args = append(cmd.Args, "--ulimit", fmt.Sprintf("%s=%s", k, strconv.Quote(option.Ulimit[k])))
 	}
 	if v := option.User; v != nil {
 		cmd.Args = append(cmd.Args, "--user", strconv.Quote(*v))

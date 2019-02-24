@@ -1,5 +1,6 @@
 package util
 
+// UniqueStringSlice returns unique slice.
 func UniqueStringSlice(data []string) []string {
 	slice := make([]string, 0)
 	u := map[string]int{}
