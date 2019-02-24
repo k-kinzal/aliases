@@ -177,6 +177,11 @@ func Unmarshal(buf []byte) (*Config, error) {
 		if err := defaults.Set(option.OptionSpec); err != nil {
 			panic(err)
 		}
+		dependencies := make([]*Option, len(option.Dependencies))
+		for index, dependency := range option.Dependencies {
+			dependencies[index] = conf.Get(dependency.Path)
+		}
+		option.Dependencies = dependencies
 		conf.Set(path, *option)
 
 		return &current, nil
