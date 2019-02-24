@@ -95,7 +95,11 @@ func (script *Script) Run(client *docker.Client, overrideArgs []string, override
 	if err != nil {
 		return err
 	}
+
 	if (info.Mode()&os.ModeNamedPipe) != 0 || info.Size() > 0 {
+		cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+		cmd.Stdin = os.Stdin
+	} else if (info.Mode() & os.ModeCharDevice) != 0 {
 		cmd.Stdin = os.Stdin
 	} else {
 		cmd.Stdin = nil
@@ -107,8 +111,6 @@ func (script *Script) Run(client *docker.Client, overrideArgs []string, override
 	if err != nil {
 		return nil
 	}
-
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
 	fn := func() error {
 		if err := cmd.Start(); err != nil {
@@ -141,7 +143,7 @@ func (script *Script) Run(client *docker.Client, overrideArgs []string, override
 		return cmd.Wait()
 	}
 
-	if (info.Mode()&os.ModeNamedPipe) != 0 && info.Size() == 0 {
+	if cmd.SysProcAttr != nil {
 		// FIXME: timeout get from command line arguments
 		if err := util.Timeout(3*time.Second, fn); err != nil {
 			if _, ok := err.(*util.TimeoutError); ok {
