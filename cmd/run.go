@@ -37,6 +37,9 @@ func stringFlag(c *cli.Context, name string) *string {
 		n = strings.Trim(n, " \t")
 		if c.IsSet(n) {
 			val := c.String(n)
+			if val == "" {
+				val = "''"
+			}
 			return &val
 		}
 	}
@@ -48,7 +51,14 @@ func sliceFlag(c *cli.Context, name string) []string {
 	for _, n := range strings.Split(name, ",") {
 		n = strings.Trim(n, " \t")
 		if c.IsSet(n) {
-			return c.StringSlice(n)
+			val := make([]string, 0)
+			for _, v := range c.StringSlice(n) {
+				if v == "" {
+					v = "''"
+				}
+				val = append(val, v)
+			}
+			return val
 		}
 	}
 	return nil
@@ -62,6 +72,9 @@ func mapFlag(c *cli.Context, name string) map[string]string {
 			val := map[string]string{}
 			for _, v := range c.StringSlice(n) {
 				s := strings.Split(v, "=")
+				if len(s) != 2 {
+					continue
+				}
 				val[s[0]] = strings.Join(s[1:], "=")
 			}
 			return val
@@ -320,7 +333,6 @@ func RunAction(c *cli.Context) error {
 	}
 
 	cmd := script.NewScript(*option)
-
 	if err := cmd.Run(client, args, opt); err != nil {
 		return err
 	}

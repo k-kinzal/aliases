@@ -145,10 +145,11 @@ func (adpt *DockerRunAdapter) Command(client *docker.Client, overrideArgs []stri
 	if len(overrideArgs) > 0 {
 		args = overrideArgs
 	}
-	opt := overrideOption
-	if err := mergo.Merge(&opt, adpt.Option(), mergo.WithAppendSlice); err != nil {
+	dst := overrideOption
+	if err := mergo.Merge(&dst, *adpt.Option(), mergo.WithAppendSlice); err != nil {
 		panic(err)
 	}
+	opt := dst
 
 	opt.AddHost = util.UniqueStringSlice(opt.AddHost)
 	opt.BlkioWeightDevice = util.UniqueStringSlice(opt.BlkioWeightDevice)
