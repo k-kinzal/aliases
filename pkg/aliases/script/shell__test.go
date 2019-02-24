@@ -49,7 +49,7 @@ func ExampleShellAdapter_Command() {
 	// fi
 }
 
-func ExampleShellAdapter_Command_UseExtendEntrypoint() {
+func ExampleShellAdapter_Command_useExtendEntrypoint() {
 	if err := context.ChangeHomePath("/tmp/aliases/ExampleShellAdapter_Command_UseExtendEntrypoint"); err != nil {
 		panic(err)
 	}
@@ -90,7 +90,7 @@ func ExampleShellAdapter_Command_UseExtendEntrypoint() {
 	// fi
 }
 
-func ExampleShellAdapter_Command_HasDependencies() {
+func ExampleShellAdapter_Command_hasDependencies() {
 	if err := context.ChangeHomePath("/tmp/aliases/ExampleShellAdapter_Command_HasDependencies"); err != nil {
 		panic(err)
 	}
