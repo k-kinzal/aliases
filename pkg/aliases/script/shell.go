@@ -26,7 +26,7 @@ if [ ! -f "${DOCKER_BINARY_PATH}" ]; then
 fi
 {{- end }}
 {{- if .debug }}
-echo "\033[0;90m{{ .command | quote }}\033[0m"
+echo "\033[0;90m{{ .command | replace "\\n" "\\\\n" | replace "\r" "\\r" | quote }}\033[0m"
 {{- end }}
 if [ -p /dev/stdin ]; then
   cat - | {{ .command }} "$@"
@@ -50,7 +50,7 @@ func (adpt *ShellAdapter) Command(client *docker.Client, overrideArgs []string, 
 	runner := adaptDockerRun(*spec)
 
 	// extend entrypoint
-	if spec.Entrypoint != nil && strings.HasPrefix(strings.Trim(*spec.Entrypoint, " \t\r\n"), "#!") {
+	if overrideOption.Entrypoint == nil && spec.Entrypoint != nil && strings.HasPrefix(strings.Trim(*spec.Entrypoint, " \t\r\n"), "#!") {
 		body := strings.Trim(*spec.Entrypoint, " \t\r\n")
 		hash := types.MD5(body)
 		entrypoint := fmt.Sprintf("/%s", hash)
@@ -118,6 +118,9 @@ func (adpt *ShellAdapter) Command(client *docker.Client, overrideArgs []string, 
 
 	funcs := template.FuncMap{
 		"quote": strconv.Quote,
+		"replace": func(old string, new string, s string) string {
+			return strings.Replace(s, old, new, -1)
+		},
 	}
 
 	tmpl := template.Must(template.New(adpt.Path.Name()).Funcs(funcs).Parse(content))

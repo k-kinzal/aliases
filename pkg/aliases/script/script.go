@@ -72,6 +72,18 @@ func (script *Script) Alias(client *docker.Client) (*posix.Cmd, error) {
 
 // Run aliases script.
 func (script *Script) Run(client *docker.Client, overrideArgs []string, overrideOption docker.RunOption) error {
+	targetPath := filepath.Join(context.ExportPath(), script.spec.Namespace(), script.spec.Path.Base())
+
+	if err := os.MkdirAll(path.Dir(targetPath), 0755); err != nil {
+		return err
+	}
+
+	fp, err := os.OpenFile(targetPath, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0755) // set lock
+	if err != nil {
+		return nil
+	}
+	defer fp.Close()
+
 	shell := adaptShell(script.spec)
 	cmd, err := shell.Command(client, overrideArgs, overrideOption, logger.LogLevel() == logger.DebugLevel)
 	if err != nil {

@@ -15,3 +15,5 @@ cat ${TEMP_DIR}/alpine | ${MASK} | ${DIFF} ${TEST_DIR}/alpine -
 
 ${TEMP_DIR}/alpine | ${DIFF} ${TEST_DIR}/stdout -
 ${ALIASES} run /usr/local/bin/alpine | ${MASK} | ${DIFF} ${TEST_DIR}/stdout -
+
+${ALIASES} run --entrypoint '' /usr/local/bin/alpine sh -c "echo 1" | ${MASK} | ${DIFF} ${TEST_DIR}/stdout -
