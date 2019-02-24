@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -24,6 +25,9 @@ if [ ! -f "${DOCKER_BINARY_PATH}" ]; then
   {{ .binary.command }} >/dev/null
 fi
 {{- end }}
+{{- if .debug }}
+echo "\033[0;90m{{ .command | quote }}\033[0m"
+{{- end }}
 if [ -p /dev/stdin ]; then
   cat - | {{ .command }} "$@"
   exit $?
@@ -40,7 +44,7 @@ fi
 type ShellAdapter yaml.Option
 
 // Command returns a command to aliases script.
-func (adpt *ShellAdapter) Command(client *docker.Client, overrideArgs []string, overrideOption docker.RunOption) (*posix.ShellScript, error) {
+func (adpt *ShellAdapter) Command(client *docker.Client, overrideArgs []string, overrideOption docker.RunOption, debug bool) (*posix.ShellScript, error) {
 	spec := (*yaml.Option)(adpt)
 	bin := adaptDockerBinary(*spec)
 	runner := adaptDockerRun(*spec)
@@ -112,6 +116,12 @@ func (adpt *ShellAdapter) Command(client *docker.Client, overrideArgs []string, 
 		}
 	}
 
+	funcs := template.FuncMap{
+		"quote": strconv.Quote,
+	}
+
+	tmpl := template.Must(template.New(adpt.Path.Name()).Funcs(funcs).Parse(content))
+
 	data := map[string]interface{}{
 		"command":      runner.Command(client, overrideArgs, overrideOption).String(),
 		"dependencies": len(spec.Dependencies) > 0,
@@ -120,9 +130,8 @@ func (adpt *ShellAdapter) Command(client *docker.Client, overrideArgs []string, 
 			"filename": bin.FileName(),
 		},
 		"binaryPath": context.BinaryPath(),
+		"debug":      debug,
 	}
-
-	tmpl := template.Must(template.New(adpt.Path.Name()).Parse(content))
 
 	var tpl bytes.Buffer
 	if err := tmpl.Execute(&tpl, data); err != nil {

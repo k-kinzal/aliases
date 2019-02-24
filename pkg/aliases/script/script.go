@@ -11,6 +11,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/k-kinzal/aliases/pkg/logger"
+
 	"github.com/k-kinzal/aliases/pkg/posix"
 
 	"github.com/k-kinzal/aliases/pkg/util"
@@ -46,7 +48,7 @@ func (script *Script) WriteWithOverride(client *docker.Client, overrideArgs []st
 	defer fp.Close()
 
 	shell := adaptShell(script.spec)
-	cmd, err := shell.Command(client, overrideArgs, overrideOption)
+	cmd, err := shell.Command(client, overrideArgs, overrideOption, false)
 	if err != nil {
 		return err
 	}
@@ -71,7 +73,7 @@ func (script *Script) Alias(client *docker.Client) (*posix.Cmd, error) {
 // Run aliases script.
 func (script *Script) Run(client *docker.Client, overrideArgs []string, overrideOption docker.RunOption) error {
 	shell := adaptShell(script.spec)
-	cmd, err := shell.Command(client, overrideArgs, overrideOption)
+	cmd, err := shell.Command(client, overrideArgs, overrideOption, logger.LogLevel() == logger.DebugLevel)
 	if err != nil {
 		return err
 	}

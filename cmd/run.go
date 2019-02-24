@@ -320,7 +320,6 @@ func RunAction(c *cli.Context) error {
 	}
 
 	cmd := script.NewScript(*option)
-	//logger.Debug(cmd.StringWithOverride(args, opt))
 
 	if err := cmd.Run(client, args, opt); err != nil {
 		return err

@@ -31,7 +31,7 @@ func ExampleShellAdapter_Command() {
 	runner := script.AdaptShell(spec)
 	cmd, err := runner.Command(client, []string{"-c", "echo 1"}, docker.RunOption{
 		Entrypoint: (func(str string) *string { return &str })("bash"),
-	})
+	}, false)
 	if err != nil {
 		panic(err)
 	}
@@ -72,7 +72,7 @@ func ExampleShellAdapter_Command_UseExtendEntrypoint() {
 		},
 	}
 	runner := script.AdaptShell(spec)
-	cmd, err := runner.Command(client, []string{}, docker.RunOption{})
+	cmd, err := runner.Command(client, []string{}, docker.RunOption{}, false)
 	if err != nil {
 		panic(err)
 	}
@@ -122,7 +122,7 @@ func ExampleShellAdapter_Command_HasDependencies() {
 		},
 	}
 	runner := script.AdaptShell(spec)
-	cmd, err := runner.Command(client, []string{}, docker.RunOption{})
+	cmd, err := runner.Command(client, []string{}, docker.RunOption{}, false)
 	if err != nil {
 		panic(err)
 	}

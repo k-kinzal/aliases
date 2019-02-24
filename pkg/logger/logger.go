@@ -25,6 +25,11 @@ func SetLogLevel(level int) {
 	logLevel = level
 }
 
+// LogLevel returns log level.
+func LogLevel() int {
+	return logLevel
+}
+
 // SetOutput changes the output destination of log.
 func SetOutput(output *os.File) {
 	logOutput = output
