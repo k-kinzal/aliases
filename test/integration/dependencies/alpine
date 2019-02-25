@@ -10,6 +10,9 @@ if [ -p /dev/stdin ]; then
 elif [ -f /dev/stdin ]; then
   docker run --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --interactive --network "host" --privileged --rm $(tty >/dev/null && echo "--tty") --volume "[HOME]/.aliases:[HOME]/.aliases" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "[TEMP_DIR]/kubectl:/usr/local/bin/kubectl" --volume "[HOME]/.kube:/root/.kube" --volume "${ALIASES_PWD:-$PWD}:/kube" --workdir "/kube" alpine:${ALPINE_VERSION:-"3.8"} "$@" </dev/stdin
   exit $?
+elif [ -t 0 ]; then
+  docker run --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --interactive --network "host" --privileged --rm $(tty >/dev/null && echo "--tty") --volume "[HOME]/.aliases:[HOME]/.aliases" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "[TEMP_DIR]/kubectl:/usr/local/bin/kubectl" --volume "[HOME]/.kube:/root/.kube" --volume "${ALIASES_PWD:-$PWD}:/kube" --workdir "/kube" alpine:${ALPINE_VERSION:-"3.8"} "$@"
+  exit $?
 else
   echo "" >/dev/null | docker run --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --interactive --network "host" --privileged --rm $(tty >/dev/null && echo "--tty") --volume "[HOME]/.aliases:[HOME]/.aliases" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "[TEMP_DIR]/kubectl:/usr/local/bin/kubectl" --volume "[HOME]/.kube:/root/.kube" --volume "${ALIASES_PWD:-$PWD}:/kube" --workdir "/kube" alpine:${ALPINE_VERSION:-"3.8"} "$@"
   exit $?

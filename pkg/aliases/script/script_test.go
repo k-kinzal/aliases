@@ -51,6 +51,9 @@ func ExampleScript_Write() {
 	// elif [ -f /dev/stdin ]; then
 	//   docker run alpine:${COMMAND_VERSION:-"latest"} -c "$@" </dev/stdin
 	//   exit $?
+	// elif [ -t 0 ]; then
+	//   docker run alpine:${COMMAND_VERSION:-"latest"} -c "$@"
+	//   exit $?
 	// else
 	//   echo "" >/dev/null | docker run alpine:${COMMAND_VERSION:-"latest"} -c "$@"
 	//   exit $?
@@ -116,6 +119,9 @@ func ExampleScript_WriteWithOverride() {
 	// elif [ -f /dev/stdin ]; then
 	//   docker run --entrypoint "bash" --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --privileged --volume "/tmp/aliases/ExampleScript_WriteWithOverride:/tmp/aliases/ExampleScript_WriteWithOverride" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "/tmp/aliases/ExampleScript_WriteWithOverride/export/command2:/path/to/command2" alpine:${COMMAND1_VERSION:-"latest"} --posix -c "$@" </dev/stdin
 	//   exit $?
+	// elif [ -t 0 ]; then
+	//   docker run --entrypoint "bash" --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --privileged --volume "/tmp/aliases/ExampleScript_WriteWithOverride:/tmp/aliases/ExampleScript_WriteWithOverride" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "/tmp/aliases/ExampleScript_WriteWithOverride/export/command2:/path/to/command2" alpine:${COMMAND1_VERSION:-"latest"} --posix -c "$@"
+	//   exit $?
 	// else
 	//   echo "" >/dev/null | docker run --entrypoint "bash" --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --privileged --volume "/tmp/aliases/ExampleScript_WriteWithOverride:/tmp/aliases/ExampleScript_WriteWithOverride" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "/tmp/aliases/ExampleScript_WriteWithOverride/export/command2:/path/to/command2" alpine:${COMMAND1_VERSION:-"latest"} --posix -c "$@"
 	//   exit $?
@@ -129,6 +135,9 @@ func ExampleScript_WriteWithOverride() {
 	//   exit $?
 	// elif [ -f /dev/stdin ]; then
 	//   docker run alpine:${COMMAND2_VERSION:-"latest"} -c "$@" </dev/stdin
+	//   exit $?
+	// elif [ -t 0 ]; then
+	//   docker run alpine:${COMMAND2_VERSION:-"latest"} -c "$@"
 	//   exit $?
 	// else
 	//   echo "" >/dev/null | docker run alpine:${COMMAND2_VERSION:-"latest"} -c "$@"

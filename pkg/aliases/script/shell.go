@@ -34,6 +34,9 @@ if [ -p /dev/stdin ]; then
 elif [ -f /dev/stdin ]; then
   {{ .command }} "$@" </dev/stdin
   exit $?
+elif [ -t 0 ]; then
+  {{ .command }} "$@"
+  exit $?
 else
   echo "" >/dev/null | {{ .command }} "$@"
   exit $?

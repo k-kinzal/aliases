@@ -43,6 +43,9 @@ func ExampleShellAdapter_Command() {
 	// elif [ -f /dev/stdin ]; then
 	//   docker run --entrypoint "bash" alpine:${._VERSION:-"latest"} -c "echo 1" "$@" </dev/stdin
 	//   exit $?
+	// elif [ -t 0 ]; then
+	//   docker run --entrypoint "bash" alpine:${._VERSION:-"latest"} -c "echo 1" "$@"
+	//   exit $?
 	// else
 	//   echo "" >/dev/null | docker run --entrypoint "bash" alpine:${._VERSION:-"latest"} -c "echo 1" "$@"
 	//   exit $?
@@ -83,6 +86,9 @@ func ExampleShellAdapter_Command_useExtendEntrypoint() {
 	//   exit $?
 	// elif [ -f /dev/stdin ]; then
 	//   docker run --entrypoint "/b82c6c95fa559f017ac62344f961e206" --volume "/tmp/aliases/ExampleShellAdapter_Command_UseExtendEntrypoint/entrypoint/b82c6c95fa559f017ac62344f961e206:/b82c6c95fa559f017ac62344f961e206" alpine:${._VERSION:-"latest"} -c "$@" </dev/stdin
+	//   exit $?
+	// elif [ -t 0 ]; then
+	//   docker run --entrypoint "/b82c6c95fa559f017ac62344f961e206" --volume "/tmp/aliases/ExampleShellAdapter_Command_UseExtendEntrypoint/entrypoint/b82c6c95fa559f017ac62344f961e206:/b82c6c95fa559f017ac62344f961e206" alpine:${._VERSION:-"latest"} -c "$@"
 	//   exit $?
 	// else
 	//   echo "" >/dev/null | docker run --entrypoint "/b82c6c95fa559f017ac62344f961e206" --volume "/tmp/aliases/ExampleShellAdapter_Command_UseExtendEntrypoint/entrypoint/b82c6c95fa559f017ac62344f961e206:/b82c6c95fa559f017ac62344f961e206" alpine:${._VERSION:-"latest"} -c "$@"
@@ -137,6 +143,9 @@ func ExampleShellAdapter_Command_hasDependencies() {
 	//   exit $?
 	// elif [ -f /dev/stdin ]; then
 	//   docker run --entrypoint "sh" --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --privileged --volume "/tmp/aliases/ExampleShellAdapter_Command_HasDependencies:/tmp/aliases/ExampleShellAdapter_Command_HasDependencies" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" alpine:${._VERSION:-"latest"} -c "$@" </dev/stdin
+	//   exit $?
+	// elif [ -t 0 ]; then
+	//   docker run --entrypoint "sh" --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --privileged --volume "/tmp/aliases/ExampleShellAdapter_Command_HasDependencies:/tmp/aliases/ExampleShellAdapter_Command_HasDependencies" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" alpine:${._VERSION:-"latest"} -c "$@"
 	//   exit $?
 	// else
 	//   echo "" >/dev/null | docker run --entrypoint "sh" --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --privileged --volume "/tmp/aliases/ExampleShellAdapter_Command_HasDependencies:/tmp/aliases/ExampleShellAdapter_Command_HasDependencies" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" alpine:${._VERSION:-"latest"} -c "$@"

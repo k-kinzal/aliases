@@ -10,6 +10,9 @@ if [ -p /dev/stdin ]; then
 elif [ -f /dev/stdin ]; then
   docker run --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --env FOO="${FOO}" --interactive --network "host" --privileged --rm $(tty >/dev/null && echo "--tty") --volume "[HOME]/.aliases:[HOME]/.aliases" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "[TEMP_DIR]/alpine1:/usr/local/bin/alpine1" --volume "[TEMP_DIR]/4d89908fa7d1581bb3aaa1558f57ce08/alpine3:/usr/local/bin/alpine3" alpine:${ALPINE2_VERSION:-"3.8"} "$@" </dev/stdin
   exit $?
+elif [ -t 0 ]; then
+  docker run --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --env FOO="${FOO}" --interactive --network "host" --privileged --rm $(tty >/dev/null && echo "--tty") --volume "[HOME]/.aliases:[HOME]/.aliases" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "[TEMP_DIR]/alpine1:/usr/local/bin/alpine1" --volume "[TEMP_DIR]/4d89908fa7d1581bb3aaa1558f57ce08/alpine3:/usr/local/bin/alpine3" alpine:${ALPINE2_VERSION:-"3.8"} "$@"
+  exit $?
 else
   echo "" >/dev/null | docker run --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --env FOO="${FOO}" --interactive --network "host" --privileged --rm $(tty >/dev/null && echo "--tty") --volume "[HOME]/.aliases:[HOME]/.aliases" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "[TEMP_DIR]/alpine1:/usr/local/bin/alpine1" --volume "[TEMP_DIR]/4d89908fa7d1581bb3aaa1558f57ce08/alpine3:/usr/local/bin/alpine3" alpine:${ALPINE2_VERSION:-"3.8"} "$@"
   exit $?
