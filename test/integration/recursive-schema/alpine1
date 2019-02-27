@@ -1,0 +1,15 @@
+#!/bin/sh
+
+if [ -p /dev/stdin ]; then
+  cat - | docker run --interactive --network "host" --rm $(tty >/dev/null && echo "--tty") alpine:${ALPINE1_VERSION:-"3.8"} "$@"
+  exit $?
+elif [ -f /dev/stdin ]; then
+  docker run --interactive --network "host" --rm $(tty >/dev/null && echo "--tty") alpine:${ALPINE1_VERSION:-"3.8"} "$@" </dev/stdin
+  exit $?
+elif [ -t 0 ]; then
+  docker run --interactive --network "host" --rm $(tty >/dev/null && echo "--tty") alpine:${ALPINE1_VERSION:-"3.8"} "$@"
+  exit $?
+else
+  echo "" >/dev/null | docker run --interactive --network "host" --rm $(tty >/dev/null && echo "--tty") alpine:${ALPINE1_VERSION:-"3.8"} "$@"
+  exit $?
+fi

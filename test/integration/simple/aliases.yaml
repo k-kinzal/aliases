@@ -1,3 +1,5 @@
-/usr/local/bin/alpine:
+/usr/local/bin/sh:
   image: alpine
   tag: 3.8
+  command: sh
+  args: [-c]

@@ -1,9 +1,15 @@
 #!/bin/sh
 
 if [ -p /dev/stdin ]; then
-  cat - | docker run --env ${ALIASES_PWD:-$PWD}="$PWD" --interactive --label [HOME]="$HOME" --network "host" --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") --ulimit $(echo nofile)="$(ulimit -n)" --user "root:$USER" --volume "${ALIASES_PWD:-$PWD}:$PWD" --volume "[HOME]:$HOME" --volume "$(echo $HOME):$(echo $HOME)" alpine:${ALPINE_VERSION:-"3.8"} "$@"
+  cat - | docker run --env ${ALIASES_PWD:-$PWD}="$PWD" --interactive --label [HOME]="$HOME" --network "host" --rm $(tty >/dev/null && echo "--tty") --ulimit $(echo nofile)="$(ulimit -n)" --user "root:$USER" --volume "${ALIASES_PWD:-$PWD}:$PWD" --volume "[HOME]:$HOME" --volume "$(echo $HOME):$(echo $HOME)" alpine:${ALPINE_VERSION:-"3.8"} "$@"
+  exit $?
+elif [ -f /dev/stdin ]; then
+  docker run --env ${ALIASES_PWD:-$PWD}="$PWD" --interactive --label [HOME]="$HOME" --network "host" --rm $(tty >/dev/null && echo "--tty") --ulimit $(echo nofile)="$(ulimit -n)" --user "root:$USER" --volume "${ALIASES_PWD:-$PWD}:$PWD" --volume "[HOME]:$HOME" --volume "$(echo $HOME):$(echo $HOME)" alpine:${ALPINE_VERSION:-"3.8"} "$@" </dev/stdin
+  exit $?
+elif [ -t 0 ]; then
+  docker run --env ${ALIASES_PWD:-$PWD}="$PWD" --interactive --label [HOME]="$HOME" --network "host" --rm $(tty >/dev/null && echo "--tty") --ulimit $(echo nofile)="$(ulimit -n)" --user "root:$USER" --volume "${ALIASES_PWD:-$PWD}:$PWD" --volume "[HOME]:$HOME" --volume "$(echo $HOME):$(echo $HOME)" alpine:${ALPINE_VERSION:-"3.8"} "$@"
   exit $?
 else
-  docker run --env ${ALIASES_PWD:-$PWD}="$PWD" --interactive --label [HOME]="$HOME" --network "host" --rm $(test "$(if tty >/dev/null; then echo true; else echo false; fi)" = "true" && echo "--tty") --ulimit $(echo nofile)="$(ulimit -n)" --user "root:$USER" --volume "${ALIASES_PWD:-$PWD}:$PWD" --volume "[HOME]:$HOME" --volume "$(echo $HOME):$(echo $HOME)" alpine:${ALPINE_VERSION:-"3.8"} "$@"
+  echo "" >/dev/null | docker run --env ${ALIASES_PWD:-$PWD}="$PWD" --interactive --label [HOME]="$HOME" --network "host" --rm $(tty >/dev/null && echo "--tty") --ulimit $(echo nofile)="$(ulimit -n)" --user "root:$USER" --volume "${ALIASES_PWD:-$PWD}:$PWD" --volume "[HOME]:$HOME" --volume "$(echo $HOME):$(echo $HOME)" alpine:${ALPINE_VERSION:-"3.8"} "$@"
   exit $?
 fi

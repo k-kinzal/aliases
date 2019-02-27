@@ -29,6 +29,7 @@ test:
 
 .PHONY: integration
 integration: build
+	dist/aliases --version
 	@find test/integration/*/test.sh | xargs -I{} /bin/sh -c "{} || exit 255 && echo pass {}"
 
 .PHONY: clean

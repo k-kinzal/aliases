@@ -64,7 +64,7 @@ USAGE:
    aliases [global options] command [command options] [arguments...]
 
 VERSION:
-   v0.2.1
+   v0.3.0
 
 COMMANDS:
      gen      Generate aliases
@@ -131,6 +131,80 @@ Note: Always execute the generated command on the machine (host or docker) that 
 
 `$PWD` is a special environment variable.
 The `$PWD` specified on the left always points to `$PWD` of the host.
+
+## Exdent entrypoint
+
+```yaml
+/usr/local/bin/helm:
+  image: chatwork/helm
+  tag: 2.12.3
+  volume:
+  - $HOME/.helm:/root/.helm
+  - $PWD:/helm
+  workdir: /helm
+  dependencies:
+  - /bin/bash:
+      image: bash
+      tag: 5.0.2
+  - /bin/curl:
+      image: byrnedo/alpine-curl
+      tag: 0.1.7
+  entrypoint: |
+    #!/bin/sh
+    if [ -f $(helm home)/plugins/helm-import ]; then
+      helm plugin install https://github.com/k-kinzal/helm-import --version v0.2.1
+    if
+    helm "$@"
+```
+
+If you want to extend `entrypoint`, please define a string with shebang in `entrypoint`.
+
+NOTE: Please understand that extend entrypoint is less reproducible. It should be included in the docker image if possible.
+
+## Dependencies commands.
+
+`aliases` can define commands that depend on commands.
+
+```yaml
+/usr/local/bin/sops:
+  image: mozilla/sops
+  tag: a2d0328e35e6e37b51f3ad468dc6f213c7b44014 
+  env:
+    AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+    AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+    AWS_PROFILE: ${AWS_PROFILE}
+    AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
+  volume:
+  - $PWD:/sops
+  workdir: /sops
+
+/usr/local/bin/helm:
+  image: chatwork/helm
+  tag: 2.12.3
+  volume:
+  - $HOME/.helm:/root/.helm
+  - $PWD:/helm
+  workdir: /helm
+  dependencies:
+  - /usr/local/bin/sops
+  - /bin/bash:
+      image: bash
+      tag: 5.0.2
+  - /bin/curl:
+      image: byrnedo/alpine-curl
+      tag: 0.1.7
+```
+
+For dependency, reference to another command defined or define command.
+If you want to define a command that can only be called from a command, please recursively define the dependency.
+
+Also, parent commands inherit dependent parameters.
+
+```bash
+$ AWS_ACCESS_KEY_ID=xxx AWS_SECRET_ACCESS_KEY=xxx helm secrets enc ...
+```
+
+If the same parameter exists, the parent parameter takes precedence.
 
 ## How to debug aliases
 

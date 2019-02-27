@@ -1,0 +1,7 @@
+# Note: object in YAML are output in random order
+/usr/local/bin/alpine:
+  image: alpine
+  tag: 3.8
+  entrypoint: |
+    #!/bin/sh
+    echo 1
