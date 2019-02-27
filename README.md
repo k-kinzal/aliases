@@ -132,7 +132,7 @@ Note: Always execute the generated command on the machine (host or docker) that 
 `$PWD` is a special environment variable.
 The `$PWD` specified on the left always points to `$PWD` of the host.
 
-## Exdent entrypoint
+## Extend entrypoint
 
 ```yaml
 /usr/local/bin/helm:
