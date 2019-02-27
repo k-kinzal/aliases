@@ -8,7 +8,7 @@ commands:
       version:
         description: Install version.
         type: string
-        default: v0.2.1
+        default: v0.3.0
     steps:
     - restore_cache:
         key: aliases-<< parameters.version >>
