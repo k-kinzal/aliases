@@ -2,7 +2,6 @@ package docker
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -67,7 +66,6 @@ func (client *Client) ClientVersion() (*ClientVersion, error) {
 	out, err := cmd.Output()
 	if err != nil {
 		e, ok := err.(*exec.ExitError)
-		fmt.Fprintln(os.Stderr, string(e.Stderr))
 		if !ok {
 			return nil, err
 		}
