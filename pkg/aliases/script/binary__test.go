@@ -74,5 +74,5 @@ func ExampleDockerBinaryAdapter_Command() {
 	}
 	bin := script.AdaptDockerBinary(spec)
 	fmt.Println(bin.Command(client).String())
-	// Output: docker run --entrypoint "" --volume "/tmp/aliases/ExampleDockerBinaryAdapter_Command/docker:/share" docker:18.09.0 sh -c "cp -av $(which docker) /share/docker-18-09-0"
+	// Output: docker run --entrypoint "" --volume "/tmp/aliases/ExampleDockerBinaryAdapter_Command/docker:/share" docker:18.09.0 sh -c 'cp -av $(which docker) /share/docker-18-09-0'
 }

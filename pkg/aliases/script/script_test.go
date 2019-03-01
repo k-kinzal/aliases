@@ -111,7 +111,7 @@ func ExampleScript_WriteWithOverride() {
 	//
 	// DOCKER_BINARY_PATH="/tmp/aliases/ExampleScript_WriteWithOverride/docker/docker-18-09-0"
 	// if [ ! -f "${DOCKER_BINARY_PATH}" ]; then
-	//   docker run --entrypoint "" --volume "/tmp/aliases/ExampleScript_WriteWithOverride/docker:/share" docker:18.09.0 sh -c "cp -av $(which docker) /share/docker-18-09-0" >/dev/null
+	//   docker run --entrypoint "" --volume "/tmp/aliases/ExampleScript_WriteWithOverride/docker:/share" docker:18.09.0 sh -c 'cp -av $(which docker) /share/docker-18-09-0' >/dev/null
 	// fi
 	// if [ -p /dev/stdin ]; then
 	//   cat - | docker run --entrypoint "bash" --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --privileged --volume "/tmp/aliases/ExampleScript_WriteWithOverride:/tmp/aliases/ExampleScript_WriteWithOverride" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "/tmp/aliases/ExampleScript_WriteWithOverride/export/command2:/path/to/command2" alpine:${COMMAND1_VERSION:-"latest"} --posix -c "$@"

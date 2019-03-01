@@ -2,7 +2,7 @@
 
 DOCKER_BINARY_PATH="[HOME]/.aliases/docker/docker-18-09-0"
 if [ ! -f "${DOCKER_BINARY_PATH}" ]; then
-  docker run --entrypoint "" --volume "[HOME]/.aliases/docker:/share" docker:18.09.0 sh -c "cp -av $(which docker) /share/docker-18-09-0" >/dev/null
+  docker run --entrypoint "" --volume "[HOME]/.aliases/docker:/share" docker:18.09.0 sh -c 'cp -av $(which docker) /share/docker-18-09-0' >/dev/null
 fi
 
 if [ -p /dev/stdin ]; then
