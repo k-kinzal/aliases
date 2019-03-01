@@ -1,3 +1,8 @@
+## v0.3.1 - 2019-03-01
+
+Bug Fixes:
+* fixed use local docker binary path in docker download (https://github.com/k-kinzal/aliases/pull/65)
+
 ## v0.3.0 - 2019-02-18
 
 New Feature:
