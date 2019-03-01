@@ -43,7 +43,7 @@ func (adpt *DockerBinaryAdapter) Command(client *docker.Client) *posix.Cmd {
 	cmd := client.Run(image, []string{
 		"sh",
 		"-c",
-		fmt.Sprintf("cp -av $(which docker) /share/%s", adpt.FileName()),
+		fmt.Sprintf("'cp -av $(which docker) /share/%s'", adpt.FileName()),
 	}, docker.RunOption{
 		Entrypoint: (func(str string) *string { return &str })(""),
 		Volume: []string{

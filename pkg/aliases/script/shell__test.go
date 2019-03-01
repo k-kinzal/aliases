@@ -136,7 +136,7 @@ func ExampleShellAdapter_Command_hasDependencies() {
 	// Output:
 	// DOCKER_BINARY_PATH="/tmp/aliases/ExampleShellAdapter_Command_HasDependencies/docker/docker-18-09-0"
 	// if [ ! -f "${DOCKER_BINARY_PATH}" ]; then
-	//   docker run --entrypoint "" --volume "/tmp/aliases/ExampleShellAdapter_Command_HasDependencies/docker:/share" docker:18.09.0 sh -c "cp -av $(which docker) /share/docker-18-09-0" >/dev/null
+	//   docker run --entrypoint "" --volume "/tmp/aliases/ExampleShellAdapter_Command_HasDependencies/docker:/share" docker:18.09.0 sh -c 'cp -av $(which docker) /share/docker-18-09-0' >/dev/null
 	// fi
 	// if [ -p /dev/stdin ]; then
 	//   cat - | docker run --entrypoint "sh" --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --privileged --volume "/tmp/aliases/ExampleShellAdapter_Command_HasDependencies:/tmp/aliases/ExampleShellAdapter_Command_HasDependencies" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" alpine:${._VERSION:-"latest"} -c "$@"
