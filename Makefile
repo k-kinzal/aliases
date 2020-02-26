@@ -6,12 +6,8 @@ VERSION  := $(shell if [ -n "$(GIT_TAG)" ]; then echo "$(GIT_TAG)"; else echo "$
 
 DIST_DIR := $(shell if [ -n "$(GOOS)$(GOARCH)" ]; then echo "./dist/$(GOOS)-$(GOARCH)"; else echo "./dist"; fi)
 
-.PHONY: dep
-dep:
-	dep ensure -vendor-only=true
-
 .PHONY: build
-build: dep
+build:
 	go build -ldflags "-s -w -X github.com/$(USER)/$(REPO)/pkg/version.version=$(VERSION)" -o $(DIST_DIR)/aliases .
 
 .PHONY: cross-build
