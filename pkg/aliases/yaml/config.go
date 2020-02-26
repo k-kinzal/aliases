@@ -4,6 +4,12 @@ import (
 	"github.com/k-kinzal/aliases/pkg/types"
 )
 
+// DockerSpec is docker binary config to mount
+type DockerSpec struct {
+	Image string `yaml:"image" default:"docker"`
+	Tag   string `yaml:"tag" default:"18.09.0"`
+}
+
 // OptionSpec is the specification of option in aliases config
 //
 // ```
@@ -13,10 +19,7 @@ import (
 // ```
 type OptionSpec struct {
 	// binary settings
-	Docker struct {
-		Image string `yaml:"image" default:"docker"`
-		Tag   string `yaml:"tag" default:"18.09.0"`
-	} `yaml:"docker"`
+	Docker *DockerSpec
 	// docker run settings
 	Image   string   `yaml:"image" validate:"required"`
 	Tag     string   `yaml:"tag" validate:"required"`

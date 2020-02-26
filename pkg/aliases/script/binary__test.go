@@ -14,10 +14,10 @@ import (
 func ExampleDockerBinaryAdapter_Image() {
 	spec := yaml.Option{
 		OptionSpec: &yaml.OptionSpec{
-			Docker: struct {
-				Image string `yaml:"image" default:"docker"`
-				Tag   string `yaml:"tag" default:"18.09.0"`
-			}{Image: "docker", Tag: "18.09.0"},
+			Docker: &yaml.DockerSpec{
+				Image: "docker",
+				Tag:   "18.09.0",
+			},
 		},
 	}
 	bin := script.AdaptDockerBinary(spec)
@@ -28,10 +28,10 @@ func ExampleDockerBinaryAdapter_Image() {
 func ExampleDockerBinaryAdapter_Tag() {
 	spec := yaml.Option{
 		OptionSpec: &yaml.OptionSpec{
-			Docker: struct {
-				Image string `yaml:"image" default:"docker"`
-				Tag   string `yaml:"tag" default:"18.09.0"`
-			}{Image: "docker", Tag: "18.09.0"},
+			Docker: &yaml.DockerSpec{
+				Image: "docker",
+				Tag:   "18.09.0",
+			},
 		},
 	}
 	bin := script.AdaptDockerBinary(spec)
@@ -42,10 +42,10 @@ func ExampleDockerBinaryAdapter_Tag() {
 func ExampleDockerBinaryAdapter_FileName() {
 	spec := yaml.Option{
 		OptionSpec: &yaml.OptionSpec{
-			Docker: struct {
-				Image string `yaml:"image" default:"docker"`
-				Tag   string `yaml:"tag" default:"18.09.0"`
-			}{Image: "docker", Tag: "18.09.0"},
+			Docker: &yaml.DockerSpec{
+				Image: "docker",
+				Tag:   "18.09.0",
+			},
 		},
 	}
 	bin := script.AdaptDockerBinary(spec)
@@ -66,10 +66,10 @@ func ExampleDockerBinaryAdapter_Command() {
 	}
 	spec := yaml.Option{
 		OptionSpec: &yaml.OptionSpec{
-			Docker: struct {
-				Image string `yaml:"image" default:"docker"`
-				Tag   string `yaml:"tag" default:"18.09.0"`
-			}{Image: "docker", Tag: "18.09.0"},
+			Docker: &yaml.DockerSpec{
+				Image: "docker",
+				Tag:   "18.09.0",
+			},
 		},
 	}
 	bin := script.AdaptDockerBinary(spec)

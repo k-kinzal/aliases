@@ -19,8 +19,8 @@ import (
 )
 
 var content = `
-{{- if .dependencies }}
-DOCKER_BINARY_PATH="{{ .binaryPath }}/{{ .binary.filename }}"
+{{- if .binary }}
+DOCKER_BINARY_PATH="{{ .binary.path }}/{{ .binary.filename }}"
 if [ ! -f "${DOCKER_BINARY_PATH}" ]; then
   {{ .binary.command }} >/dev/null
 fi
@@ -73,7 +73,7 @@ func (adpt *ShellAdapter) Command(client *docker.Client, overrideArgs []string, 
 		overrideOption.Volume = append(overrideOption.Volume, fmt.Sprintf("%s:%s", path, entrypoint))
 	}
 	// docker info
-	if len(spec.Dependencies) > 0 {
+	if spec.Docker != nil {
 		if overrideOption.Env == nil {
 			overrideOption.Env = make(map[string]string)
 		}
@@ -131,12 +131,15 @@ func (adpt *ShellAdapter) Command(client *docker.Client, overrideArgs []string, 
 	data := map[string]interface{}{
 		"command":      runner.Command(client, overrideArgs, overrideOption).String(),
 		"dependencies": len(spec.Dependencies) > 0,
-		"binary": map[string]string{
+		"binary":       nil,
+		"debug":        debug,
+	}
+	if spec.Docker != nil {
+		data["binary"] = map[string]string{
 			"command":  bin.Command(client).String(),
 			"filename": bin.FileName(),
-		},
-		"binaryPath": context.BinaryPath(),
-		"debug":      debug,
+			"path":     context.BinaryPath(),
+		}
 	}
 
 	var tpl bytes.Buffer

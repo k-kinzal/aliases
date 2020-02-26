@@ -109,10 +109,10 @@ func ExampleShellAdapter_Command_hasDependencies() {
 	}
 	spec := yaml.Option{
 		OptionSpec: &yaml.OptionSpec{
-			Docker: struct {
-				Image string `yaml:"image" default:"docker"`
-				Tag   string `yaml:"tag" default:"18.09.0"`
-			}{Image: "docker", Tag: "18.09.0"},
+			Docker: &yaml.DockerSpec{
+				Image: "docker",
+				Tag:   "18.09.0",
+			},
 			Image:      "alpine",
 			Tag:        "latest",
 			Entrypoint: (func(str string) *string { return &str })("sh"),

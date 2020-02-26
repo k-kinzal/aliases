@@ -176,6 +176,13 @@ func Unmarshal(buf []byte) (*Config, error) {
 		if err := v.Struct(option.OptionSpec); err != nil {
 			return nil, Errorf("%s in `%s`", err, path)
 		}
+		if len(option.Dependencies) > 0 && option.Docker == nil {
+			dockerSpec := &DockerSpec{}
+			if err := defaults.Set(dockerSpec); err != nil {
+				panic(err)
+			}
+			option.Docker = dockerSpec
+		}
 		if err := defaults.Set(option.OptionSpec); err != nil {
 			panic(err)
 		}
