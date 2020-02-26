@@ -9,14 +9,14 @@ commands:
   go_cache_restore:
     steps:
     - restore_cache:
-        key: v1-gopkg-{{ checksum "Gopkg.lock" }}
+        key: v1-gomod-{{ checksum "go.sum" }}
         paths:
         - vendor
 
   go_cache_save:
     steps:
     - save_cache:
-        key: v1-gopkg-{{ checksum "Gopkg.lock" }}
+        key: v1-gomod-{{ checksum "go.sum" }}
         paths:
         - vendor
 
@@ -50,7 +50,8 @@ jobs:
     machine: true
     steps:
     - checkout
-    - aliases/install
+    - aliases/install:
+        version: v0.4.0
     - aliases/gen
     - go_cache_restore
     - run: make build
