@@ -3,7 +3,7 @@ version: "2.1"
 orbs:
   cli: circleci/circleci-cli@0.1.2
   orb-tools: circleci/orb-tools@2.0.2
-  aliases: k-kinzal/aliases@0.3.1
+  aliases: k-kinzal/aliases@0.4.0
 
 commands:
   go_cache_restore:

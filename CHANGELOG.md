@@ -1,3 +1,8 @@
+## v0.4.0 - 2020-02-26
+
+New Feature:
+* Changes to be able to mount docker binary without dependencies (#67)
+
 ## v0.3.1 - 2019-03-01
 
 Bug Fixes:

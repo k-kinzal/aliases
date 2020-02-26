@@ -64,7 +64,7 @@ USAGE:
    aliases [global options] command [command options] [arguments...]
 
 VERSION:
-   v0.3.1
+   v0.4.0
 
 COMMANDS:
      gen      Generate aliases
