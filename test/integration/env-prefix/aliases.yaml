@@ -1,0 +1,11 @@
+# Note: object in YAML are output in random order
+/usr/local/bin/alpine1:
+  image: alpine
+  tag: 3.8
+  envPrefix:
+    - FOO_
+/usr/local/bin/alpine2:
+  image: alpine
+  tag: 3.8
+  dependencies:
+    - /usr/local/bin/alpine1

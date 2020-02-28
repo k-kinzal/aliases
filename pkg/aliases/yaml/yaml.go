@@ -6,6 +6,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/k-kinzal/aliases/pkg/util"
+
 	"github.com/k-kinzal/aliases/pkg/types"
 
 	"github.com/creasty/defaults"
@@ -129,6 +131,31 @@ func Unmarshal(buf []byte) (*Config, error) {
 			if err := mergo.Map(&dst, src, mergo.WithAppendSlice); err != nil {
 				panic(err)
 			}
+			dst.AddHost = util.UniqueStringSlice(dst.AddHost)
+			dst.Attach = util.UniqueStringSlice(dst.Attach)
+			dst.CapAdd = util.UniqueStringSlice(dst.CapAdd)
+			dst.CapDrop = util.UniqueStringSlice(dst.CapDrop)
+			dst.DNS = util.UniqueStringSlice(dst.DNS)
+			dst.DNSOption = util.UniqueStringSlice(dst.DNSOption)
+			dst.DNSSearch = util.UniqueStringSlice(dst.DNSSearch)
+			dst.Device = util.UniqueStringSlice(dst.Device)
+			dst.DeviceCgroupRule = util.UniqueStringSlice(dst.DeviceCgroupRule)
+			dst.DeviceReadBPS = util.UniqueStringSlice(dst.DeviceReadBPS)
+			dst.DeviceReadIOPS = util.UniqueStringSlice(dst.DeviceReadIOPS)
+			dst.DeviceWriteBPS = util.UniqueStringSlice(dst.DeviceWriteBPS)
+			dst.DeviceWriteIOPS = util.UniqueStringSlice(dst.DeviceWriteIOPS)
+			dst.EnvFile = util.UniqueStringSlice(dst.EnvFile)
+			dst.Expose = util.UniqueStringSlice(dst.Expose)
+			dst.GroupAdd = util.UniqueStringSlice(dst.GroupAdd)
+			dst.LabelFile = util.UniqueStringSlice(dst.LabelFile)
+			dst.Link = util.UniqueStringSlice(dst.Link)
+			dst.LinkLocalIP = util.UniqueStringSlice(dst.LinkLocalIP)
+			dst.NetworkAlias = util.UniqueStringSlice(dst.NetworkAlias)
+			dst.Publish = util.UniqueStringSlice(dst.Publish)
+			dst.Tmpfs = util.UniqueStringSlice(dst.Tmpfs)
+			dst.Volume = util.UniqueStringSlice(dst.Volume)
+			dst.VolumesFrom = util.UniqueStringSlice(dst.VolumesFrom)
+			dst.EnvPrefix = util.UniqueStringSlice(dst.EnvPrefix)
 		}
 		option.OptionSpec = &dst
 		conf.Set(path, *option)
@@ -161,6 +188,31 @@ func Unmarshal(buf []byte) (*Config, error) {
 			if err := mergo.Map(&dst, src, mergo.WithAppendSlice); err != nil {
 				panic(err)
 			}
+			dst.AddHost = util.UniqueStringSlice(dst.AddHost)
+			dst.Attach = util.UniqueStringSlice(dst.Attach)
+			dst.CapAdd = util.UniqueStringSlice(dst.CapAdd)
+			dst.CapDrop = util.UniqueStringSlice(dst.CapDrop)
+			dst.DNS = util.UniqueStringSlice(dst.DNS)
+			dst.DNSOption = util.UniqueStringSlice(dst.DNSOption)
+			dst.DNSSearch = util.UniqueStringSlice(dst.DNSSearch)
+			dst.Device = util.UniqueStringSlice(dst.Device)
+			dst.DeviceCgroupRule = util.UniqueStringSlice(dst.DeviceCgroupRule)
+			dst.DeviceReadBPS = util.UniqueStringSlice(dst.DeviceReadBPS)
+			dst.DeviceReadIOPS = util.UniqueStringSlice(dst.DeviceReadIOPS)
+			dst.DeviceWriteBPS = util.UniqueStringSlice(dst.DeviceWriteBPS)
+			dst.DeviceWriteIOPS = util.UniqueStringSlice(dst.DeviceWriteIOPS)
+			dst.EnvFile = util.UniqueStringSlice(dst.EnvFile)
+			dst.Expose = util.UniqueStringSlice(dst.Expose)
+			dst.GroupAdd = util.UniqueStringSlice(dst.GroupAdd)
+			dst.LabelFile = util.UniqueStringSlice(dst.LabelFile)
+			dst.Link = util.UniqueStringSlice(dst.Link)
+			dst.LinkLocalIP = util.UniqueStringSlice(dst.LinkLocalIP)
+			dst.NetworkAlias = util.UniqueStringSlice(dst.NetworkAlias)
+			dst.Publish = util.UniqueStringSlice(dst.Publish)
+			dst.Tmpfs = util.UniqueStringSlice(dst.Tmpfs)
+			dst.Volume = util.UniqueStringSlice(dst.Volume)
+			dst.VolumesFrom = util.UniqueStringSlice(dst.VolumesFrom)
+			dst.EnvPrefix = util.UniqueStringSlice(dst.EnvPrefix)
 		}
 		option.OptionSpec = &dst
 		conf.Set(path, *option)

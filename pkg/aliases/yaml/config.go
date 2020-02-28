@@ -118,6 +118,8 @@ type OptionSpec struct {
 	VolumeDriver        *string           `yaml:"volumeDriver"`
 	VolumesFrom         []string          `yaml:"volumesFrom"`
 	Workdir             *string           `yaml:"workdir"`
+	// extend docker run option settings
+	EnvPrefix []string `yaml:"envPrefix"`
 	// dependency
 	Dependencies []DependencySpec `yaml:"dependencies"`
 }

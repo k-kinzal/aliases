@@ -3,6 +3,7 @@ package script_test
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/k-kinzal/aliases/pkg/aliases/context"
@@ -15,9 +16,21 @@ func ExampleScript_Write() {
 	if err := context.ChangeHomePath("/tmp/aliases/ExampleScript_Write"); err != nil {
 		panic(err)
 	}
+
+	file, err := os.Create("/tmp/aliases.yaml")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	if err := context.ChangeConfPath(file.Name()); err != nil {
+		panic(err)
+	}
+
 	if err := context.ChangeExportPath("/tmp/aliases/ExampleScript_Write/export"); err != nil {
 		panic(err)
 	}
+
 	client, err := docker.NewClient()
 	if err != nil {
 		panic(err)
