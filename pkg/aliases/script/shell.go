@@ -10,6 +10,8 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/Masterminds/sprig"
+
 	"github.com/k-kinzal/aliases/pkg/types"
 
 	"github.com/k-kinzal/aliases/pkg/aliases/context"
@@ -24,6 +26,15 @@ DOCKER_BINARY_PATH="{{ .binary.path }}/{{ .binary.filename }}"
 if [ ! -f "${DOCKER_BINARY_PATH}" ]; then
   {{ .binary.command }} >/dev/null
 fi
+{{- end }}
+{{- if .envPrefix }}
+TEMPDIR="{{ .temporaryPath }}"
+{{- range $prefix := .envPrefix }}
+touch ${TEMPDIR}/{{ $prefix | lower | trimSuffix "_" }}.env
+for line in $(env | grep "^{{ $prefix }}"); do
+  echo "${line#{{ $prefix }}}" >> ${TEMPDIR}/{{ $prefix | lower | trimSuffix "_" }}.env
+done
+{{- end }}
 {{- end }}
 {{- if .debug }}
 echo "\033[0;90m{{ .command | replace "\\n" "\\\\n" | replace "\r" "\\r" | quote }}\033[0m"
@@ -90,6 +101,10 @@ func (adpt *ShellAdapter) Command(client *docker.Client, overrideArgs []string, 
 			overrideOption.Env["DOCKER_HOST"] = client.Host()
 		}
 	}
+	//
+	for _, prefix := range spec.EnvPrefix {
+		overrideOption.EnvFile = append(overrideOption.EnvFile, "${TEMPDIR}/"+strings.Trim(strings.ToLower(prefix), "_")+".env")
+	}
 	// resolve dependency commands
 	for _, dependency := range spec.Dependencies {
 		path := filepath.Join(context.ExportPath(), dependency.Namespace(), dependency.Path.Base())
@@ -126,13 +141,15 @@ func (adpt *ShellAdapter) Command(client *docker.Client, overrideArgs []string, 
 		},
 	}
 
-	tmpl := template.Must(template.New(adpt.Path.Name()).Funcs(funcs).Parse(content))
+	tmpl := template.Must(template.New(adpt.Path.Name()).Funcs(sprig.TxtFuncMap()).Funcs(funcs).Parse(content))
 
 	data := map[string]interface{}{
-		"command":      runner.Command(client, overrideArgs, overrideOption).String(),
-		"dependencies": len(spec.Dependencies) > 0,
-		"binary":       nil,
-		"debug":        debug,
+		"command":       runner.Command(client, overrideArgs, overrideOption).String(),
+		"envPrefix":     spec.EnvPrefix,
+		"dependencies":  len(spec.Dependencies) > 0,
+		"binary":        nil,
+		"debug":         debug,
+		"temporaryPath": context.TemporaryPath(),
 	}
 	if spec.Docker != nil {
 		data["binary"] = map[string]string{

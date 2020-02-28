@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path"
+
+	"github.com/k-kinzal/aliases/pkg/types"
 )
 
 var (
@@ -91,5 +93,15 @@ func BinaryPath() string {
 	if _, err := os.Stat(p); os.IsNotExist(err) {
 		_ = makeDir(binaryPath)
 	}
+
+	return p
+}
+
+func TemporaryPath() string {
+	p := path.Join(HomePath(), "tmp", types.MD5(ConfPath()))
+	if _, err := os.Stat(p); os.IsNotExist(err) {
+		_ = makeDir(p)
+	}
+
 	return p
 }
