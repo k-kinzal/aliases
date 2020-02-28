@@ -2,7 +2,7 @@
 
 set -eu
 
-TEMP_DIR=$(mktemp -d)
+TEMP_DIR=$(mktemp -d /tmp/XXXX)
 TEST_DIR="$(cd "$(dirname "${0}")"; echo "$(pwd)")"
 
 ALIASES=$(cd "${TEST_DIR}/../../../dist"; echo "$(pwd)/aliases -c ${TEST_DIR}/aliases.yaml")
