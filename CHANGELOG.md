@@ -1,3 +1,8 @@
+## v0.5.0 - 2020-02-28
+
+New Feature:
+* Added `envPrefix` parameter to the schema. It passed env when the environment variable name prefix matched (#68)
+
 ## v0.4.0 - 2020-02-26
 
 New Feature:
@@ -6,7 +11,7 @@ New Feature:
 ## v0.3.1 - 2019-03-01
 
 Bug Fixes:
-* fixed use local docker binary path in docker download (https://github.com/k-kinzal/aliases/pull/65)
+* Fixed use local docker binary path in docker download (https://github.com/k-kinzal/aliases/pull/65)
 
 ## v0.3.0 - 2019-02-18
 
@@ -28,7 +33,7 @@ Misc:
 ## v0.2.1 - 2019-01-06
 
 Bug Fixes:
-* command and arguments were not passed in `aliases run` (https://github.com/k-kinzal/aliases/pull/47)
+* Command and arguments were not passed in `aliases run` (https://github.com/k-kinzal/aliases/pull/47)
 
 ## v0.2.0 - 2019-01-02
 
