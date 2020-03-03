@@ -18,5 +18,5 @@ ${ALIASES} gen --export --export-path "${TEMP_DIR}" | ${MASK} | ${DIFF} ${TEST_D
 cat ${TEMP_DIR}/alpine1 | ${MASK} | ${DIFF} ${TEST_DIR}/alpine1 -
 cat ${TEMP_DIR}/alpine2 | ${MASK} | ${DIFF} ${TEST_DIR}/alpine2 -
 
-${TEMP_DIR}/alpine2 /bin/sh -c 'alpine1 sh -c "env"' | grep PASS_ENV | ${DIFF} ${TEST_DIR}/stdout -
-${ALIASES} run /usr/local/bin/alpine2 /bin/sh -c 'alpine1 sh -c "env"' | ${MASK} | grep PASS_ENV | ${DIFF} ${TEST_DIR}/stdout -
+#${TEMP_DIR}/alpine2 /bin/sh -c 'alpine1 sh -c "env"' | grep PASS_ENV | ${DIFF} ${TEST_DIR}/stdout -
+${ALIASES} -v run /usr/local/bin/alpine2 /bin/sh -c 'alpine1 sh -c "env"' | ${MASK} | grep PASS_ENV | ${DIFF} ${TEST_DIR}/stdout -

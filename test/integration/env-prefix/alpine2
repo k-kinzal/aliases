@@ -5,10 +5,12 @@ if [ ! -f "${DOCKER_BINARY_PATH}" ]; then
   docker run --entrypoint "" --volume "[HOME]/.aliases/docker:/share" docker:18.09.0 sh -c 'cp -av $(which docker) /share/docker-18-09-0' >/dev/null
 fi
 TEMPDIR="[ALIASE_TEMP_DIR]"
-touch ${TEMPDIR}/foo.env
-for line in $(env | grep "^FOO_"); do
-  echo "${line#FOO_}" >> ${TEMPDIR}/foo.env
-done
+if [ -z "${ALIASES_PWD}" ]; then
+  echo "" > ${TEMPDIR}/foo.env
+  for line in $(env | grep "^FOO_"); do
+    echo "${line#FOO_}" >> ${TEMPDIR}/foo.env
+  done
+fi
 if [ -p /dev/stdin ]; then
   cat - | docker run --env ALIASES_PWD="${ALIASES_PWD:-$PWD}" --env-file "${TEMPDIR}/foo.env" --interactive --network "host" --privileged --rm $(tty >/dev/null && echo "--tty") --volume "[HOME]/.aliases:[HOME]/.aliases" --volume "${DOCKER_BINARY_PATH}:/usr/local/bin/docker" --volume "/var/run/docker.sock:/var/run/docker.sock" --volume "[TEMP_DIR]/alpine1:/usr/local/bin/alpine1" alpine:${ALPINE2_VERSION:-"3.8"} "$@"
   exit $?
