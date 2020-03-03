@@ -149,7 +149,7 @@ func (adpt *ShellAdapter) Command(client *docker.Client, overrideArgs []string, 
 		"dependencies":  len(spec.Dependencies) > 0,
 		"binary":        nil,
 		"debug":         debug,
-		"temporaryPath": context.TemporaryPath(),
+		"temporaryPath": context.TemporaryPath(spec),
 	}
 	if spec.Docker != nil {
 		data["binary"] = map[string]string{

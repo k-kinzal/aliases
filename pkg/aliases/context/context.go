@@ -97,8 +97,8 @@ func BinaryPath() string {
 	return p
 }
 
-func TemporaryPath() string {
-	p := path.Join(HomePath(), "tmp", types.MD5(ConfPath()))
+func TemporaryPath(spec interface{}) string {
+	p := path.Join(HomePath(), "tmp", types.MD5(spec))
 	if _, err := os.Stat(p); os.IsNotExist(err) {
 		_ = makeDir(p)
 	}
