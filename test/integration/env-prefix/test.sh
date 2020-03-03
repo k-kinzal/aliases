@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -eu
+set -euv
 
 TEMP_DIR=$(mktemp -d /tmp/XXXX)
 TEST_DIR="$(cd "$(dirname "${0}")"; echo "$(pwd)")"
@@ -15,7 +15,9 @@ export FOO_PASS_ENV3="3"
 
 ${ALIASES} gen --export-path "${TEMP_DIR}" | ${MASK} | sort | ${DIFF} ${TEST_DIR}/alias -
 ${ALIASES} gen --export --export-path "${TEMP_DIR}" | ${MASK} | ${DIFF} ${TEST_DIR}/export -
+cat ${TEMP_DIR}/alpine1
 cat ${TEMP_DIR}/alpine1 | ${MASK} | ${DIFF} ${TEST_DIR}/alpine1 -
+cat ${TEMP_DIR}/alpine2
 cat ${TEMP_DIR}/alpine2 | ${MASK} | ${DIFF} ${TEST_DIR}/alpine2 -
 
 ${TEMP_DIR}/alpine2 /bin/sh -c 'alpine1 sh -c "env"' | grep PASS_ENV | ${DIFF} ${TEST_DIR}/stdout -
