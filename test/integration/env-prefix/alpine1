@@ -1,10 +1,12 @@
 #!/bin/sh
 
 TEMPDIR="[ALIASE_TEMP_DIR]"
-touch ${TEMPDIR}/foo.env
-for line in $(env | grep "^FOO_"); do
-  echo "${line#FOO_}" >> ${TEMPDIR}/foo.env
-done
+if [ -z "${ALIASES_PWD}" ]; then
+  echo "" > ${TEMPDIR}/foo.env
+  for line in $(env | grep "^FOO_"); do
+    echo "${line#FOO_}" >> ${TEMPDIR}/foo.env
+  done
+fi
 if [ -p /dev/stdin ]; then
   cat - | docker run --env-file "${TEMPDIR}/foo.env" --interactive --network "host" --rm $(tty >/dev/null && echo "--tty") alpine:${ALPINE1_VERSION:-"3.8"} "$@"
   exit $?

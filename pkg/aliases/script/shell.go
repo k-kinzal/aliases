@@ -30,10 +30,12 @@ fi
 {{- if .envPrefix }}
 TEMPDIR="{{ .temporaryPath }}"
 {{- range $prefix := .envPrefix }}
-touch ${TEMPDIR}/{{ $prefix | lower | trimSuffix "_" }}.env
-for line in $(env | grep "^{{ $prefix }}"); do
-  echo "${line#{{ $prefix }}}" >> ${TEMPDIR}/{{ $prefix | lower | trimSuffix "_" }}.env
-done
+if [ -z "${ALIASES_PWD}" ]; then
+  echo "" > ${TEMPDIR}/{{ $prefix | lower | trimSuffix "_" }}.env
+  for line in $(env | grep "^{{ $prefix }}"); do
+    echo "${line#{{ $prefix }}}" >> ${TEMPDIR}/{{ $prefix | lower | trimSuffix "_" }}.env
+  done
+fi
 {{- end }}
 {{- end }}
 {{- if .debug }}
