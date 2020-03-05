@@ -1,3 +1,10 @@
+## v0.5.1 - 2020-03-05
+
+Bug Fixes:
+* Fixed an issue where `envPrefix` always appended to `.env`. update `.env` only when run on host (#70)
+* Stop using hash of conf path for temp dir generation (#71)
+
+
 ## v0.5.0 - 2020-02-28
 
 New Feature:
